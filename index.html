@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master the DevOps Game — Zero to Pro Roadmap 2026</title>
+    <meta name="description" content="Complete DevOps Roadmap 2026: From Zero to Professional. 16 Modules, 24+ Real-Time Projects. Inspired by TechWorld with Nana Bootcamp.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <canvas id="bgNetwork" aria-hidden="true"></canvas>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">⚙️</span>
+                <span class="logo-text">DevOps<span class="logo-accent">Roadmap</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#overview" class="nav-link">Overview</a>
+                <a href="#roadmap" class="nav-link">Roadmap</a>
+                <div class="nav-dropdown" id="modulesDropdown">
+                    <button class="nav-link nav-dropdown-btn" id="modulesBtn" aria-haspopup="true" aria-expanded="false">Modules <span class="caret">▾</span></button>
+                    <div class="nav-dropdown-menu" id="modulesMenu">
+                        <a href="module-01.html" class="dropdown-item live"><span class="di-num">01</span><span class="di-title">Introduction to DevOps</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-02.html" class="dropdown-item live"><span class="di-num">02</span><span class="di-title">Operating Systems &amp; Linux</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-03.html" class="dropdown-item live"><span class="di-num">03</span><span class="di-title">Version Control with Git &amp; GitHub</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-04.html" class="dropdown-item live"><span class="di-num">04</span><span class="di-title">Networking &amp; Security Fundamentals</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-05.html" class="dropdown-item live"><span class="di-num">05</span><span class="di-title">Build &amp; Package Manager Tools</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-06.html" class="dropdown-item live"><span class="di-num">06</span><span class="di-title">Artifact Repository Manager (Nexus)</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-07.html" class="dropdown-item live"><span class="di-num">07</span><span class="di-title">CI/CD with Jenkins</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-08.html" class="dropdown-item live"><span class="di-num">08</span><span class="di-title">Containers with Docker</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="module-09.html" class="dropdown-item live"><span class="di-num">09</span><span class="di-title">CI/CD Pipeline + Docker Integration</span><span class="di-badge">FULL PAGE</span></a>
+                        <a href="#module-10" class="dropdown-item"><span class="di-num">10</span><span class="di-title">Introduction to Cloud &amp; AWS</span></a>
+                        <a href="#module-11" class="dropdown-item"><span class="di-num">11</span><span class="di-title">Container Orchestration with Kubernetes</span></a>
+                        <a href="#module-12" class="dropdown-item"><span class="di-num">12</span><span class="di-title">Kubernetes on AWS — EKS</span></a>
+                        <a href="#module-13" class="dropdown-item"><span class="di-num">13</span><span class="di-title">Infrastructure as Code with Terraform</span></a>
+                        <a href="#module-14" class="dropdown-item"><span class="di-num">14</span><span class="di-title">Programming &amp; Automation with Python</span></a>
+                        <a href="#module-15" class="dropdown-item"><span class="di-num">15</span><span class="di-title">Configuration Management with Ansible</span></a>
+                        <a href="#module-16" class="dropdown-item"><span class="di-num">16</span><span class="di-title">Monitoring &amp; Observability</span></a>
+                        <a href="#module-17" class="dropdown-item"><span class="di-num">17</span><span class="di-title">GitOps with ArgoCD</span></a>
+                        <a href="#module-18" class="dropdown-item"><span class="di-num">18</span><span class="di-title">DevSecOps — Security in DevOps</span></a>
+                        <a href="#module-19" class="dropdown-item"><span class="di-num">19</span><span class="di-title">SRE &amp; Platform Engineering</span></a>
+                        <a href="#module-20" class="dropdown-item"><span class="di-num">20</span><span class="di-title">AI in DevOps &amp; Career Mastery</span></a>
+                    </div>
+                </div>
+                <a href="project1.html" class="nav-link">Capstone Project</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Self-Paced Online Bootcamp • 15 hrs/week
+            </div>
+            <h1 class="hero-title">
+                Master the<br>
+                <span class="gradient-text">DevOps Game</span>
+            </h1>
+            <p class="hero-subtitle">
+                Go from <strong>Zero</strong> to <strong>DevOps Professional</strong><br>
+                16 Modules • 24+ Real-Time Projects • Complete Roadmap
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-number" data-target="16">0</span>
+                    <span class="hero-stat-label">Modules</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number" data-target="24">0</span>
+                    <span class="hero-stat-label">Projects</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number" data-target="50">0</span>
+                    <span class="hero-stat-label">Topics</span>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a href="#roadmap" class="btn btn-primary">
+                    <span>Explore Roadmap</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#overview" class="btn btn-ghost">
+                    <span>View Overview</span>
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="orbit-system">
+                <div class="orbit orbit-1"><div class="orbit-dot" style="--delay:0s">🐧</div></div>
+                <div class="orbit orbit-2"><div class="orbit-dot" style="--delay:2s">🐳</div></div>
+                <div class="orbit orbit-3"><div class="orbit-dot" style="--delay:4s">☸️</div></div>
+                <div class="center-icon">🚀</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section class="section" id="overview">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Overview</span>
+                <h2 class="section-title">Technologies & Skills You'll <span class="gradient-text">Master</span></h2>
+                <p class="section-desc">A structured journey through every essential DevOps concept, tool, and practice</p>
+            </div>
+            <div class="overview-grid">
+                <div class="overview-card" data-phase="1">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🏗️</div>
+                    <h3>Phase 1: Foundations</h3>
+                    <p>OS, Linux, Git, Build Tools, Artifact Repos</p>
+                    <div class="card-tech-tags">
+                        <span>Linux</span><span>Git</span><span>Gradle</span><span>Maven</span><span>Nexus</span>
+                    </div>
+                    <div class="card-meta">Weeks 1–6 • 5 Topics</div>
+                </div>
+                <div class="overview-card" data-phase="2">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🔄</div>
+                    <h3>Phase 2: CI/CD Pipeline</h3>
+                    <p>Jenkins, Pipeline as Code, Shared Libraries</p>
+                    <div class="card-tech-tags">
+                        <span>Jenkins</span><span>Pipelines</span><span>Webhooks</span><span>Shared Libs</span>
+                    </div>
+                    <div class="card-meta">Weeks 7–10 • 3 Topics</div>
+                </div>
+                <div class="overview-card" data-phase="3">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🐳</div>
+                    <h3>Phase 3: Containers</h3>
+                    <p>Docker, Kubernetes, Container Registries</p>
+                    <div class="card-tech-tags">
+                        <span>Docker</span><span>K8s</span><span>Helm</span><span>ECR</span><span>Docker Hub</span>
+                    </div>
+                    <div class="card-meta">Weeks 11–16 • 4 Topics</div>
+                </div>
+                <div class="overview-card" data-phase="4">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">☁️</div>
+                    <h3>Phase 4: Cloud & IaC</h3>
+                    <p>AWS, Terraform, Python, Ansible</p>
+                    <div class="card-tech-tags">
+                        <span>AWS</span><span>Terraform</span><span>Python</span><span>Ansible</span>
+                    </div>
+                    <div class="card-meta">Weeks 17–24 • 5 Topics</div>
+                </div>
+                <div class="overview-card" data-phase="5">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">📊</div>
+                    <h3>Phase 5: Monitoring</h3>
+                    <p>Prometheus, Grafana, Alerting</p>
+                    <div class="card-tech-tags">
+                        <span>Prometheus</span><span>Grafana</span><span>AlertManager</span>
+                    </div>
+                    <div class="card-meta">Weeks 25–27 • 2 Topics</div>
+                </div>
+                <div class="overview-card" data-phase="6">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🛡️</div>
+                    <h3>Phase 6: Pro Level</h3>
+                    <p>DevSecOps, GitOps, Platform Engineering</p>
+                    <div class="card-tech-tags">
+                        <span>ArgoCD</span><span>Security</span><span>SRE</span><span>AI Ops</span>
+                    </div>
+                    <div class="card-meta">Weeks 28–30+ • 4 Topics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="section section-dark" id="roadmap">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Full Roadmap</span>
+                <h2 class="section-title">Complete Topic Breakdown with <span class="gradient-text">Real-Time Projects</span></h2>
+                <p class="section-desc">Click any module to expand and see all subtopics and the hands-on project</p>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Modules</button>
+                <button class="filter-tab" data-filter="beginner">🟢 Beginner</button>
+                <button class="filter-tab" data-filter="intermediate">🟡 Intermediate</button>
+                <button class="filter-tab" data-filter="advanced">🔴 Advanced</button>
+                <button class="filter-tab" data-filter="pro">🟣 Pro</button>
+            </div>
+
+            <!-- Roadmap Timeline -->
+            <div class="roadmap-timeline" id="roadmapTimeline">
+
+                <!-- ======================================== -->
+                <!-- MODULE 1: Introduction to DevOps -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-1" data-level="beginner" data-module="1">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>01</span></div>
+                        <div class="module-info">
+                            <span class="module-level beginner">Beginner</span>
+                            <h3>Introduction to DevOps</h3>
+                            <p>Understanding the DevOps culture, lifecycle, and how it bridges Dev + Ops</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>What is DevOps — Culture, Principles & Practices</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>Software Development Life Cycle (SDLC)</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>Waterfall vs Agile vs DevOps</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>Roles & Responsibilities of a DevOps Engineer</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>DevOps Lifecycle Phases: Plan → Code → Build → Test → Release → Deploy → Operate → Monitor</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>Continuous Integration, Continuous Delivery & Continuous Deployment concepts</span>
+                            </div>
+                            <div class="topic-item">
+                                <span class="topic-bullet"></span>
+                                <span>DevOps Toolchain Overview & How Tools Fit Together</span>
+                            </div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>DevOps Toolchain Mapping Document</h4>
+                            <p>Create a comprehensive DevOps toolchain diagram mapping each lifecycle phase to specific tools. Document the flow of code from developer commit to production deployment.</p>
+                            <p style="margin-top: 12px;"><a href="module-01.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 2: Operating Systems & Linux -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-2" data-level="beginner" data-module="2">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>02</span></div>
+                        <div class="module-info">
+                            <span class="module-level beginner">Beginner</span>
+                            <h3>Operating Systems & Linux</h3>
+                            <p>Master Linux CLI, system administration, and shell scripting for server management</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Introduction to Operating Systems — Windows, macOS, Linux</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Virtualization Concepts — Virtual Machines, Hypervisors</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Installing Linux (Ubuntu) — VM setup with VirtualBox</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Linux File System & Directory Structure</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Essential CLI Commands — ls, cd, cp, mv, rm, find, grep, awk, sed</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>File Permissions & Ownership — chmod, chown, umask</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>User & Group Management</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Package Management — apt, yum, snap</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Process Management — ps, top, htop, kill, systemctl</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Networking Basics — IP, DNS, SSH, curl, wget, netstat, ports</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Shell Scripting with Bash — Variables, Loops, Functions, Conditionals</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Environment Variables & PATH configuration</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Cron Jobs & Task Scheduling</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>SSH Key-based Authentication & Remote Server Access</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Vim/Nano Editor Basics</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Linux Server Setup & Automation Scripts</h4>
+                            <p>Set up an Ubuntu server on a VM. Write Bash scripts to automate user creation, install required packages (Nginx, Node.js), configure firewall rules, and set up cron jobs for automated backups. SSH into the server remotely and manage services.</p>
+                            <p style="margin-top: 12px;"><a href="module-02.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 3: Version Control with Git -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-3" data-level="beginner" data-module="3">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>03</span></div>
+                        <div class="module-info">
+                            <span class="module-level beginner">Beginner</span>
+                            <h3>Version Control with Git & GitHub</h3>
+                            <p>Master Git workflows, branching strategies, and collaboration on GitHub</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is Version Control & Why It Matters</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Architecture — Working Tree, Staging Area, Local & Remote Repo</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Init, Clone, Add, Commit, Push, Pull, Fetch</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Branching & Merging — Feature Branches, Merge Conflicts</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Workflows — GitFlow, Trunk-Based Development, GitHub Flow</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pull Requests, Code Reviews & Collaboration</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Rebase vs Merge — When to Use Each</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Stash, Cherry-pick, Reset, Revert</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>.gitignore & Repository Best Practices</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Git Tags & Semantic Versioning</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>GitHub — Repositories, Issues, Projects, Actions (intro)</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Team Collaboration Git Workflow</h4>
+                            <p>Create a multi-branch project on GitHub. Simulate a team workflow: create feature branches, raise pull requests, resolve merge conflicts, use git rebase, tag releases with semantic versioning, and set up branch protection rules.</p>
+                            <p style="margin-top: 12px;"><a href="module-03.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 4: Networking Fundamentals -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-4" data-level="beginner" data-module="4">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>04</span></div>
+                        <div class="module-info">
+                            <span class="module-level beginner">Beginner</span>
+                            <h3>Networking & Security Fundamentals</h3>
+                            <p>Understand how networks work — protocols, DNS, firewalls, and SSL/TLS</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>OSI Model & TCP/IP Model</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>IP Addressing — IPv4, IPv6, Subnetting, CIDR</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>DNS — Domain Name Resolution, Records (A, CNAME, MX, TXT)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>HTTP/HTTPS — Request/Response, Status Codes, Headers</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>SSL/TLS — Certificates, Encryption, Let's Encrypt</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Firewalls — iptables, ufw, Security Groups</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Load Balancing Concepts — Round Robin, Least Connections</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Reverse Proxy & Forward Proxy — Nginx, HAProxy</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>SSH — Key-based Auth, Tunneling, Port Forwarding</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>VPN, NAT & Basic Network Troubleshooting Tools</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Nginx Reverse Proxy with SSL</h4>
+                            <p>Deploy a Node.js app on a Linux server. Configure Nginx as a reverse proxy, set up a custom domain with DNS records, obtain a free SSL certificate with Let's Encrypt, and configure firewall rules with ufw.</p>
+                            <p style="margin-top: 12px;"><a href="module-04.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 5: Build & Package Manager Tools -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-5" data-level="beginner" data-module="5">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>05</span></div>
+                        <div class="module-info">
+                            <span class="module-level beginner">Beginner</span>
+                            <h3>Build & Package Manager Tools</h3>
+                            <p>Build, test, and package applications using industry-standard build tools</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What are Build Tools & Why DevOps Engineers Need Them</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Java Build Tools — Maven (pom.xml), Gradle (build.gradle)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>JavaScript Package Manager — NPM, package.json, node_modules</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Python Package Manager — pip, requirements.txt, virtualenv</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Building & Packaging Applications — JAR, WAR, TAR, ZIP</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Running Tests as Part of the Build Process</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Understanding Build Artifacts & Versioning</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Multi-Language Build Pipeline (Manual)</h4>
+                            <p>Clone a Java app and a Node.js app. Build the Java app with Gradle to produce a JAR file. Build the Node.js app with NPM. Run unit tests, create packaged artifacts, and document the build process end-to-end.</p>
+                            <p style="margin-top: 12px;"><a href="module-05.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 6: Artifact Repository Manager -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-6" data-level="intermediate" data-module="6">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>06</span></div>
+                        <div class="module-info">
+                            <span class="module-level intermediate">Intermediate</span>
+                            <h3>Artifact Repository Manager (Nexus)</h3>
+                            <p>Store, version, and manage build artifacts with Nexus Repository Manager</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is an Artifact Repository & Role in DevOps</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Installing & Running Nexus on a Cloud Server</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Nexus Repository Types — Hosted, Proxy, Group</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Uploading Artifacts — Maven, npm, Docker Images</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Nexus REST API for Automation</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Blob Stores, Cleanup Policies & Repository Management</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>User Roles & Access Management in Nexus</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Nexus Repository Setup & Artifact Management</h4>
+                            <p>Install Nexus on a DigitalOcean droplet. Create hosted repositories for Maven and npm. Build a Java app with Gradle, upload the JAR artifact to Nexus. Configure Nexus as a Docker registry. Automate cleanup with Nexus REST API.</p>
+                            <p style="margin-top: 12px;"><a href="module-06.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 7: CI/CD with Jenkins -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-7" data-level="intermediate" data-module="7">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>07</span></div>
+                        <div class="module-info">
+                            <span class="module-level intermediate">Intermediate</span>
+                            <h3>CI/CD with Jenkins</h3>
+                            <p>Build production-grade CI/CD pipelines with Jenkins — the heart of DevOps</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is CI/CD — Concepts, Benefits & Best Practices</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Installing Jenkins on a Cloud Server (Ubuntu)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkins UI — Jobs, Builds, Plugins, Credentials</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Freestyle Jobs vs Pipeline Jobs</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkinsfile — Declarative & Scripted Pipelines</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pipeline Stages — Build, Test, Publish, Deploy</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkins Pipeline Syntax — Stages, Steps, Post, When, Environment</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Multi-Branch Pipeline & Webhooks (GitHub integration)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkins Shared Libraries — Reusable Pipeline Code</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkins Credentials Management & Security</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Jenkins Agents/Nodes — Distributed Builds</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pipeline Triggers — Cron, Polling SCM, Webhooks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Introduction to GitHub Actions & GitLab CI (alternatives)</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Complete CI Pipeline: Build → Test → Publish to Nexus</h4>
+                            <p>Set up Jenkins on a cloud server. Create a multi-branch pipeline that triggers on GitHub push via webhook. Pipeline: checkout code → run tests → build JAR with Gradle → push artifact to Nexus → send Slack notification. Use Jenkins Shared Library for reusable steps.</p>
+                            <p style="margin-top: 12px;"><a href="module-07.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 8: Containers with Docker -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-8" data-level="intermediate" data-module="8">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>08</span></div>
+                        <div class="module-info">
+                            <span class="module-level intermediate">Intermediate</span>
+                            <h3>Containers with Docker</h3>
+                            <p>Containerize applications, manage images, and use Docker Compose</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What are Containers & Why They Exist — VMs vs Containers</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Architecture — Docker Engine, Daemon, Client, Images, Containers</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Installation & Basic Commands — run, ps, stop, rm, exec, logs</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Images — Pulling, Building, Tagging, Pushing</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Dockerfile — FROM, RUN, COPY, CMD, ENTRYPOINT, ENV, EXPOSE, Multi-Stage Builds</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Networking — Bridge, Host, Overlay, Custom Networks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Volumes — Persistent Storage, Bind Mounts</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Compose — Multi-Container Applications (docker-compose.yml)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Registries — Docker Hub, Nexus as Docker Registry, AWS ECR</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Best Practices — Image Size Optimization, Security, Caching Layers</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Dockerize a Full-Stack App with Docker Compose</h4>
+                            <p>Containerize a Node.js backend + MongoDB + React frontend using multi-stage Dockerfiles. Create a docker-compose.yml for the full stack. Use Docker volumes for database persistence, custom networks for service communication. Push images to Docker Hub and private Nexus registry.</p>
+                            <p style="margin-top: 12px;"><a href="module-08.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 9: CI/CD Pipeline with Docker Integration -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-9" data-level="intermediate" data-module="9">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>09</span></div>
+                        <div class="module-info">
+                            <span class="module-level intermediate">Intermediate</span>
+                            <h3>CI/CD Pipeline + Docker Integration</h3>
+                            <p>Build CI/CD pipelines that containerize apps and deploy Docker containers</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Building Docker Images in Jenkins Pipeline</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pushing Images to Docker Hub / ECR from Pipeline</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Dynamic Versioning — Git Commit Hash, Build Number, Semantic Version</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Deploying Dockerized App to Remote Server via SSH in Pipeline</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Docker Compose Deployment from CI/CD Pipeline</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pipeline Security — Credentials, Secrets, Docker Content Trust</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Complete CI/CD: Build → Dockerize → Deploy to AWS EC2</h4>
+                            <p>Jenkins pipeline that: checks out code from GitHub → runs tests → builds Docker image with dynamic version tag → pushes to AWS ECR → SSHs into EC2 instance → pulls the new image → deploys using docker-compose with zero-downtime.</p>
+                            <p style="margin-top: 12px;"><a href="module-09.html">📖 Open the full module — notes, diagrams &amp; interview questions →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 10: Cloud — Introduction & AWS Basics -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-10" data-level="intermediate" data-module="10">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>10</span></div>
+                        <div class="module-info">
+                            <span class="module-level intermediate">Intermediate</span>
+                            <h3>Introduction to Cloud & AWS</h3>
+                            <p>Cloud concepts, AWS core services — IAM, EC2, VPC, S3, and more</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is Cloud Computing — IaaS, PaaS, SaaS</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Introduction to AWS — Regions, Availability Zones</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>IAM — Users, Groups, Roles, Policies, MFA</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>EC2 — Instances, AMIs, Key Pairs, Security Groups, Elastic IPs</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>VPC — Subnets, Route Tables, Internet Gateway, NAT Gateway</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>S3 — Buckets, Objects, Versioning, Lifecycle Policies</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ECR — Elastic Container Registry for Docker Images</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>AWS CLI — Installation, Configuration & Common Commands</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ELB — Application Load Balancer, Target Groups</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>RDS — Managed Databases, Backup & Restore</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>CloudWatch — Logs, Metrics, Alarms (intro)</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Deploy Dockerized App on AWS Infrastructure</h4>
+                            <p>Create a VPC with public/private subnets. Launch EC2 instances in private subnets. Set up an Application Load Balancer. Deploy a Dockerized web app. Configure IAM roles, Security Groups, and S3 for static assets. Store Docker images in ECR.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 11: Container Orchestration with Kubernetes -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-11" data-level="advanced" data-module="11">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>11</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Container Orchestration with Kubernetes</h3>
+                            <p>Master K8s architecture, deployments, services, and cluster management</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Why Container Orchestration — Problems Docker Alone Can't Solve</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Kubernetes Architecture — Control Plane, Worker Nodes, etcd, API Server</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Setting Up Local K8s — Minikube, kubectl</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Pods — The Smallest Deployable Unit</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Deployments — ReplicaSets, Rolling Updates, Rollbacks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Services — ClusterIP, NodePort, LoadBalancer</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ingress — Ingress Controller, Ingress Rules, TLS Termination</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ConfigMaps & Secrets — Externalized Configuration</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Namespaces — Multi-Tenancy & Resource Isolation</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Volumes — PersistentVolume, PersistentVolumeClaim, StorageClasses</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>StatefulSets — Running Stateful Applications (Databases)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Helm — Package Manager for Kubernetes, Helm Charts</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>K8s YAML Manifests — Writing & Understanding Configuration Files</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Resource Requests, Limits & Horizontal Pod Autoscaler (HPA)</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Deploy Microservices App on Kubernetes with Helm</h4>
+                            <p>Deploy a multi-service application (frontend, backend API, MongoDB) on Minikube. Create Deployments, Services, Ingress rules. Use ConfigMaps for env vars, Secrets for DB credentials. Package the app as a Helm chart. Implement HPA for auto-scaling.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 12: Kubernetes on AWS (EKS) -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-12" data-level="advanced" data-module="12">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>12</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Kubernetes on AWS — EKS</h3>
+                            <p>Production-grade Kubernetes on cloud with AWS Elastic Kubernetes Service</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Managed Kubernetes — Why EKS over Self-Managed Clusters</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Creating an EKS Cluster — eksctl, AWS Console</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>EKS Node Groups — Managed, Self-Managed, Fargate</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Configuring kubectl for EKS — kubeconfig, AWS IAM Authenticator</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Deploying Applications to EKS</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>EKS + ECR — Pulling Private Images</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>EKS Networking — VPC CNI, ALB Ingress Controller</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>EKS IAM Roles for Service Accounts (IRSA)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>CI/CD Pipeline Deploying to EKS Cluster</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Production CI/CD Pipeline → EKS Deployment</h4>
+                            <p>Create an EKS cluster on AWS. Build a Jenkins pipeline that: builds the app → creates Docker image → pushes to ECR → deploys to EKS using kubectl/Helm → automatic version bumping. Complete end-to-end production-grade pipeline.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 13: Infrastructure as Code with Terraform -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-13" data-level="advanced" data-module="13">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>13</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Infrastructure as Code with Terraform</h3>
+                            <p>Provision and manage cloud infrastructure declaratively with Terraform</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is Infrastructure as Code — Benefits & Concepts</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Terraform Architecture — Providers, Resources, State</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>HCL Syntax — Variables, Outputs, Data Sources</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Terraform Commands — init, plan, apply, destroy, fmt, validate</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Terraform State — Local, Remote State (S3 backend), State Locking (DynamoDB)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Provisioning AWS Resources — VPC, EC2, Security Groups, S3, IAM</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Modules — Creating Reusable, Shareable Infrastructure Components</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Provisioners — remote-exec, local-exec</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Terraform Workspaces — Managing Multiple Environments (dev/staging/prod)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Provisioning EKS Cluster with Terraform</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Terraform + CI/CD — Automating Infrastructure in Jenkins Pipeline</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Automate AWS Infrastructure + EKS with Terraform</h4>
+                            <p>Write Terraform modules to provision a complete AWS infrastructure: VPC, subnets, EC2 instances, Security Groups, S3, and a full EKS cluster. Use remote state with S3 + DynamoDB locking. Integrate Terraform into Jenkins CI/CD pipeline for automated infrastructure provisioning.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 14: Programming with Python -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-14" data-level="advanced" data-module="14">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>14</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Programming & Automation with Python</h3>
+                            <p>Learn Python programming and write automation scripts for DevOps tasks</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Python Basics — Variables, Data Types, Operators</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Control Flow — if/else, for loops, while loops</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Functions, Modules & Error Handling</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Working with Files — Read/Write, JSON, YAML, CSV</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Python Libraries — os, sys, subprocess, requests, boto3</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Working with REST APIs — GitHub API, AWS API</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Boto3 — AWS SDK for Python (EC2, S3, EKS automation)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Automating DevOps Tasks — Server Health Checks, Log Parsing, Backups</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Writing a Web App Monitor Script with Auto-Recovery</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Scheduling Python Scripts with Cron</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Python Automation Suite for DevOps</h4>
+                            <p>Build 3 automation scripts: (1) AWS resource inventory — list all EC2 instances, S3 buckets using boto3, (2) Web app health monitor — check app status, send Slack alerts, restart Docker containers on failure, (3) Log parser — analyze Nginx logs for errors and generate reports.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 15: Configuration Management with Ansible -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-15" data-level="advanced" data-module="15">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>15</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Configuration Management with Ansible</h3>
+                            <p>Automate server configuration, app deployments, and infrastructure management</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is Configuration Management — Why Ansible</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible Architecture — Control Node, Managed Nodes, Agentless</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Inventory Files — Static & Dynamic Inventory (AWS)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ad-Hoc Commands vs Playbooks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible Playbooks — Tasks, Handlers, Variables, Templates (Jinja2)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible Modules — apt, yum, copy, file, service, docker, k8s</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible Roles — Organizing Complex Playbooks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible Vault — Encrypting Sensitive Data</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible + Docker — Deploying Containers with Playbooks</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible + Terraform — Provision with TF, Configure with Ansible</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Ansible + Kubernetes — Deploying Applications to K8s Clusters</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>AWS Dynamic Inventory for Ansible</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Infrastructure Automation at Scale with Terraform + Ansible</h4>
+                            <p>Provision EC2 servers on AWS with Terraform. Use Ansible with AWS dynamic inventory to: install Docker, deploy dockerized applications using docker-compose, configure Nginx, set up monitoring agents. Create reusable Ansible roles. Use Ansible Vault for secrets.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MODULE 16: Monitoring with Prometheus & Grafana -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-16" data-level="advanced" data-module="16">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>16</span></div>
+                        <div class="module-info">
+                            <span class="module-level advanced">Advanced</span>
+                            <h3>Monitoring & Observability</h3>
+                            <p>Prometheus, Grafana, Alert Manager — monitor infrastructure, apps & K8s</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Why Monitoring Matters — Observability, Metrics, Logs, Traces</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Prometheus Architecture — Server, Exporters, Push Gateway, AlertManager</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Installing Prometheus on Kubernetes (Helm Chart / Operator)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>PromQL — Querying Metrics, Counters, Gauges, Histograms</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Node Exporter — Monitoring Server CPU, Memory, Disk</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Monitoring Kubernetes Cluster — kube-state-metrics, cAdvisor</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Grafana — Dashboards, Panels, Data Sources, Variables</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Building Custom Grafana Dashboards for K8s & AWS</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>AlertManager — Alerting Rules, Routing, Slack/Email Notifications</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Monitoring Application Metrics — Custom Instrumentation</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Centralized Logging — ELK/EFK Stack Overview (Elasticsearch, Fluentd, Kibana)</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Complete Monitoring Stack on Kubernetes</h4>
+                            <p>Deploy Prometheus, Grafana, and AlertManager on an EKS cluster using Helm. Monitor K8s cluster health, node resources, and deployed application metrics. Build custom Grafana dashboards. Set up alerting rules for CPU spikes, pod crashes, and high latency — with Slack notifications.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- BONUS MODULE 17: GitOps with ArgoCD -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-17" data-level="pro" data-module="17">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>17</span></div>
+                        <div class="module-info">
+                            <span class="module-level pro">Pro</span>
+                            <h3>GitOps with ArgoCD</h3>
+                            <p>Declarative, Git-driven continuous deployment for Kubernetes</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>What is GitOps — Principles, Pull vs Push Model</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ArgoCD Architecture — Application Controller, Repo Server, API Server</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Installing ArgoCD on Kubernetes</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ArgoCD Applications — Sync Policies, Auto-Sync, Self-Heal</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ArgoCD + Helm Charts — Deploying Helm-Based Applications</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Multi-Environment Deployments (dev/staging/prod) with ArgoCD</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>ArgoCD App of Apps Pattern</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>RBAC & SSO Integration in ArgoCD</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>GitOps Pipeline: GitHub → ArgoCD → EKS</h4>
+                            <p>Set up ArgoCD on EKS. Create a GitOps workflow where pushing to a Git config repo automatically syncs deployments to Kubernetes. Implement multi-environment (dev/staging/prod) deployments with ArgoCD App of Apps pattern. Jenkins builds the image, updates the Git config repo, and ArgoCD deploys.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- BONUS MODULE 18: DevSecOps -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-18" data-level="pro" data-module="18">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>18</span></div>
+                        <div class="module-info">
+                            <span class="module-level pro">Pro</span>
+                            <h3>DevSecOps — Security in DevOps</h3>
+                            <p>Integrate security scanning into every stage of the DevOps pipeline</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Shift-Left Security — Integrating Security Early in SDLC</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>SAST — Static Application Security Testing (SonarQube)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>DAST — Dynamic Application Security Testing (OWASP ZAP)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Container Image Scanning — Trivy, Snyk</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Dependency Vulnerability Scanning — npm audit, Safety (Python)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Secrets Management — HashiCorp Vault, AWS Secrets Manager</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Kubernetes Security — Network Policies, Pod Security, RBAC</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Supply Chain Security — Signing Images, SBOM</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Compliance as Code — Open Policy Agent (OPA), Kyverno</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Secure CI/CD Pipeline with Full Security Scanning</h4>
+                            <p>Enhance your Jenkins pipeline with: SonarQube code quality scan → Trivy container image vulnerability scan → npm dependency audit → secrets detection → if all pass, deploy to K8s. Use HashiCorp Vault for secrets management. Implement K8s Network Policies and Pod Security Standards.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- BONUS MODULE 19: SRE & Platform Engineering -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-19" data-level="pro" data-module="19">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>19</span></div>
+                        <div class="module-info">
+                            <span class="module-level pro">Pro</span>
+                            <h3>Site Reliability Engineering & Platform Engineering</h3>
+                            <p>SLIs, SLOs, error budgets, incident management, and internal developer platforms</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>SRE Fundamentals — SLIs, SLOs, SLAs, Error Budgets</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Incident Management — On-call, Runbooks, Post-Mortems</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Chaos Engineering — Principles, Chaos Monkey, LitmusChaos</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Toil Reduction & Automation</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Platform Engineering — Internal Developer Platforms (IDPs)</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Backstage — Developer Portal for Service Catalogs</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Infrastructure Cost Optimization — FinOps Basics</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Multi-Cloud Strategy & Cloud-Agnostic Design</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>SRE Dashboard + Chaos Engineering Experiment</h4>
+                            <p>Define SLIs/SLOs for your deployed application. Create Grafana dashboards tracking error budgets and latency. Run a chaos engineering experiment using LitmusChaos on your K8s cluster — simulate pod failures and network partitions. Document runbooks and write a post-mortem report.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- BONUS MODULE 20: AI in DevOps & Career Mastery -->
+                <!-- ======================================== -->
+                <div class="roadmap-module" id="module-20" data-level="pro" data-module="20">
+                    <div class="module-connector"></div>
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-number"><span>20</span></div>
+                        <div class="module-info">
+                            <span class="module-level pro">Pro</span>
+                            <h3>AI in DevOps, Advanced Topics & Career Mastery</h3>
+                            <p>AIOps, service mesh, advanced K8s, and building your DevOps career portfolio</p>
+                        </div>
+                        <div class="module-toggle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <div class="module-body">
+                        <div class="topics-list">
+                            <div class="topic-item"><span class="topic-bullet"></span><span>AIOps — AI-Powered Monitoring, Anomaly Detection, Predictive Scaling</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>AI-Assisted DevOps — Using LLMs for Pipeline Generation, Debugging</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Service Mesh — Istio / Linkerd for Microservice Communication</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Advanced K8s — Custom Resource Definitions (CRDs), Operators</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Container Security — Falco, Runtime Security</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Alternative CI/CD — GitHub Actions, GitLab CI, Tekton</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Building Your DevOps Portfolio on GitHub</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Resume & LinkedIn Optimization for DevOps Roles</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>DevOps Interview Preparation — Common Questions & System Design</span></div>
+                            <div class="topic-item"><span class="topic-bullet"></span><span>Certifications — AWS DevOps Professional, CKA, Terraform Associate</span></div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-badge">🛠️ Real-Time Project</div>
+                            <h4>Capstone: End-to-End DevOps Platform</h4>
+                            <p>Build a complete DevOps ecosystem: Terraform provisions AWS infrastructure → Jenkins/GitHub Actions CI/CD pipeline → Dockerized microservices deployed to EKS via ArgoCD (GitOps) → Prometheus/Grafana monitoring → AlertManager alerts → Security scanning with Trivy. Document everything as your portfolio project.</p>
+                            <p style="margin-top: 12px;"><a href="project1.html">📄 View the full Capstone Project documentation →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end roadmap-timeline -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">⚙️</span>
+                    <span class="logo-text">DevOps<span class="logo-accent">Roadmap</span></span>
+                    <p>From Zero to DevOps Professional — Complete 2026 Roadmap</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

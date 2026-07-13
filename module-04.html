@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 04 — Networking &amp; Security Fundamentals | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 4: Networking & Security Fundamentals — OSI Model, TCP/UDP, DNS, HTTP/HTTPS, TLS, Firewalls, Load Balancing, Proxies, and SSH.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 04 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level beginner">Beginner</span>
+                    <span class="module-hero-duration">Phase 1 · Foundations</span>
+                </div>
+                <h1>Module 04 — Networking &amp; <span class="gradient-text">Security Fundamentals</span></h1>
+                <p class="module-hero-desc">
+                    The network is the computer. Before you can deploy containers or configure load balancers in the cloud, you must understand how traffic flows securely from a browser to your backend.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">TCP/IP</span>
+                    <span class="tech-tag">DNS</span>
+                    <span class="tech-tag">HTTPS</span>
+                    <span class="tech-tag">TLS</span>
+                    <span class="tech-tag">Nginx</span>
+                    <span class="tech-tag">iptables</span>
+                    <span class="tech-tag">SSH</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#osi-tcp" class="toc-link">1. OSI &amp; TCP/IP Models</a></li>
+                    <li><a href="#tcp-udp" class="toc-link">2. TCP vs UDP &amp; Sockets</a></li>
+                    <li><a href="#ip-subnet" class="toc-link">3. IP Addressing &amp; Subnetting</a></li>
+                    <li><a href="#dns" class="toc-link">4. DNS &amp; Resolution</a></li>
+                    <li><a href="#http-https" class="toc-link">5. HTTP/HTTPS &amp; CDNs</a></li>
+                    <li><a href="#ssl-tls" class="toc-link">6. SSL/TLS</a></li>
+                    <li><a href="#firewalls" class="toc-link">7. Firewalls &amp; Security</a></li>
+                    <li><a href="#load-balancing" class="toc-link">8. Load Balancing</a></li>
+                    <li><a href="#proxies" class="toc-link">9. Reverse &amp; Forward Proxies</a></li>
+                    <li><a href="#ssh-deepdive" class="toc-link">10. SSH Deep-Dive</a></li>
+                    <li><a href="#vpn-nat" class="toc-link">11. VPN, NAT &amp; Troubleshooting</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+                
+                <!-- ============ 1. OSI & TCP/IP Models ============ -->
+                <section class="content-section" id="osi-tcp">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📶</div>
+                        <h2>1. OSI &amp; TCP/IP Models (Debugging Altitude)</h2>
+                    </div>
+                    <p class="content-text">
+                        The OSI model has 7 layers. The TCP/IP model has 4. Interviewers will ask you to recite them, but in real DevOps work, you don't recite the layers—you use them to establish <strong>debugging altitude</strong>. If a user says "the app is down," you systematically work your way up the layers.
+                    </p>
+                    
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The "Ping Works but Curl Fails" Rule</div>
+                        <p>If you can <code>ping</code> a server, Layer 3 (Network) is fine. If <code>nc -zv</code> or <code>telnet</code> connects to the port, Layer 4 (Transport) is fine. If <code>curl</code> returns a 502 error, the problem is at Layer 7 (Application). <strong>Stop troubleshooting the network when the problem is the app.</strong></p>
+                    </div>
+
+                    <table class="content-table">
+                        <thead><tr><th>Layer (OSI)</th><th>What it is</th><th>What breaks here</th><th>DevOps Tool to check</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>L7: Application</strong></td><td>HTTP, DNS, SSH, TLS</td><td>502 Bad Gateway, Expired Certs, Wrong Host header</td><td><code>curl -v</code>, <code>dig</code>, <code>openssl</code></td></tr>
+                            <tr><td><strong>L4: Transport</strong></td><td>TCP / UDP</td><td>Port closed, Firewall blocking port, Connection Refused</td><td><code>nc -zv</code>, <code>ss -tulpn</code></td></tr>
+                            <tr><td><strong>L3: Network</strong></td><td>IP Addresses, Routing</td><td>No route to host, Subnet routing wrong, VPN down</td><td><code>ping</code>, <code>traceroute</code>, <code>mtr</code></td></tr>
+                            <tr><td><strong>L1/L2: Physical/Data</strong></td><td>Cables, MAC Addresses</td><td>Rare in cloud (AWS handles it). Physical switch failures.</td><td><code>arp</code>, AWS Status Page</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 2. TCP vs UDP & Sockets ============ -->
+                <section class="content-section" id="tcp-udp">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤝</div>
+                        <h2>2. TCP vs UDP &amp; Sockets</h2>
+                    </div>
+                    <p class="content-text">
+                        Layer 4 handles how data is transported. <strong>TCP</strong> is reliable and guarantees delivery (used by HTTP, SSH). <strong>UDP</strong> is fast and "fire-and-forget" (used by DNS, Video Streaming).
+                    </p>
+
+                    <div class="content-subheading">The TCP 3-Way Handshake</div>
+                    <p class="content-text">Before TCP sends a single byte of application data, it must establish a connection.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Visualizing the Handshake</span></div>
+                        <pre><code>Client                          Server
+  | ------- SYN (Hello!) --------> |
+  | <---- SYN-ACK (Hi! Ready) ---- |
+  | -------- ACK (Great!) -------> |
+  |                                |
+  | <======= HTTP DATA ========>   |</code></pre>
+                    </div>
+                    <p class="content-text"><strong>SYN Floods:</strong> A classic DDoS attack where thousands of spoofed IPs send SYN packets, the server replies with SYN-ACK and waits, exhausting its memory.</p>
+
+                    <div class="content-subheading">Ports &amp; Sockets Recap</div>
+                    <p class="content-text">A <strong>Socket</strong> is an IP address + a Port (e.g., <code>10.0.0.5:443</code>). Let's map the theory to the <code>ss</code> tool we learned in Module 02.</p>
+                    <table class="content-table">
+                        <thead><tr><th>Socket State</th><th>What it means in reality</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>LISTEN</code></td><td>The app (Nginx, Node) is healthy and waiting for connections on this port.</td></tr>
+                            <tr><td><code>ESTABLISHED</code></td><td>Active, ongoing traffic between a client and this server.</td></tr>
+                            <tr><td><code>TIME_WAIT</code></td><td>The connection closed gracefully. High numbers are normal on busy servers.</td></tr>
+                            <tr><td><code>CLOSE_WAIT</code></td><td>The client hung up, but your app hasn't closed the socket. Usually indicates an app bug or resource leak!</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 3. IP & Subnetting ============ -->
+                <section class="content-section" id="ip-subnet">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌍</div>
+                        <h2>3. IP Addressing &amp; Subnetting (CIDR)</h2>
+                    </div>
+                    <p class="content-text">
+                        A VPC (Virtual Private Cloud) in AWS requires you to define a network size using CIDR notation (e.g., <code>10.0.0.0/16</code>). Understanding CIDR is mandatory for cloud architecture.
+                    </p>
+
+                    <div class="content-subheading">Decoding CIDR Notation</div>
+                    <p class="content-text">An IP address has 32 bits. The <code>/X</code> tells you how many bits are locked for the network. The remaining bits are available for your servers (hosts).</p>
+                    <table class="content-table">
+                        <thead><tr><th>CIDR</th><th>Available IPs</th><th>DevOps Use Case</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>/16</code></td><td>65,536</td><td>The standard size for an entire AWS VPC.</td></tr>
+                            <tr><td><code>/24</code></td><td>256</td><td>A standard subnet (e.g., Public Subnet A, Private Subnet B).</td></tr>
+                            <tr><td><code>/26</code></td><td>64</td><td>A small subnet for isolated database clusters.</td></tr>
+                            <tr><td><code>/28</code></td><td>16</td><td>The smallest allowed in AWS. Too small for most workloads.</td></tr>
+                            <tr><td><code>/32</code></td><td>1</td><td>A single specific IP. Used in Security Groups to allow exactly ONE computer.</td></tr>
+                            <tr><td><code>0.0.0.0/0</code></td><td>ALL</td><td>The entire internet. Used in route tables for internet access.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The EKS IP Exhaustion Incident</div>
+                        <p>A classic DevOps incident: A team puts their Kubernetes (EKS) cluster in a <code>/24</code> subnet (256 IPs). AWS reserves 5. Every node takes 1. In EKS, <em>every single pod (container) gets its own real VPC IP address</em>. When the cluster scales to 200 pods, the subnet runs out of IPs, and new containers crash with <code>FailedCreatePodSandBox</code>. Always size subnets generously for containers (e.g., <code>/20</code> or <code>/22</code>).</p>
+                    </div>
+
+                    <div class="content-subheading">Private IPs (RFC 1918) &amp; Overlap</div>
+                    <p class="content-text">
+                        You can't use random IPs for your internal servers; you must use private ranges: <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, or <code>192.168.0.0/16</code>. 
+                        <strong>Critical Rule:</strong> If you plan to connect your AWS VPC to your company office via a VPN, their IP ranges <em>cannot overlap</em>. If your office is <code>10.0.0.0/16</code>, your VPC must be something else (like <code>10.1.0.0/16</code>), otherwise routers won't know where to send the packets.
+                    </p>
+                </section>
+
+                <!-- ============ 4. DNS ============ -->
+                <section class="content-section" id="dns">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔍</div>
+                        <h2>4. DNS &amp; Resolution</h2>
+                    </div>
+                    <p class="content-text">
+                        DNS (Domain Name System) translates human-readable names (<code>google.com</code>) into IP addresses (<code>142.250.190.46</code>). In DevOps, DNS is often your global load balancer and your first point of failure.
+                    </p>
+
+                    <div class="content-subheading">The Resolution Chain</div>
+                    <p class="content-text">When a user types a URL, their machine doesn't instantly know the IP. It asks a chain of servers:</p>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>1. Browser Cache<br><small>(Did I visit this recently?)</small></span> →
+                            <span>2. OS Cache<br><small>(/etc/hosts)</small></span> →
+                            <span>3. Local Resolver<br><small>(ISP / 8.8.8.8)</small></span> →
+                            <span>4. Root Server<br><small>(.)</small></span> →
+                            <span>5. TLD Server<br><small>(.com)</small></span> →
+                            <span>6. Authoritative<br><small>(Route53 / Cloudflare)</small></span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">DNS Records that Matter</div>
+                    <table class="content-table">
+                        <thead><tr><th>Record</th><th>What it does</th><th>DevOps Context</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>A / AAAA</strong></td><td>Maps name to IPv4 / IPv6</td><td>Points <code>api.app.com</code> directly to your EC2 instance IP.</td></tr>
+                            <tr><td><strong>CNAME</strong></td><td>Maps name to another name</td><td>Points your domain to an AWS ALB (e.g., <code>app-123.elb.amazonaws.com</code>).</td></tr>
+                            <tr><td><strong>TXT</strong></td><td>Text data for a domain</td><td>Domain verification (Google Workspace) and Let's Encrypt (DNS-01 challenge).</td></tr>
+                            <tr><td><strong>MX</strong></td><td>Mail Exchange</td><td>Where to route emails for the domain.</td></tr>
+                            <tr><td><strong>SRV</strong></td><td>Service locator</td><td>Used in Kubernetes and Active Directory to find services dynamically.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Troubleshooting with <code>dig</code></div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">dig</span> A google.com +short
+<span class="comment">142.250.190.46  # The direct IP address</span>
+
+<span class="command">dig</span> CNAME www.github.com +short
+<span class="comment">github.com.     # It's an alias to the main domain</span></code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The TTL Trap ("Users see the old site!")</div>
+                        <p>Every DNS record has a TTL (Time To Live). If your TTL is 24 hours, and you change your DB IP, the world will cache the old IP for 24 hours. <strong>Pro Tip:</strong> Before a major migration (like a Blue-Green deployment where you flip a CNAME to the new stack), lower your TTL to 60 seconds a day in advance!</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. HTTP/HTTPS ============ -->
+                <section class="content-section" id="http-https">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>5. HTTP/HTTPS &amp; CDNs</h2>
+                    </div>
+                    <p class="content-text">
+                        HTTP is plain text; HTTPS is encrypted. As a DevOps engineer, you must know how to read the raw text of an HTTP request.
+                    </p>
+
+                    <div class="content-subheading">Anatomy of a Request (curl -v)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">curl</span> -v http://example.com
+
+<span class="comment"># === THE REQUEST (What we send) ===</span>
+> GET / HTTP/1.1                  <span class="comment"># Method, Path, Protocol</span>
+> Host: example.com               <span class="comment"># Crucial: Tells the server WHICH site we want</span>
+> User-Agent: curl/7.81.0         <span class="comment"># Who is asking</span>
+> Accept: */*
+
+<span class="comment"># === THE RESPONSE (What the server replies) ===</span>
+< HTTP/1.1 200 OK                 <span class="comment"># Status Code</span>
+< Content-Type: text/html         <span class="comment"># What kind of data is attached</span>
+< Content-Length: 1256            <span class="comment"># Size of the payload</span>
+< 
+< &lt;html&gt;...&lt;/html&gt;                 <span class="comment"># The actual body payload</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Status Codes (Whose fault is it?)</div>
+                    <table class="content-table">
+                        <thead><tr><th>Code</th><th>Meaning</th><th>On-Call Translation</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>2xx</strong></td><td>Success</td><td>Everything is fine.</td></tr>
+                            <tr><td><strong>3xx</strong></td><td>Redirect</td><td>You need to go somewhere else (e.g., 301 HTTP to HTTPS).</td></tr>
+                            <tr><td><strong>4xx</strong></td><td>Client Error</td><td>The user messed up (404 Not Found, 401 Unauthorized, 403 Forbidden).</td></tr>
+                            <tr><td><strong>502</strong></td><td>Bad Gateway</td><td>Your Proxy (Nginx) is alive, but the backend app is crashed or unreachable.</td></tr>
+                            <tr><td><strong>503</strong></td><td>Service Unavailable</td><td>The Load Balancer is alive, but it has no healthy pods to send traffic to.</td></tr>
+                            <tr><td><strong>504</strong></td><td>Gateway Timeout</td><td>The backend is alive, but it took too long to answer (e.g., slow database query).</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">CDNs &amp; Caching Basics (CloudFront)</div>
+                    <p class="content-text">
+                        A <strong>CDN (Content Delivery Network)</strong> caches static files (images, JS, CSS) on edge servers close to users around the world.
+                        If you deploy a new frontend but users complain "it still looks like the old site," they are getting a <strong>Cache Hit</strong> from the CDN. You must <em>invalidate</em> the CDN cache so it pulls the fresh files from the <strong>Origin</strong> (your real server).
+                    </p>
+
+                    <div class="content-subheading">Modern Protocols: HTTP/2, HTTP/3 &amp; gRPC</div>
+                    <ul class="content-list">
+                        <li><strong>HTTP/2:</strong> Multiplexes multiple requests over a single TCP connection. Much faster for modern web apps.</li>
+                        <li><strong>HTTP/3:</strong> Uses UDP (QUIC protocol) instead of TCP to eliminate head-of-line blocking.</li>
+                        <li><strong>gRPC:</strong> Uses HTTP/2 for lightning-fast microservice-to-microservice communication. <em>Gotcha:</em> Nginx and Load Balancers must be explicitly configured to support gRPC, otherwise they will break the HTTP/2 streams!</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 6. SSL/TLS ============ -->
+                <section class="content-section" id="ssl-tls">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔒</div>
+                        <h2>6. SSL / TLS</h2>
+                    </div>
+                    <p class="content-text">
+                        TLS (Transport Layer Security) is the encryption layer that turns HTTP into HTTPS. (SSL is the old deprecated name, but people still say "SSL Certificate").
+                    </p>
+
+                    <div class="content-subheading">The TLS Handshake</div>
+                    <p class="content-text">After the TCP 3-way handshake finishes, TLS does its own handshake to establish a secure, encrypted tunnel.</p>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>ClientHello<br><small>(Here are my ciphers)</small></span> →
+                            <span>ServerHello &amp; Cert<br><small>(Here is my ID)</small></span> →
+                            <span>Key Exchange<br><small>(Let's agree on a secret)</small></span> →
+                            <span>Encrypted Tunnel Established</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">The Certificate Chain</div>
+                    <p class="content-text">How does your browser trust a certificate? It relies on a Chain of Trust:</p>
+                    <ul class="content-list">
+                        <li><strong>Root CA:</strong> Baked into your browser/OS (e.g., ISRG Root X1). Highly protected.</li>
+                        <li><strong>Intermediate CA:</strong> Signed by the Root. Used to sign actual website certs.</li>
+                        <li><strong>Leaf Certificate:</strong> Your specific website's certificate (e.g., <code>example.com</code>).</li>
+                    </ul>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The #1 DevOps Incident: "Cert Expired on a Saturday"</div>
+                        <p>Historically, certs lasted 1-3 years and humans forgot to renew them. Today, <strong>Let's Encrypt</strong> provides free 90-day certificates. You use a tool like <code>certbot</code> to automatically renew them every 60 days via a cron job. In Kubernetes, you will use <code>cert-manager</code>, and in AWS, you will use <code>ACM</code> (AWS Certificate Manager) to handle auto-renewals.</p>
+                    </div>
+
+                    <div class="content-subheading">Checking Expiry with OpenSSL</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># How to instantly check when a site's cert expires</span>
+<span class="command">echo</span> | <span class="command">openssl</span> s_client -servername google.com -connect google.com:443 2>/dev/null | <span class="command">openssl</span> x509 -noout -dates
+
+<span class="comment">notBefore=Jul 10 08:24:19 2023 GMT
+notAfter=Oct  2 08:24:18 2023 GMT</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Firewalls ============ -->
+                <section class="content-section" id="firewalls">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧱</div>
+                        <h2>7. Firewalls &amp; Security</h2>
+                    </div>
+                    <p class="content-text">
+                        Firewalls block or allow traffic at Layer 3 (IPs) and Layer 4 (Ports). We deal with three main levels in the cloud.
+                    </p>
+
+                    <div class="content-subheading">Host-Level Firewalls (Linux)</div>
+                    <ul class="content-list">
+                        <li><strong>iptables:</strong> The raw Linux kernel firewall. Extremely powerful, but terrifying syntax. <em>You do not need to memorize iptables rules, just know how to read them.</em></li>
+                        <li><strong>ufw (Uncomplicated Firewall):</strong> A user-friendly wrapper for iptables used in Ubuntu.</li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">sudo</span> ufw allow 22/tcp    <span class="comment"># Allow SSH</span>
+<span class="command">sudo</span> ufw allow 80/tcp    <span class="comment"># Allow HTTP</span>
+<span class="command">sudo</span> ufw enable          <span class="comment"># Turn it on</span>
+<span class="command">sudo</span> ufw status          <span class="comment"># Check rules</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Cloud Firewalls: Security Groups vs NACLs</div>
+                    <p class="content-text">AWS isolates resources using two different concepts:</p>
+                    <table class="content-table">
+                        <thead><tr><th>Feature</th><th>Security Groups (SG)</th><th>Network ACLs (NACL)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Level</strong></td><td>Instance-level (Attached to EC2/RDS)</td><td>Subnet-level (Attached to VPC subnet)</td></tr>
+                            <tr><td><strong>Stateful?</strong></td><td><strong>Yes.</strong> If you allow inbound port 80, outbound responses are automatically allowed.</td><td><strong>No (Stateless).</strong> You must explicitly write rules for both inbound and outbound traffic.</td></tr>
+                            <tr><td><strong>Rules</strong></td><td>Allow rules only (deny by default).</td><td>Can explicitly Allow or Deny traffic.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ "My App Can't Reach the Database!"</div>
+                        <p>A classic ticket. The app is on EC2; the DB is on RDS. The EC2 Security Group allows inbound 443, but the RDS Security Group <strong>forgot to allow inbound 5432</strong> from the EC2 instance.<br>
+                        <strong>How to debug:</strong> SSH into the EC2 instance and run <code>nc -zv &lt;rds-ip&gt; 5432</code>. If it hangs, it's a Security Group block.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Load Balancing ============ -->
+                <section class="content-section" id="load-balancing">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚖️</div>
+                        <h2>8. Load Balancing</h2>
+                    </div>
+                    <p class="content-text">
+                        A Load Balancer distributes incoming traffic across multiple backend servers to ensure no single server gets overwhelmed. But routing traffic is only half its job; its real superpower is <strong>Health Checks</strong>.
+                    </p>
+
+                    <div class="content-subheading">Routing Algorithms</div>
+                    <table class="content-table">
+                        <thead><tr><th>Algorithm</th><th>How it works</th><th>When to use it</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Round Robin</strong></td><td>Server 1 → Server 2 → Server 3 → Repeat.</td><td>Stateless apps where all servers are equal. (Default choice).</td></tr>
+                            <tr><td><strong>Least Connections</strong></td><td>Sends traffic to the server with the fewest active users.</td><td>Heavy apps (like video encoding) where requests take a long time.</td></tr>
+                            <tr><td><strong>IP Hash</strong></td><td>Hashes the client IP to always route them to the same server.</td><td>Legacy apps that store "session state" locally in memory.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">L4 vs L7 Load Balancing</div>
+                    <p class="content-text">When creating a load balancer in AWS, you must choose the layer:</p>
+                    <ul class="content-list">
+                        <li><strong>Layer 4 (AWS NLB - Network Load Balancer):</strong> Routes traffic based purely on IP and Port. It doesn't look at the HTTP request. Extremely fast. Used in the Capstone project to route raw TCP traffic to the EKS cluster.</li>
+                        <li><strong>Layer 7 (AWS ALB - Application Load Balancer):</strong> Looks inside the HTTP request. It can route traffic based on the URL path (<code>/api</code> goes to Server A, <code>/images</code> goes to Server B).</li>
+                    </ul>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ "It fails randomly 1 out of 3 times!"</div>
+                        <p>If a user complains of intermittent 500 errors, you almost certainly have <strong>one sick backend server behind a Load Balancer</strong>. If you have 3 pods and Pod C has a broken DB connection, Round Robin routing means 1 in 3 requests will hit the broken pod. This happens when your Load Balancer's <strong>Health Check</strong> is misconfigured and doesn't realize Pod C is broken.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Proxies ============ -->
+                <section class="content-section" id="proxies">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎭</div>
+                        <h2>9. Reverse &amp; Forward Proxies</h2>
+                    </div>
+                    <p class="content-text">
+                        A proxy is a middleman. The direction dictates the name. <strong>Forward Proxies hide the Client</strong> (e.g., a corporate VPN proxying your browsing). <strong>Reverse Proxies hide the Server</strong> (e.g., Nginx sitting in front of a Node.js app).
+                    </p>
+
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span><strong>Reverse Proxy (Nginx)</strong><br>Client → Proxy → Server A / Server B</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">The Classic Nginx Reverse Proxy</div>
+                    <p class="content-text">In the capstone project, we use Nginx to terminate TLS (handle the SSL cert) and pass raw HTTP traffic to the backend app (like a Node.js or Python server). Here is the exact config pattern:</p>
+                    
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">nginx.conf</span></div>
+                        <pre><code>server {
+    listen 443 ssl;
+    server_name api.example.com;
+
+    <span class="comment"># Let Nginx handle the SSL certificates</span>
+    ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+
+    location / {
+        <span class="comment"># Pass the traffic to the backend app running on port 3000</span>
+        proxy_pass http://127.0.0.1:3000;
+        
+        <span class="comment"># Pass critical headers so the backend knows the user's real IP</span>
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        <span class="comment"># ⚠️ The 502 Fix: If your backend takes 70 seconds to process a report,</span>
+        <span class="comment"># Nginx will give up at 60s and throw a 502 Bad Gateway. Increase timeouts:</span>
+        proxy_read_timeout 90s;
+    }
+}</code></pre>
+                    </div>
+                    <p class="content-text"><em>Note:</em> While Nginx is the most famous reverse proxy, <strong>HAProxy</strong> is also widely used for pure, high-performance load balancing, and <strong>Envoy</strong> is heavily used in Kubernetes Service Meshes.</p>
+                </section>
+
+                <!-- ============ 10. SSH Deep-Dive ============ -->
+                <section class="content-section" id="ssh-deepdive">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>10. SSH Deep-Dive (Tunnels &amp; Bastions)</h2>
+                    </div>
+                    <p class="content-text">
+                        You already know how to generate SSH keys (Module 02). But SSH is not just for getting a remote shell; it's a powerful tool for creating secure encrypted tunnels to access private resources.
+                    </p>
+
+                    <div class="content-subheading">The Daily Bastion Pattern (Local Port Forwarding)</div>
+                    <p class="content-text">Your RDS Database is in a Private Subnet (no internet access). You need to connect to it from your laptop using pgAdmin or DBeaver. You do this by tunneling through a "Bastion Host" (a small EC2 instance in the Public Subnet).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Syntax: ssh -L [local_port]:[remote_host]:[remote_port] [bastion_user@bastion_ip]</span>
+<span class="command">ssh</span> -L 5432:mydb.us-east-1.rds.amazonaws.com:5432 ec2-user@bastion.example.com
+
+<span class="comment"># Now, on your laptop, point your DB client to:</span>
+<span class="comment"># localhost:5432</span>
+<span class="comment"># The traffic encrypts, goes to the bastion, and forwards to the RDS.</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">ProxyJump and SOCKS</div>
+                    <ul class="content-list">
+                        <li><strong>ProxyJump (<code>-J</code>):</strong> Need to SSH into a private server through a bastion? Don't SSH into the bastion and then SSH again. Do it in one command: <code>ssh -J ec2-user@bastion ec2-user@private-server</code>.</li>
+                        <li><strong>Remote Forwarding (<code>-R</code>):</strong> Expose a port on your local laptop to the public internet via a remote server (like a DIY ngrok).</li>
+                        <li><strong>Dynamic SOCKS Proxy (<code>-D</code>):</strong> Turn a remote SSH server into a VPN for your web browser: <code>ssh -D 9090 user@server</code>.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 11. VPN, NAT & Troubleshooting ============ -->
+                <section class="content-section" id="vpn-nat">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>11. VPN, NAT &amp; Troubleshooting Ladder</h2>
+                    </div>
+                    
+                    <div class="content-subheading">NAT &amp; VPNs</div>
+                    <ul class="content-list">
+                        <li><strong>NAT (Network Address Translation):</strong> How private IPs access the public internet. In the Capstone project, your EKS pods in private subnets will need to download images from ECR. They use a <strong>NAT Gateway</strong> in the public subnet to disguise their private IP as a public one.</li>
+                        <li><strong>Client VPN vs Site-to-Site:</strong> Client VPNs (like WireGuard or OpenVPN) connect your laptop to the VPC. Site-to-Site VPNs (IPsec) connect an entire corporate office router directly to the AWS VPC.</li>
+                    </ul>
+
+                    <div class="content-subheading">Container Networking Preview (Seed for Mod 08)</div>
+                    <p class="content-text">When you run a Docker container, why can't it access a database running on your laptop's <code>localhost:5432</code>? Because the container has its own <strong>Network Namespace</strong> and its own virtual <code>localhost</code>. Traffic leaves the container via a virtual bridge (<code>docker0</code>). To reach your laptop from inside a container, you must route to the host IP, not localhost.</p>
+
+                    <div class="content-subheading">The Ultimate Troubleshooting Ladder</div>
+                    <p class="content-text">Never guess. Work your way up the OSI layers using this exact sequence when an app is unreachable:</p>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span><strong>1. ping / traceroute (L3)</strong><br>Can I route to the server? Is it alive?</span> →
+                            <span><strong>2. dig (L7)</strong><br>Is the DNS resolving to the correct IP?</span> →
+                            <span><strong>3. nc -zv (L4)</strong><br>Is the port open? Or blocked by a Security Group?</span> →
+                            <span><strong>4. curl -v (L7)</strong><br>Does the web server respond with a 200 or 502?</span> →
+                            <span><strong>5. ss -tulpn (Host)</strong><br>Is the app actually listening on the port?</span> →
+                            <span><strong>6. tcpdump (God Mode)</strong><br>Read the raw packets on the wire to see exactly who drops the connection.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Build &amp; Debug a Real Web Stack</h2>
+                        <p>Turn your Module 02 VM into a production-grade, load-balanced, HTTPS-secured web server. Then break it on purpose and diagnose the failures.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Deploy the Backends</h3>
+                            <p>Run two tiny python web servers on ports 3001 and 3002 to act as our backend "pods".</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">echo</span> "Hello from Server 1" > index1.html
+<span class="command">echo</span> "Hello from Server 2" > index2.html
+<span class="comment"># Run in the background (&amp;)</span>
+<span class="command">python3</span> -m http.server 3001 --directory . &amp;
+<span class="command">python3</span> -m http.server 3002 --directory . &amp;
+
+<span class="comment"># Verify they are running (Layer 4)</span>
+<span class="command">ss</span> -tulpn | grep python</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="2">
+                            <h3>Configure the Nginx Load Balancer</h3>
+                            <p>Install Nginx. Configure it to reverse-proxy traffic to both backends using Round Robin.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">/etc/nginx/sites-available/default</span></div>
+                                <pre><code>upstream myapp {
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://myapp;
+    }
+}</code></pre>
+                            </div>
+                            <p>Restart Nginx (<code>sudo systemctl restart nginx</code>). Run <code>curl http://localhost</code> multiple times to see the output alternate between Server 1 and Server 2!</p>
+                        </div>
+
+                        <div class="project-step" data-step="3">
+                            <h3>Secure with TLS (HTTPS)</h3>
+                            <p>If you own a domain, point an A record to your VM's public IP and run <code>sudo certbot --nginx -d yourdomain.com</code>. If not, generate a self-signed certificate and update Nginx to listen on port 443 with the SSL cert.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">sudo</span> openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="4">
+                            <h3>Lock Down the Host</h3>
+                            <p>Use <code>ufw</code> to block all traffic except SSH (22), HTTP (80), and HTTPS (443). Test that ports 3001/3002 are no longer directly accessible from the outside.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">sudo</span> ufw allow 22/tcp
+<span class="command">sudo</span> ufw allow 80/tcp
+<span class="command">sudo</span> ufw allow 443/tcp
+<span class="command">sudo</span> ufw enable</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="5">
+                            <h3>Break It &amp; Diagnose (The Gauntlet)</h3>
+                            <p>Time to trigger real alerts. Do these one at a time and use the Troubleshooting Ladder to figure out exactly what broke.</p>
+                            <ul class="content-list">
+                                <li><strong>Failure 1 (502 Bad Gateway):</strong> <code>kill</code> the python process on port 3001. Watch how Nginx reacts when you curl. (It should instantly route to 3002).</li>
+                                <li><strong>Failure 2 (Timeout):</strong> Change the Nginx config to proxy to port <code>3009</code> (which doesn't exist). Reload. What error do you get?</li>
+                                <li><strong>Failure 3 (L4 Block):</strong> <code>sudo ufw deny 443</code>. What happens to curl now? Use <code>nc -zv</code> to prove the firewall blocked it.</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-step" data-step="6">
+                            <h3>The Bastion Tunnel</h3>
+                            <p>With port 3001 blocked by the firewall from the outside, use your laptop to create an SSH tunnel to the VM, forwarding your local port 8080 to the VM's port 3001.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash (Run on your laptop)</span></div>
+                                <pre><code><span class="command">ssh</span> -L 8080:localhost:3001 user@your-vm-ip</code></pre>
+                            </div>
+                            <p>Open <code>http://localhost:8080</code> in your laptop's browser. You have bypassed the firewall via a secure tunnel!</p>
+                        </div>
+
+                        <div class="project-step" data-step="7">
+                            <h3>Document Your Work</h3>
+                            <p>Take screenshots of your <code>ss -tulpn</code> output, your Nginx config, and the TLS certificate details in your browser. Add them to a new markdown file in your portfolio repo, documenting how you solved each failure in Step 5.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>Networking separates junior admins from senior engineers. You must be able to answer these smoothly.</p>
+                    </div>
+
+                    <div class="interview-grid">
+                        <!-- Q1 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What happens when you type google.com into your browser?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><strong>The Classic Question. Walk the OSI model:</strong></p>
+                                <ul class="content-list">
+                                    <li><strong>DNS (L7):</strong> Browser checks cache, asks OS, asks local resolver, gets IP.</li>
+                                    <li><strong>TCP (L4):</strong> Browser performs 3-way handshake with the IP.</li>
+                                    <li><strong>TLS (L7):</strong> ClientHello, ServerHello, cert validation, secure tunnel established.</li>
+                                    <li><strong>HTTP (L7):</strong> Sends GET request. Server routes it through load balancers (L4/L7) and reverse proxies.</li>
+                                    <li><strong>Response:</strong> HTML is returned, browser parses it, and requests additional assets (CSS/JS).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between a 502, 503, and 504?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <ul class="content-list">
+                                    <li><strong>502 Bad Gateway:</strong> The proxy (Nginx/ALB) tried to talk to the backend, but the backend is crashed or rejecting connections.</li>
+                                    <li><strong>503 Service Unavailable:</strong> The Load Balancer has zero healthy targets (all health checks failed).</li>
+                                    <li><strong>504 Gateway Timeout:</strong> The backend accepted the request but took too long to answer (usually a slow DB query).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: TCP vs UDP?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>TCP is connection-oriented, guarantees delivery, and handles packet ordering. Used for HTTP, SSH, DBs. UDP is connectionless, fast, "fire-and-forget", but packets can be lost. Used for DNS, video streaming, and VoIP.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Explain the DNS "TTL Trap".</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Time-To-Live dictates how long downstream resolvers cache a DNS record. If a record has a 24-hour TTL and a server dies, updating the DNS record won't fix it for users until their local caches expire. <strong>Always lower TTLs before a migration.</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: AWS Security Groups vs NACLs?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Security Groups are attached to instances and are <strong>stateful</strong> (allowing inbound automatically allows the return outbound). NACLs are attached to subnets and are <strong>stateless</strong> (require explicit inbound AND outbound rules). SGs only have Allow rules; NACLs support Deny rules.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Reverse vs Forward Proxy?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A Forward Proxy sits in front of clients and hides them from the internet (e.g., corporate VPN). A Reverse Proxy (like Nginx) sits in front of servers and hides them from clients, handling TLS termination and load balancing.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Explain the TLS Handshake.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>After TCP handshake: Client sends ClientHello (supported ciphers). Server responds with ServerHello and its Certificate. Client validates the cert against Root CAs. They perform a key exchange to generate a shared symmetric session key. Encrypted traffic begins.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q8 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: "App can't reach the DB." Debug it live.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I work up the layers. 1. <code>ping DB_IP</code> (Is it alive/routing?). 2. <code>dig DB_NAME</code> (Does it resolve?). 3. <code>nc -zv DB_IP 5432</code> (Is the port blocked by a firewall/Security Group?). 4. SSH to DB server and run <code>ss -tulpn</code> (Is Postgres actually listening on 5432?). 5. Check Postgres logs (Is it rejecting the password?).</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-03.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 03 — Git</span>
+                </div>
+            </a>
+            
+            <a href="module-05.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 05 — Build Tools</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+
+</body>
+</html>

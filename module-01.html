@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 01 — Introduction to DevOps | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 1: Introduction to DevOps — culture, SDLC, Waterfall vs Agile vs DevOps, DevOps engineer roles, lifecycle phases, CI/CD concepts, and the DevOps toolchain.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 01 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level beginner">Beginner</span>
+                    <span class="module-hero-duration">Phase 1 · Foundations</span>
+                </div>
+                <h1>Module 01 — Introduction to <span class="gradient-text">DevOps</span></h1>
+                <p class="module-hero-desc">
+                    Understand what DevOps really is — the culture, the lifecycle, and how it bridges
+                    Development and Operations. This module builds the mental model every other tool
+                    and practice in this roadmap plugs into.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">DevOps Culture</span>
+                    <span class="tech-tag">SDLC</span>
+                    <span class="tech-tag">Agile</span>
+                    <span class="tech-tag">CI/CD</span>
+                    <span class="tech-tag">Toolchain</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#what-is-devops" class="toc-link">1. What is DevOps</a></li>
+                    <li><a href="#sdlc" class="toc-link">2. SDLC</a></li>
+                    <li><a href="#waterfall-agile-devops" class="toc-link">3. Waterfall vs Agile vs DevOps</a></li>
+                    <li><a href="#roles" class="toc-link">4. DevOps Engineer Roles</a></li>
+                    <li><a href="#lifecycle" class="toc-link">5. DevOps Lifecycle Phases</a></li>
+                    <li><a href="#cicd" class="toc-link">6. CI / CD / CD Concepts</a></li>
+                    <li><a href="#toolchain" class="toc-link">7. DevOps Toolchain</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+
+                <!-- ============ 1. What is DevOps ============ -->
+                <section class="content-section" id="what-is-devops">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤝</div>
+                        <h2>1. What is DevOps — Culture, Principles &amp; Practices</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>DevOps</strong> is a combination of <strong>Dev</strong>elopment and <strong>Op</strong>eration<strong>s</strong>.
+                        It is not a tool, not a job title you can buy, and not just automation — it is a
+                        <strong>culture and set of practices</strong> that brings development teams (who want to ship
+                        changes fast) and operations teams (who want systems stable) together, so software can be
+                        delivered <strong>faster, more reliably, and continuously</strong>.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The Wall of Confusion — What DevOps Removes</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Developers: "It works on my machine"</span>
+                            <span class="flow-arrow">⚡</span>
+                            <span class="flow-item">Operations: "It broke my server"</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-arrow">↓</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">DevOps: One team, shared ownership, shared responsibility</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Core Principles — CALMS</div>
+                    <table class="content-table">
+                        <thead><tr><th>Principle</th><th>Meaning</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>C</strong>ulture</td><td>Break down silos — Dev, Ops, QA, and Security collaborate and share responsibility for the product end-to-end</td></tr>
+                            <tr><td><strong>A</strong>utomation</td><td>Automate everything repeatable — builds, tests, deployments, infrastructure provisioning</td></tr>
+                            <tr><td><strong>L</strong>ean</td><td>Ship small batches frequently, eliminate waste, shorten feedback loops</td></tr>
+                            <tr><td><strong>M</strong>easurement</td><td>Measure everything — deployment frequency, lead time, failure rate, recovery time (DORA metrics)</td></tr>
+                            <tr><td><strong>S</strong>haring</td><td>Share knowledge, tools, and post-mortems openly — blameless culture</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Key Practices</div>
+                    <ul class="content-list">
+                        <li><strong>Continuous Integration (CI)</strong> — merge and test code changes frequently</li>
+                        <li><strong>Continuous Delivery / Deployment (CD)</strong> — release software in short, automated cycles</li>
+                        <li><strong>Infrastructure as Code (IaC)</strong> — manage servers and networks through versioned code (Terraform, Ansible)</li>
+                        <li><strong>Monitoring &amp; Observability</strong> — know the health of systems in real time (Prometheus, Grafana)</li>
+                        <li><strong>Microservices &amp; Containers</strong> — small, independently deployable services (Docker, Kubernetes)</li>
+                        <li><strong>Blameless Post-Mortems</strong> — learn from failures instead of punishing them</li>
+                    </ul>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Remember This</div>
+                        <p>DevOps = <strong>People + Process + Tools</strong>, in that order. Companies fail at DevOps when they buy tools but skip the culture change. You can have Jenkins and Kubernetes and still not "do DevOps".</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. SDLC ============ -->
+                <section class="content-section" id="sdlc">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔁</div>
+                        <h2>2. Software Development Life Cycle (SDLC)</h2>
+                    </div>
+                    <p class="content-text">
+                        The <strong>SDLC</strong> is the structured process every piece of software goes through —
+                        from an idea to a running product in production. DevOps doesn't replace the SDLC;
+                        it <strong>automates and accelerates</strong> it.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The 6 Classic SDLC Phases</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">1. Planning</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">2. Analysis</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">3. Design</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">4. Implementation</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">5. Testing</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">6. Deployment &amp; Maintenance</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Phase</th><th>What Happens</th><th>Who Is Involved</th></tr></thead>
+                        <tbody>
+                            <tr><td>Planning</td><td>Define goals, scope, budget, and timelines</td><td>Product Owner, Business Analysts</td></tr>
+                            <tr><td>Analysis</td><td>Gather detailed requirements (functional &amp; non-functional)</td><td>Analysts, Architects</td></tr>
+                            <tr><td>Design</td><td>System architecture, database design, UI/UX design</td><td>Architects, Designers</td></tr>
+                            <tr><td>Implementation</td><td>Actual coding of the application</td><td>Developers</td></tr>
+                            <tr><td>Testing</td><td>Unit, integration, system, and acceptance testing</td><td>QA Engineers</td></tr>
+                            <tr><td>Deployment &amp; Maintenance</td><td>Release to production, monitor, patch, improve</td><td>Operations / DevOps</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ The Pain Point DevOps Solves</div>
+                        <p>In traditional SDLC, each phase is a hand-off to a different team — and every hand-off adds delay, miscommunication, and finger-pointing. DevOps turns these phases into a <strong>continuous, automated loop</strong> owned by one collaborative team.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Waterfall vs Agile vs DevOps ============ -->
+                <section class="content-section" id="waterfall-agile-devops">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚖️</div>
+                        <h2>3. Waterfall vs Agile vs DevOps</h2>
+                    </div>
+                    <p class="content-text">
+                        These three represent the <strong>evolution of software delivery</strong>. Each one fixed
+                        the biggest problem of the previous approach.
+                    </p>
+
+                    <div class="content-subheading">Waterfall — The Sequential Era</div>
+                    <p class="content-text">
+                        Phases run strictly one after another — you cannot start Testing until all Development is done.
+                        Requirements are frozen upfront. A release could take <strong>6–18 months</strong>, and customer
+                        feedback arrived only at the very end, when changes were most expensive.
+                    </p>
+
+                    <div class="content-subheading">Agile — The Iterative Era</div>
+                    <p class="content-text">
+                        Agile (2001) broke the work into <strong>sprints of 1–4 weeks</strong>, delivering small working
+                        increments and getting customer feedback continuously. But Agile only sped up
+                        <strong>development</strong> — the finished code still sat waiting for the Ops team to deploy it
+                        manually, sometimes for weeks.
+                    </p>
+
+                    <div class="content-subheading">DevOps — The Continuous Era</div>
+                    <p class="content-text">
+                        DevOps extends Agile all the way to <strong>production</strong>. Automated pipelines build, test,
+                        and deploy every change, so software can be released daily — or even multiple times per day.
+                    </p>
+
+                    <table class="content-table">
+                        <thead><tr><th>Aspect</th><th>Waterfall</th><th>Agile</th><th>DevOps</th></tr></thead>
+                        <tbody>
+                            <tr><td>Approach</td><td>Sequential phases</td><td>Iterative sprints</td><td>Continuous flow</td></tr>
+                            <tr><td>Release Cycle</td><td>Months / Years</td><td>Weeks (per sprint)</td><td>Days / Hours / On-demand</td></tr>
+                            <tr><td>Scope</td><td>Dev → Test → Deploy as silos</td><td>Dev + QA collaborate</td><td>Dev + QA + Ops + Security as one team</td></tr>
+                            <tr><td>Feedback</td><td>At the end of the project</td><td>End of every sprint</td><td>Real-time from production monitoring</td></tr>
+                            <tr><td>Deployment</td><td>Manual, high-risk event</td><td>Manual / semi-automated</td><td>Fully automated pipeline</td></tr>
+                            <tr><td>Change Handling</td><td>Very expensive</td><td>Welcomed between sprints</td><td>Continuous, small, low-risk changes</td></tr>
+                            <tr><td>Best For</td><td>Fixed-scope projects (e.g., regulated hardware)</td><td>Evolving product requirements</td><td>Cloud-native, always-on services</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Key Insight</div>
+                        <p>Agile and DevOps are <strong>not competitors</strong> — DevOps is the natural extension of Agile. Agile answers "how do we build the right thing fast?", DevOps answers "how do we deliver and run it fast and safely?"</p>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Roles & Responsibilities ============ -->
+                <section class="content-section" id="roles">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">👨‍💻</div>
+                        <h2>4. Roles &amp; Responsibilities of a DevOps Engineer</h2>
+                    </div>
+                    <p class="content-text">
+                        A DevOps Engineer is the <strong>bridge between development and operations</strong> — building
+                        the automation, infrastructure, and pipelines that let developers ship code to production
+                        safely and repeatedly.
+                    </p>
+                    <div class="content-subheading">Day-to-Day Responsibilities</div>
+                    <ul class="content-list">
+                        <li><strong>CI/CD Pipelines</strong> — design, build, and maintain automated build → test → deploy pipelines (Jenkins, GitHub Actions)</li>
+                        <li><strong>Infrastructure as Code</strong> — provision and manage cloud infrastructure with Terraform / Ansible instead of manual clicks</li>
+                        <li><strong>Containerization &amp; Orchestration</strong> — package apps with Docker, run them at scale with Kubernetes</li>
+                        <li><strong>Cloud Management</strong> — architect and operate workloads on AWS / Azure / GCP with cost awareness</li>
+                        <li><strong>Monitoring &amp; Alerting</strong> — set up Prometheus, Grafana, and log aggregation; define alerts before users notice problems</li>
+                        <li><strong>Security (DevSecOps)</strong> — embed vulnerability scanning, secret management, and least-privilege access into pipelines</li>
+                        <li><strong>Incident Response</strong> — troubleshoot production issues, participate in on-call, write blameless post-mortems</li>
+                        <li><strong>Collaboration</strong> — enable developer self-service, document runbooks, spread automation culture across teams</li>
+                    </ul>
+
+                    <div class="content-subheading">DevOps Engineer vs Related Roles</div>
+                    <table class="content-table">
+                        <thead><tr><th>Role</th><th>Primary Focus</th></tr></thead>
+                        <tbody>
+                            <tr><td>DevOps Engineer</td><td>Automating the path from code to production (pipelines, IaC, deployment)</td></tr>
+                            <tr><td>Site Reliability Engineer (SRE)</td><td>Reliability of production systems — SLIs/SLOs, error budgets, incident management</td></tr>
+                            <tr><td>Platform Engineer</td><td>Building the internal developer platform (IDP) other teams build on</td></tr>
+                            <tr><td>Cloud Engineer</td><td>Designing and managing cloud infrastructure and services</td></tr>
+                            <tr><td>Build/Release Engineer</td><td>Build systems, artifact management, release coordination</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Career Tip</div>
+                        <p>Job postings use these titles interchangeably. Read the <strong>responsibilities</strong>, not the title — the skill set in this roadmap (Linux, Git, CI/CD, Docker, Kubernetes, Terraform, AWS, monitoring) qualifies you for all of them.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. DevOps Lifecycle ============ -->
+                <section class="content-section" id="lifecycle">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">♾️</div>
+                        <h2>5. DevOps Lifecycle Phases</h2>
+                    </div>
+                    <p class="content-text">
+                        The DevOps lifecycle is drawn as an <strong>infinity loop</strong> because it never ends —
+                        insights from Monitoring feed straight back into Planning. Eight phases, continuously repeating:
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The Infinite Loop</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">📝 Plan</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">💻 Code</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">🔨 Build</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">🧪 Test</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">🚀 Release</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">📦 Deploy</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">⚙️ Operate</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">📊 Monitor</span>
+                            <span class="flow-arrow">↩</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Phase</th><th>What Happens</th><th>Typical Tools</th></tr></thead>
+                        <tbody>
+                            <tr><td>📝 Plan</td><td>Define features, track work items, prioritize backlog</td><td>Jira, Azure Boards, Trello</td></tr>
+                            <tr><td>💻 Code</td><td>Write code, review via pull requests, manage versions</td><td>Git, GitHub, GitLab, VS Code</td></tr>
+                            <tr><td>🔨 Build</td><td>Compile code, resolve dependencies, produce artifacts / images</td><td>Maven, Gradle, npm, Docker</td></tr>
+                            <tr><td>🧪 Test</td><td>Automated unit, integration, security &amp; quality tests</td><td>JUnit, Selenium, SonarQube, Trivy</td></tr>
+                            <tr><td>🚀 Release</td><td>Version, approve, and stage the artifact for production</td><td>Jenkins, GitHub Actions, Nexus, ECR</td></tr>
+                            <tr><td>📦 Deploy</td><td>Push to production — automated, repeatable, roll-back-able</td><td>ArgoCD, Helm, Kubernetes, Terraform</td></tr>
+                            <tr><td>⚙️ Operate</td><td>Manage infrastructure, scaling, configuration in production</td><td>Kubernetes, Ansible, AWS</td></tr>
+                            <tr><td>📊 Monitor</td><td>Collect metrics, logs &amp; alerts; feed insights back to Plan</td><td>Prometheus, Grafana, Loki, CloudWatch</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Interview Favorite</div>
+                        <p>"Walk me through what happens when a developer pushes code" is one of the most common DevOps interview questions. Answer it by walking these 8 phases with one tool per phase — that story is exactly what this whole roadmap teaches you to build.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. CI/CD ============ -->
+                <section class="content-section" id="cicd">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>6. Continuous Integration, Delivery &amp; Deployment</h2>
+                    </div>
+                    <p class="content-text">
+                        These three "CDs" are the engine of DevOps. They differ in <strong>how far automation goes</strong>
+                        before a human is involved.
+                    </p>
+
+                    <div class="content-subheading">Continuous Integration (CI)</div>
+                    <p class="content-text">
+                        Developers merge small changes into the shared main branch <strong>frequently — at least daily</strong>.
+                        Every merge automatically triggers a build and test run, so integration bugs are caught within
+                        minutes instead of at the end of the month ("integration hell").
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">CI Flow</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Commit</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Push to Git</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Automated Build</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Automated Tests</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">✅ Feedback in Minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Continuous Delivery (CDelivery)</div>
+                    <p class="content-text">
+                        Extends CI: every change that passes the pipeline is packaged and kept in a
+                        <strong>deployable state</strong>. Deployment to production requires <strong>one manual approval</strong> —
+                        the business decides <em>when</em> to release, but the release itself is a button-press, not a project.
+                    </p>
+
+                    <div class="content-subheading">Continuous Deployment (CDeployment)</div>
+                    <p class="content-text">
+                        The final step of automation: every change that passes all tests goes to
+                        <strong>production automatically — no human approval at all</strong>. This is how Netflix and
+                        Amazon deploy thousands of times per day. It demands excellent test coverage and monitoring.
+                    </p>
+
+                    <table class="content-table">
+                        <thead><tr><th></th><th>Continuous Integration</th><th>Continuous Delivery</th><th>Continuous Deployment</th></tr></thead>
+                        <tbody>
+                            <tr><td>Automates</td><td>Build + Test</td><td>Build + Test + Release</td><td>Build + Test + Release + Deploy</td></tr>
+                            <tr><td>Manual Step</td><td>Merge review</td><td>Approval to deploy</td><td><strong>None</strong></td></tr>
+                            <tr><td>Production Deploys</td><td>—</td><td>On demand</td><td>Every passing commit</td></tr>
+                            <tr><td>Requirement</td><td>Automated tests</td><td>+ Staging environment</td><td>+ High test confidence &amp; monitoring</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Common Confusion</div>
+                        <p>"CD" means <strong>Delivery</strong> or <strong>Deployment</strong> depending on context. The difference is one thing only: <strong>is the final push to production approved by a human (Delivery) or fully automatic (Deployment)?</strong></p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Toolchain ============ -->
+                <section class="content-section" id="toolchain">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧰</div>
+                        <h2>7. DevOps Toolchain Overview — How Tools Fit Together</h2>
+                    </div>
+                    <p class="content-text">
+                        No single tool "does DevOps". Instead, a <strong>toolchain</strong> connects specialized tools
+                        into one automated flow. Here is the exact chain this roadmap teaches, mapped to the lifecycle:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Category</th><th>Tools in This Roadmap</th><th>Lifecycle Phase</th></tr></thead>
+                        <tbody>
+                            <tr><td>Version Control</td><td>Git, GitHub</td><td>Code</td></tr>
+                            <tr><td>Build Tools</td><td>Maven, Gradle, npm</td><td>Build</td></tr>
+                            <tr><td>Artifact Repository</td><td>Nexus, Amazon ECR</td><td>Build / Release</td></tr>
+                            <tr><td>CI/CD Server</td><td>Jenkins, GitHub Actions</td><td>Build → Deploy</td></tr>
+                            <tr><td>Code Quality &amp; Security</td><td>SonarQube / SonarCloud, Trivy</td><td>Test</td></tr>
+                            <tr><td>Containers</td><td>Docker</td><td>Build / Deploy</td></tr>
+                            <tr><td>Orchestration</td><td>Kubernetes, Amazon EKS, Helm</td><td>Deploy / Operate</td></tr>
+                            <tr><td>Infrastructure as Code</td><td>Terraform</td><td>Deploy / Operate</td></tr>
+                            <tr><td>Configuration Management</td><td>Ansible</td><td>Operate</td></tr>
+                            <tr><td>GitOps</td><td>ArgoCD</td><td>Deploy</td></tr>
+                            <tr><td>Cloud Platform</td><td>AWS (VPC, EKS, IAM, Route53…)</td><td>All phases</td></tr>
+                            <tr><td>Monitoring &amp; Logging</td><td>Prometheus, Grafana, Loki, AlertManager</td><td>Monitor</td></tr>
+                            <tr><td>Scripting / Automation</td><td>Bash, Python</td><td>Glue for everything</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="visual-box">
+                        <div class="visual-box-title">One Commit's Journey Through the Toolchain</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Developer</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Git Push (GitHub)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">CI Trigger (Jenkins / Actions)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Build (Maven)</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Tests + SonarQube</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Docker Build</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Trivy Scan</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Push to ECR</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">GitOps Repo Update</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD Sync</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Kubernetes (EKS)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Prometheus / Grafana Monitor</span>
+                        </div>
+                    </div>
+
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ This Is the Whole Roadmap</div>
+                        <p>Look closely at that flow — it is exactly the <a href="project1.html">Capstone Project</a> you'll build by the end of this roadmap. Every module from here on teaches one link of this chain in depth.</p>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: DevOps Toolchain Mapping Document</h2>
+                        <p>Create a comprehensive DevOps toolchain diagram mapping each lifecycle phase to specific tools, and document the flow of code from developer commit to production deployment.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>List the 8 Lifecycle Phases</h3>
+                            <p>Start a document (Markdown, Google Docs, or draw.io) with the phases: Plan → Code → Build → Test → Release → Deploy → Operate → Monitor.</p>
+                        </div>
+                        <div class="project-step" data-step="2">
+                            <h3>Map 2–3 Tools to Each Phase</h3>
+                            <p>For every phase, research and note the leading tools (use the toolchain table above as your starting point). Write one sentence on what each tool does.</p>
+                        </div>
+                        <div class="project-step" data-step="3">
+                            <h3>Draw the Commit-to-Production Flow</h3>
+                            <p>Using draw.io, Excalidraw, or Mermaid, diagram the journey of a single commit through your chosen tools — from <code>git push</code> to a monitored production deployment.</p>
+                        </div>
+                        <div class="project-step" data-step="4">
+                            <h3>Mark CI vs CD Boundaries</h3>
+                            <p>On the diagram, mark where Continuous Integration ends and Continuous Delivery/Deployment begins. Add the manual approval gate if you chose Delivery over Deployment.</p>
+                        </div>
+                        <div class="project-step" data-step="5">
+                            <h3>Publish to GitHub</h3>
+                            <p>Create a repository, add your document as <code>README.md</code> with the diagram embedded. This is the first artifact of your DevOps portfolio — you'll keep adding to it every module.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💬</div>
+                        <h2>Interview Questions</h2>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q1</span>
+                            <h4>What is DevOps and why do companies adopt it?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            DevOps is a culture and set of practices that unifies software development and IT operations to deliver software faster and more reliably. Companies adopt it to increase deployment frequency, reduce failure rates, recover from incidents faster, and shorten the time from idea to production — measured by the four DORA metrics.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q2</span>
+                            <h4>Explain the difference between Continuous Delivery and Continuous Deployment.</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Both keep every change in a deployable state through automated build and test. In Continuous Delivery, the final deployment to production requires a manual approval — a human decides when. In Continuous Deployment, every change that passes the pipeline goes to production automatically with no human gate.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q3</span>
+                            <h4>How is DevOps different from Agile?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Agile is about how software is built — iteratively, in short sprints with continuous customer feedback. DevOps extends Agile to how software is delivered and operated — automating the path to production and unifying Dev and Ops. Agile ends at "working software"; DevOps ends at "working software running reliably in production". They complement each other.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q4</span>
+                            <h4>Walk me through what happens when a developer pushes code to production.</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            The push to Git triggers the CI server (Jenkins/GitHub Actions), which builds the code, runs unit tests and quality/security scans (SonarQube, Trivy), builds a Docker image, and pushes it to a registry (ECR). The CD stage updates the GitOps repository with the new image tag; ArgoCD detects the change and syncs it to the Kubernetes cluster. Prometheus and Grafana then monitor the new version, and alerts fire if anything degrades — enabling automatic or manual rollback.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q5</span>
+                            <h4>What are the DORA metrics?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            The four key metrics from DevOps Research and Assessment used to measure DevOps performance: (1) Deployment Frequency — how often you release to production; (2) Lead Time for Changes — commit to production time; (3) Change Failure Rate — percentage of deployments causing failures; (4) Mean Time to Recovery (MTTR) — how fast you recover from incidents. Elite teams deploy on demand, with lead times under a day and MTTR under an hour.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q6</span>
+                            <h4>Is DevOps a role, a tool, or a culture?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Primarily a culture — shared ownership of software from idea to production, supported by automation and measurement (CALMS: Culture, Automation, Lean, Measurement, Sharing). The industry also uses "DevOps Engineer" as a role that builds the enabling automation, and there are many DevOps tools — but tools without the culture change fail to deliver DevOps outcomes.
+                        </div></div>
+                    </div>
+                </section>
+
+                <!-- Footer nav -->
+                <div class="module-nav">
+                    <a href="index.html#roadmap" class="module-nav-card">
+                        <span class="module-nav-label">← Back</span>
+                        <span class="module-nav-title">DevOps Roadmap 2026</span>
+                    </a>
+                    <a href="module-02.html" class="module-nav-card next">
+                        <span class="module-nav-label">Next Module →</span>
+                        <span class="module-nav-title">02 · Operating Systems &amp; Linux</span>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

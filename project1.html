@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Project — Production-Grade E-Commerce Platform on AWS EKS</title>
+    <meta name="description" content="End-to-End DevOps Engineering Capstone Project: Production-Grade E-Commerce Platform on AWS EKS with Terraform, GitOps (ArgoCD), Prometheus, Grafana and Loki.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">CAPSTONE PROJECT · v1.0</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level pro">Capstone</span>
+                    <span class="module-hero-duration">AWS · EKS · Terraform · ArgoCD</span>
+                </div>
+                <h1>Production-Grade E-Commerce Platform on <span class="gradient-text">AWS EKS</span></h1>
+                <p class="module-hero-desc">
+                    End-to-End DevOps Engineering Project — design, implementation, automation, deployment,
+                    monitoring, security, and operations of a production-grade e-commerce platform running on AWS,
+                    built with modern DevOps, Platform Engineering, and GitOps principles.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">AWS</span>
+                    <span class="tech-tag">Kubernetes (EKS)</span>
+                    <span class="tech-tag">Terraform</span>
+                    <span class="tech-tag">ArgoCD</span>
+                    <span class="tech-tag">GitHub Actions</span>
+                    <span class="tech-tag">Prometheus</span>
+                    <span class="tech-tag">Grafana</span>
+                    <span class="tech-tag">Loki</span>
+                    <span class="tech-tag">Trivy</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#summary" class="toc-link">1. Executive Summary</a></li>
+                    <li><a href="#business" class="toc-link">2. Business Requirement</a></li>
+                    <li><a href="#solution" class="toc-link">3. Solution Overview</a></li>
+                    <li><a href="#stack" class="toc-link">4. Technology Stack</a></li>
+                    <li><a href="#repos" class="toc-link">5. Repository Architecture</a></li>
+                    <li><a href="#infra" class="toc-link">6. Infrastructure Architecture</a></li>
+                    <li><a href="#k8s" class="toc-link">7. Kubernetes Architecture</a></li>
+                    <li><a href="#app" class="toc-link">8. Application Architecture</a></li>
+                    <li><a href="#gitops" class="toc-link">9. GitOps Architecture</a></li>
+                    <li><a href="#cicd" class="toc-link">10. CI/CD Architecture</a></li>
+                    <li><a href="#monitoring" class="toc-link">11. Monitoring Architecture</a></li>
+                    <li><a href="#logging" class="toc-link">12. Logging Architecture</a></li>
+                    <li><a href="#security" class="toc-link">13. Security Architecture</a></li>
+                    <li><a href="#deployment" class="toc-link">14. Deployment Strategy</a></li>
+                    <li><a href="#observability" class="toc-link">15. Observability Strategy</a></li>
+                    <li><a href="#scalability" class="toc-link">16. Scalability Strategy</a></li>
+                    <li><a href="#dr" class="toc-link">17. Disaster Recovery</a></li>
+                    <li><a href="#runbook" class="toc-link">18. Operational Runbook</a></li>
+                    <li><a href="#practices" class="toc-link">19. Best Practices</a></li>
+                    <li><a href="#skills" class="toc-link">20. Key Skills</a></li>
+                    <li><a href="#rollback" class="toc-link">21. Rollback Strategy</a></li>
+                    <li><a href="#cost" class="toc-link">22. Cost Optimization</a></li>
+                    <li><a href="#loadtest" class="toc-link">23. Load Testing</a></li>
+                    <li><a href="#outcome" class="toc-link toc-project">🏆 Project Outcome</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+
+                <!-- 1. Executive Summary -->
+                <section class="content-section" id="summary">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📋</div>
+                        <h2>1. Executive Summary</h2>
+                    </div>
+                    <p class="content-text">
+                        This project demonstrates the design, implementation, automation, deployment, monitoring,
+                        security, and operations of a <strong>Production-Grade E-Commerce Platform</strong> running on AWS.
+                    </p>
+                    <p class="content-text">
+                        The platform is built using modern DevOps, Platform Engineering, and GitOps principles to provide:
+                    </p>
+                    <ul class="content-list">
+                        <li>Automated Infrastructure Provisioning</li>
+                        <li>Secure Cloud Architecture</li>
+                        <li>Kubernetes-based Container Orchestration</li>
+                        <li>Continuous Integration and Continuous Deployment</li>
+                        <li>Centralized Monitoring and Logging</li>
+                        <li>Security and Compliance Controls</li>
+                        <li>Production Deployment Governance</li>
+                    </ul>
+                    <p class="content-text">
+                        The objective is to create a real-world enterprise platform similar to what is used in large
+                        organizations such as <strong>Amazon, Netflix, Walmart, Reliance Jio</strong>, and Fortune 500 companies.
+                    </p>
+                </section>
+
+                <!-- 2. Business Requirement -->
+                <section class="content-section" id="business">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💼</div>
+                        <h2>2. Business Requirement</h2>
+                    </div>
+                    <p class="content-text">The business requires a scalable e-commerce platform capable of handling:</p>
+                    <ul class="content-list">
+                        <li>User Registration</li>
+                        <li>Product Catalog Management</li>
+                        <li>Shopping Cart Operations</li>
+                        <li>Order Processing</li>
+                        <li>Authentication &amp; Authorization</li>
+                        <li>Monitoring &amp; Alerting</li>
+                        <li>Continuous Deployment</li>
+                    </ul>
+                    <div class="content-subheading">The platform must support</div>
+                    <ul class="content-list">
+                        <li>High Availability</li>
+                        <li>Scalability</li>
+                        <li>Security</li>
+                        <li>Cost Optimization</li>
+                        <li>Disaster Recovery</li>
+                        <li>Production Operations</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Solution Overview -->
+                <section class="content-section" id="solution">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>3. Solution Overview</h2>
+                    </div>
+                    <p class="content-text">The solution is built using a cloud-native architecture on AWS.</p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">High-Level Architecture</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Users</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Internet</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Route53</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">NGINX Ingress (NLB)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Frontend</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">API Gateway</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">User Service</span>
+                            <span class="flow-item">Product Service</span>
+                            <span class="flow-item">Cart Service</span>
+                            <span class="flow-item">Order Service</span>
+                            <span class="flow-item">Payment Service</span>
+                        </div>
+                    </div>
+                    <p class="content-text">The entire platform runs on Kubernetes managed through <strong>Amazon EKS</strong>.</p>
+                </section>
+
+                <!-- 4. Technology Stack -->
+                <section class="content-section" id="stack">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧰</div>
+                        <h2>4. Technology Stack</h2>
+                    </div>
+
+                    <div class="content-subheading">Cloud Platform</div>
+                    <table class="content-table">
+                        <thead><tr><th>Technology</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>AWS</td><td>Cloud Provider</td></tr>
+                            <tr><td>VPC</td><td>Networking</td></tr>
+                            <tr><td>EKS</td><td>Kubernetes</td></tr>
+                            <tr><td>ECR</td><td>Container Registry</td></tr>
+                            <tr><td>Route53</td><td>DNS</td></tr>
+                            <tr><td>ACM</td><td>SSL Certificates</td></tr>
+                            <tr><td>IAM</td><td>Security</td></tr>
+                            <tr><td>CloudWatch</td><td>Cloud Monitoring</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Infrastructure as Code</div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Terraform</td><td>Infrastructure Provisioning</td></tr>
+                            <tr><td>AWS CLI</td><td>AWS Management</td></tr>
+                            <tr><td>GitHub Actions</td><td>Automation</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Containerization &amp; Orchestration</div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Docker</td><td>Container Build</td></tr>
+                            <tr><td>ECR</td><td>Image Storage</td></tr>
+                            <tr><td>Kubernetes</td><td>Container Orchestration</td></tr>
+                            <tr><td>EKS</td><td>Managed Kubernetes</td></tr>
+                            <tr><td>Helm</td><td>Package Management</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">GitOps</div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>ArgoCD</td><td>Continuous Deployment</td></tr>
+                            <tr><td>GitOps Repository</td><td>Source of Truth</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Monitoring &amp; Logging</div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Prometheus</td><td>Metrics Collection</td></tr>
+                            <tr><td>Grafana</td><td>Visualization &amp; Log Analysis</td></tr>
+                            <tr><td>AlertManager</td><td>Alerting</td></tr>
+                            <tr><td>Loki</td><td>Log Storage</td></tr>
+                            <tr><td>Promtail</td><td>Log Collection</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Security</div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>GitHub OIDC</td><td>Authentication</td></tr>
+                            <tr><td>IAM Roles</td><td>Authorization</td></tr>
+                            <tr><td>IRSA</td><td>Pod Authentication</td></tr>
+                            <tr><td>Trivy</td><td>Vulnerability Scanning</td></tr>
+                            <tr><td>SonarCloud</td><td>Code Quality</td></tr>
+                            <tr><td>Kubernetes Secrets</td><td>Secret Management</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 5. Repository Architecture -->
+                <section class="content-section" id="repos">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>5. Repository Architecture</h2>
+                    </div>
+                    <p class="content-text">The platform follows a <strong>Three Repository Model</strong>.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Repositories</span></div>
+                        <pre><code>GitHub
+│
+├── techitfactory-infra
+│
+├── techitfactory-app
+│
+└── techitfactory-gitops</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Infrastructure Repository</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">techitfactory-infra</span></div>
+                        <pre><code>techitfactory-infra
+│
+├── bootstrap
+├── modules
+│   ├── vpc
+│   ├── iam
+│   ├── ecr
+│   ├── eks
+│   ├── monitoring
+│   └── security
+│
+└── environments
+    ├── dev
+    └── prod</code></pre>
+                    </div>
+                    <ul class="content-list">
+                        <li>Infrastructure Deployment</li>
+                        <li>Terraform Modules</li>
+                        <li>Networking</li>
+                        <li>IAM</li>
+                        <li>EKS</li>
+                    </ul>
+
+                    <div class="content-subheading">Application Repository</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">techitfactory-app</span></div>
+                        <pre><code>techitfactory-app
+│
+├── services
+│   ├── frontend
+│   ├── api-gateway
+│   ├── user-service
+│   ├── product-service
+│   ├── order-service
+│   └── cart-service
+│
+└── .github</code></pre>
+                    </div>
+                    <ul class="content-list">
+                        <li>Application Code</li>
+                        <li>Dockerfiles</li>
+                        <li>Unit Testing</li>
+                        <li>Build Pipelines</li>
+                    </ul>
+
+                    <div class="content-subheading">GitOps Repository</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">techitfactory-gitops</span></div>
+                        <pre><code>techitfactory-gitops
+│
+├── apps
+├── base
+└── environments
+    ├── dev
+    └── prod</code></pre>
+                    </div>
+                    <ul class="content-list">
+                        <li>Kubernetes Manifests</li>
+                        <li>ArgoCD Applications</li>
+                        <li>Environment Configuration</li>
+                    </ul>
+                </section>
+
+                <!-- 6. Infrastructure Architecture -->
+                <section class="content-section" id="infra">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>6. Infrastructure Architecture</h2>
+                    </div>
+                    <div class="content-subheading">AWS VPC</div>
+                    <p class="content-text">VPC CIDR: <code>10.0.0.0/16</code></p>
+
+                    <div class="content-subheading">Public Subnets</div>
+                    <p class="content-text"><code>10.0.1.0/24</code> &nbsp; <code>10.0.2.0/24</code> — used for NAT Gateway and NLB.</p>
+
+                    <div class="content-subheading">Private Subnets</div>
+                    <p class="content-text"><code>10.0.11.0/24</code> &nbsp; <code>10.0.12.0/24</code> — used for EKS Nodes and Application Pods.</p>
+
+                    <div class="content-subheading">Network Components</div>
+                    <table class="content-table">
+                        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+                        <tbody>
+                            <tr><td>Internet Gateway</td><td>Provides internet access</td></tr>
+                            <tr><td>NAT Gateway</td><td>Allows private resources to access internet</td></tr>
+                            <tr><td>Route Tables</td><td>Control network routing</td></tr>
+                            <tr><td>Security Groups</td><td>Firewall at instance level</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 7. Kubernetes Architecture -->
+                <section class="content-section" id="k8s">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☸️</div>
+                        <h2>7. Kubernetes Architecture</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Amazon EKS</span></div>
+                        <pre><code>EKS Cluster
+│
+├── Control Plane
+│
+└── Managed Node Groups</code></pre>
+                    </div>
+                    <div class="content-subheading">Namespaces</div>
+                    <p class="content-text"><code>argocd</code> &nbsp; <code>monitoring</code> &nbsp; <code>techitfactory</code></p>
+
+                    <div class="content-subheading">Kubernetes Components</div>
+                    <table class="content-table">
+                        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+                        <tbody>
+                            <tr><td>Deployments</td><td>Manage pods</td></tr>
+                            <tr><td>Services</td><td>Expose applications</td></tr>
+                            <tr><td>Ingress</td><td>Provides external access</td></tr>
+                            <tr><td>ConfigMaps</td><td>Store configuration</td></tr>
+                            <tr><td>Secrets</td><td>Store sensitive information</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 8. Application Architecture -->
+                <section class="content-section" id="app">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧩</div>
+                        <h2>8. Application Architecture</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Service</th><th>Technology / Responsibilities</th></tr></thead>
+                        <tbody>
+                            <tr><td>Frontend</td><td>NGINX, HTML, CSS, JavaScript — User Interface, Product Display</td></tr>
+                            <tr><td>API Gateway</td><td>Central Entry Point, Authentication, Request Routing</td></tr>
+                            <tr><td>User Service</td><td>User Management, JWT Authentication</td></tr>
+                            <tr><td>Product Service</td><td>Product Catalog</td></tr>
+                            <tr><td>Cart Service</td><td>Cart Management</td></tr>
+                            <tr><td>Order Service</td><td>Order Processing</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Data Layer</div>
+                    <table class="content-table">
+                        <thead><tr><th>Store</th><th>Used By</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>PostgreSQL (RDS)</td><td>User, Product, Order Service</td><td>Persistent relational data</td></tr>
+                            <tr><td>Redis (ElastiCache)</td><td>Cart Service</td><td>Fast in-memory cart &amp; sessions</td></tr>
+                        </tbody>
+                    </table>
+                    <ul class="content-list">
+                        <li>RDS Multi-AZ for High Availability</li>
+                        <li>Automated Daily Snapshots</li>
+                        <li>Credentials stored in AWS Secrets Manager</li>
+                        <li>Databases in Private Subnets only</li>
+                    </ul>
+                </section>
+
+                <!-- 9. GitOps Architecture -->
+                <section class="content-section" id="gitops">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>9. GitOps Architecture</h2>
+                    </div>
+                    <div class="content-subheading">ArgoCD Components</div>
+                    <ul class="content-list">
+                        <li>ArgoCD Server</li>
+                        <li>ArgoCD Repo Server</li>
+                        <li>Application Controller</li>
+                        <li>Redis</li>
+                    </ul>
+
+                    <div class="content-subheading">App of Apps Pattern</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">App of Apps</span></div>
+                        <pre><code>Root App
+│
+├── Frontend
+├── API Gateway
+├── User Service
+├── Product Service
+├── Order Service
+├── Cart Service
+└── Monitoring</code></pre>
+                    </div>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Benefits</div>
+                        <p>Single Source of Truth · Automatic Sync · Drift Detection · Rollback</p>
+                    </div>
+                </section>
+
+                <!-- 10. CI/CD Architecture -->
+                <section class="content-section" id="cicd">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚀</div>
+                        <h2>10. CI/CD Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Infrastructure Pipeline</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Git Push</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Terraform Validate</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Terraform Plan</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Terraform Apply</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">AWS</span>
+                        </div>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Application Pipeline</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Developer</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Git Push</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">GitHub Actions</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Unit Test</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">SonarCloud</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Docker Build</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Trivy Scan</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ECR Push</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">GitOps Update</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">EKS</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 11. Monitoring Architecture -->
+                <section class="content-section" id="monitoring">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📊</div>
+                        <h2>11. Monitoring Architecture</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Coverage</th></tr></thead>
+                        <tbody>
+                            <tr><td>Prometheus</td><td>CPU Usage, Memory Usage, Pod Metrics, Node Metrics</td></tr>
+                            <tr><td>Grafana</td><td>Cluster Dashboard, Node Dashboard, Application Dashboard</td></tr>
+                            <tr><td>AlertManager</td><td>High CPU, High Memory, Pod Crash, Node Failure</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 12. Logging Architecture -->
+                <section class="content-section" id="logging">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>12. Logging Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Log Pipeline</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Application Pods</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Promtail</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Loki</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Grafana</span>
+                        </div>
+                    </div>
+                    <ul class="content-list">
+                        <li>Centralized Logging</li>
+                        <li>Log Search</li>
+                        <li>Error Investigation</li>
+                    </ul>
+                </section>
+
+                <!-- 13. Security Architecture -->
+                <section class="content-section" id="security">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>13. Security Architecture</h2>
+                    </div>
+                    <div class="content-subheading">Authentication — GitHub OIDC</div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">OIDC Flow</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">GitHub</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">OIDC</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">IAM Role</span>
+                        </div>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Key Advantage</div>
+                        <p>No Access Keys required — GitHub Actions authenticates to AWS through short-lived OIDC tokens.</p>
+                    </div>
+
+                    <div class="content-subheading">Authorization</div>
+                    <table class="content-table">
+                        <thead><tr><th>Mechanism</th><th>Controls</th></tr></thead>
+                        <tbody>
+                            <tr><td>IAM</td><td>AWS Access</td></tr>
+                            <tr><td>IRSA</td><td>Pod Access</td></tr>
+                            <tr><td>RBAC</td><td>Kubernetes Access</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Image Security</div>
+                    <ul class="content-list">
+                        <li><strong>Trivy</strong> — scans Docker images</li>
+                        <li><strong>ECR Scan</strong> — scans container images</li>
+                    </ul>
+
+                    <div class="content-subheading">Secrets</div>
+                    <ul class="content-list">
+                        <li>Kubernetes Secrets</li>
+                        <li>AWS Secrets Manager</li>
+                    </ul>
+                </section>
+
+                <!-- 14. Production Deployment Strategy -->
+                <section class="content-section" id="deployment">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎯</div>
+                        <h2>14. Production Deployment Strategy</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Development — Automatic Deployment</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Push</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">CI</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Build</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Deploy</span>
+                        </div>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Production — Controlled Deployment</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Release</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Approval</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">GitOps Update</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD Sync</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 15. Observability Strategy -->
+                <section class="content-section" id="observability">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">👁️</div>
+                        <h2>15. Observability Strategy</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Concern</th><th>Tool</th></tr></thead>
+                        <tbody>
+                            <tr><td>Metrics</td><td>Prometheus</td></tr>
+                            <tr><td>Dashboards</td><td>Grafana</td></tr>
+                            <tr><td>Logs</td><td>Loki</td></tr>
+                            <tr><td>Alerts</td><td>AlertManager</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 16. Scalability Strategy -->
+                <section class="content-section" id="scalability">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📈</div>
+                        <h2>16. Scalability Strategy</h2>
+                    </div>
+                    <div class="content-subheading">Horizontal Pod Autoscaler</div>
+                    <p class="content-text"><code>Min Pods = 2</code> &nbsp; <code>Max Pods = 10</code> — scales based on <strong>CPU</strong> and <strong>Memory</strong>.</p>
+                    <div class="content-subheading">Cluster Autoscaler</div>
+                    <p class="content-text">Automatically <strong>adds nodes</strong> and <strong>removes nodes</strong> based on demand.</p>
+                </section>
+
+                <!-- 17. Disaster Recovery -->
+                <section class="content-section" id="dr">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛟</div>
+                        <h2>17. Disaster Recovery</h2>
+                    </div>
+                    <div class="content-subheading">Infrastructure Recovery</div>
+                    <p class="content-text">Terraform state stored in an <code>S3 Backend</code>.</p>
+                    <div class="content-subheading">Kubernetes Recovery</div>
+                    <p class="content-text">Backup of Deployments, Services, ConfigMaps, and Secrets.</p>
+                    <div class="content-subheading">Recovery Objectives</div>
+                    <table class="content-table">
+                        <thead><tr><th>Objective</th><th>Target</th></tr></thead>
+                        <tbody>
+                            <tr><td>RTO — Recovery Time Objective</td><td>30 Minutes</td></tr>
+                            <tr><td>RPO — Recovery Point Objective</td><td>15 Minutes</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 18. Operational Runbook -->
+                <section class="content-section" id="runbook">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📖</div>
+                        <h2>18. Operational Runbook</h2>
+                    </div>
+                    <div class="content-subheading">Cluster Health</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">kubectl</span> get nodes
+<span class="command">kubectl</span> get pods <span class="flag">-A</span></code></pre>
+                    </div>
+                    <div class="content-subheading">ArgoCD</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">argocd</span> app list
+<span class="command">argocd</span> app sync APP_NAME</code></pre>
+                    </div>
+                    <div class="content-subheading">Logs</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">kubectl</span> logs POD</code></pre>
+                    </div>
+                    <div class="content-subheading">Metrics</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">kubectl</span> top nodes
+<span class="command">kubectl</span> top pods</code></pre>
+                    </div>
+                </section>
+
+                <!-- 19. Best Practices -->
+                <section class="content-section" id="practices">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">✅</div>
+                        <h2>19. DevOps Best Practices Implemented</h2>
+                    </div>
+                    <ul class="content-list">
+                        <li>Infrastructure as Code</li>
+                        <li>GitOps</li>
+                        <li>Continuous Integration</li>
+                        <li>Continuous Deployment</li>
+                        <li>Automated Security Scanning</li>
+                        <li>Centralized Monitoring</li>
+                        <li>Centralized Logging</li>
+                        <li>Container Security</li>
+                        <li>Non-Root Containers</li>
+                        <li>Network Policies</li>
+                        <li>Production Approval Gates</li>
+                        <li>Disaster Recovery</li>
+                        <li>Autoscaling</li>
+                    </ul>
+                </section>
+
+                <!-- 20. Key Skills -->
+                <section class="content-section" id="skills">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎓</div>
+                        <h2>20. Key Skills Demonstrated</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Area</th><th>Skills</th></tr></thead>
+                        <tbody>
+                            <tr><td>AWS</td><td>VPC, IAM, EKS, ECR, Route53, ACM</td></tr>
+                            <tr><td>Terraform</td><td>Modules, Remote State, Workspaces</td></tr>
+                            <tr><td>Kubernetes</td><td>Deployments, Services, Ingress, HPA, RBAC</td></tr>
+                            <tr><td>DevOps</td><td>GitHub Actions, CI/CD, GitOps</td></tr>
+                            <tr><td>Observability</td><td>Prometheus, Grafana, Loki</td></tr>
+                            <tr><td>Security</td><td>OIDC, Trivy, IRSA, RBAC</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 21. Rollback Strategy -->
+                <section class="content-section" id="rollback">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⏪</div>
+                        <h2>21. Rollback Strategy</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Application Rollback</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Bad Deployment Detected (Alerts / Health Checks)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD Rollback to Previous Git Revision</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Rolling Update Back to Last Image</span>
+                        </div>
+                    </div>
+                    <ul class="content-list">
+                        <li>Every deployment is a Git commit — rollback = revert commit</li>
+                        <li>Kubernetes keeps previous ReplicaSets for instant rollback</li>
+                        <li>Database changes use backward-compatible migrations</li>
+                    </ul>
+                </section>
+
+                <!-- 22. Cost Optimization -->
+                <section class="content-section" id="cost">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💰</div>
+                        <h2>22. Cost Optimization (FinOps)</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Strategy</th><th>Implementation</th></tr></thead>
+                        <tbody>
+                            <tr><td>Right-Sizing</td><td>Resource requests/limits tuned from metrics</td></tr>
+                            <tr><td>Autoscaling</td><td>HPA + Cluster Autoscaler — pay for demand</td></tr>
+                            <tr><td>Spot Instances</td><td>Non-critical node groups on EC2 Spot</td></tr>
+                            <tr><td>Single NAT Gateway</td><td>Dev environment cost reduction</td></tr>
+                            <tr><td>ECR Lifecycle Policies</td><td>Auto-delete old container images</td></tr>
+                            <tr><td>Monitoring</td><td>CloudWatch billing alarms + cost tags</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 23. Performance & Load Testing -->
+                <section class="content-section" id="loadtest">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏋️</div>
+                        <h2>23. Performance &amp; Load Testing</h2>
+                    </div>
+                    <p class="content-text">Tools: <strong>k6</strong> for HTTP load testing, with Grafana dashboards observed during test runs.</p>
+                    <ul class="content-list">
+                        <li>Application behavior validated under 500+ concurrent users</li>
+                        <li>HPA scale-out and scale-in verified under load</li>
+                        <li>p95 latency within SLO before production release</li>
+                    </ul>
+                </section>
+
+                <!-- Project Outcome -->
+                <section class="content-section" id="outcome">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏆</div>
+                        <h2>Project Outcome</h2>
+                    </div>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">🏆 Outcome</div>
+                        <p>
+                            Successfully designed and implemented a complete production-grade Kubernetes platform using
+                            AWS, Terraform, GitHub Actions, ArgoCD, Prometheus, Grafana, Loki, and EKS. The platform
+                            supports automated infrastructure provisioning, GitOps-based deployments, centralized
+                            monitoring and logging, security controls, autoscaling, and production deployment
+                            governance — providing a real-world DevOps and Platform Engineering implementation
+                            suitable for enterprise environments.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Footer nav -->
+                <div class="module-nav">
+                    <a href="index.html#roadmap" class="module-nav-card">
+                        <span class="module-nav-label">← Back</span>
+                        <span class="module-nav-title">DevOps Roadmap 2026</span>
+                    </a>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</body>
+</html>

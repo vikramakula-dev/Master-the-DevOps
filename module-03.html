@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 03 — Version Control with Git &amp; GitHub | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 3: Version Control with Git & GitHub — architecture, core commands, branching, PRs, merge vs rebase, workflows, and semantic versioning.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 03 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level beginner">Beginner</span>
+                    <span class="module-hero-duration">Phase 1 · Foundations</span>
+                </div>
+                <h1>Module 03 — Version Control with <span class="gradient-text">Git &amp; GitHub</span></h1>
+                <p class="module-hero-desc">
+                    Source code is the single source of truth in modern IT. Master Git workflows, branching strategies, and collaboration on GitHub to safely manage the lifeblood of your DevOps pipelines.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Git</span>
+                    <span class="tech-tag">GitHub</span>
+                    <span class="tech-tag">Branching</span>
+                    <span class="tech-tag">Pull Requests</span>
+                    <span class="tech-tag">SemVer</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#vcs-intro" class="toc-link">1. What is Version Control</a></li>
+                    <li><a href="#git-arch" class="toc-link">2. Git Architecture</a></li>
+                    <li><a href="#core-commands" class="toc-link">3. Core Commands</a></li>
+                    <li><a href="#branch-merge" class="toc-link">4. Branching &amp; Merging</a></li>
+                    <li><a href="#git-workflows" class="toc-link">5. Git Workflows</a></li>
+                    <li><a href="#pull-requests" class="toc-link">6. Pull Requests &amp; Code Reviews</a></li>
+                    <li><a href="#rebase-merge" class="toc-link">7. Rebase vs Merge</a></li>
+                    <li><a href="#stash-reset" class="toc-link">8. Stash, Reset &amp; Revert</a></li>
+                    <li><a href="#gitignore" class="toc-link">9. .gitignore &amp; Best Practices</a></li>
+                    <li><a href="#tags-semver" class="toc-link">10. Tags &amp; SemVer</a></li>
+                    <li><a href="#github-intro" class="toc-link">11. GitHub Platform Intro</a></li>
+                    <li><a href="#advanced-scenarios" class="toc-link">12. Advanced Scenarios</a></li>
+                    <li><a href="#practical-exams" class="toc-link">13. Practical Exams</a></li>
+                    <li><a href="#cheat-sheet" class="toc-link">14. Daily Git Cheat Sheet</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+
+                <!-- ============ 1. VCS Intro ============ -->
+                <section class="content-section" id="vcs-intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>1. What is Version Control &amp; Why It Matters</h2>
+                    </div>
+                    <p class="content-text">
+                        Without a <strong>Version Control System (VCS)</strong>, collaboration descends into chaos.
+                        We've all lived through the horror of folder structures like <code>project_v1.zip</code>,
+                        <code>project_final.zip</code>, and <code>project_REALLY_FINAL_USE_THIS.zip</code>.
+                        VCS solves this by tracking changes over time, allowing teams to collaborate concurrently,
+                        and providing an exact audit trail of who changed what, when, and why.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Feature</th><th>Centralized (e.g., SVN)</th><th>Distributed (e.g., Git)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Repository Location</strong></td><td>Single central server</td><td>Every developer has a full local copy</td></tr>
+                            <tr><td><strong>Offline Work</strong></td><td>Impossible (needs server connection)</td><td>Full support for commits, branches, logs offline</td></tr>
+                            <tr><td><strong>Single Point of Failure</strong></td><td>Yes — if server dies, nobody can work</td><td>No — any dev's clone can restore the project</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="content-subheading">Why DevOps Runs on Git</div>
+                    <ul class="content-list">
+                        <li><strong>Git won the VCS war:</strong> It is fast, branching is incredibly cheap, and it scales effortlessly.</li>
+                        <li><strong>Everything as Code:</strong> DevOps treats infrastructure (Terraform), configuration (Ansible), and pipelines (Jenkinsfile) exactly like application source code. All of it lives in Git.</li>
+                        <li><strong>GitOps (Preview):</strong> In modern workflows (Module 17), Git isn't just a storage location — it's the operational dashboard. If it's not in Git, it doesn't exist in production.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 2. Architecture ============ -->
+                <section class="content-section" id="git-arch">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏛️</div>
+                        <h2>2. Git Architecture</h2>
+                    </div>
+                    <p class="content-text">
+                        Git doesn't just save files; it manages files moving across <strong>four distinct zones</strong>.
+                        Understanding this flow is the key to mastering Git and diagnosing issues.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The Four Zones of Git</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Working Tree<br><small>(Your local files)</small></span>
+                            <span class="flow-arrow">→<br><code>git add</code></span>
+                            <span class="flow-item">Staging Area<br><small>(The index/prep zone)</small></span>
+                            <span class="flow-arrow">→<br><code>git commit</code></span>
+                            <span class="flow-item">Local Repo<br><small>(<code>.git/</code> directory)</small></span>
+                            <span class="flow-arrow">→<br><code>git push</code></span>
+                            <span class="flow-item">Remote Repo<br><small>(GitHub/GitLab)</small></span>
+                        </div>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>The <code>.git/</code> Directory:</strong> When you run <code>git init</code>, Git creates a hidden <code>.git/</code> folder. This <em>is</em> the repository. If you delete this folder, your files remain, but all version history is permanently destroyed.</li>
+                        <li><strong>Commits are Snapshots:</strong> Git doesn't store differences (deltas). It stores complete snapshots of your project at the exact moment of the commit, identified by a unique 40-character SHA-1 hash (e.g., <code>f8d9a2c...</code>).</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 3. Core Commands ============ -->
+                <section class="content-section" id="core-commands">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⌨️</div>
+                        <h2>3. Core Commands (Beginner Steps)</h2>
+                    </div>
+                    <p class="content-text">Mastering Git means reading what Git tells you. Here is your step-by-step initiation.</p>
+                    
+                    <div class="content-subheading">Step 1 — Your first 10 minutes</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash - Follow along locally</span></div>
+                        <pre><code><span class="command">git</span> init
+<span class="comment">Initialized empty Git repository in /project/.git/</span>
+
+<span class="command">echo</span> "Hello DevOps" > readme.txt
+<span class="command">git</span> status
+<span class="comment">Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+        readme.txt</span>
+
+<span class="command">git</span> add readme.txt
+<span class="command">git</span> status
+<span class="comment">Changes to be committed:
+  (use "git rm --cached &lt;file&gt;..." to unstage)
+        new file:   readme.txt</span>
+
+<span class="command">git</span> commit -m <span class="string">"Initial commit"</span>
+<span class="comment">[main (root-commit) a1b2c3d] Initial commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 readme.txt</span>
+
+<span class="command">git</span> log
+<span class="comment">commit a1b2c3d (HEAD -> main)
+Author: Jane DevOps &lt;jane@example.com&gt;
+Date:   Mon Jul 13 14:00:00 2026 +0000
+
+    Initial commit</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 2 — Decoding git status</div>
+                    <p class="content-text"><code>git status</code> is your map. Learn to read its three main categories:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Understanding State</span></div>
+                        <pre><code><span class="comment"># 1. Untracked (Git doesn't know about this file yet)</span>
+<span class="comment">Untracked files:
+        new_script.sh</span>
+
+<span class="comment"># 2. Modified (Known to Git, changed, but NOT ready to commit)</span>
+<span class="comment">Changes not staged for commit:
+        modified:   readme.txt</span>
+
+<span class="comment"># 3. Staged (Ready to be permanently saved in the next commit)</span>
+<span class="comment">Changes to be committed:
+        modified:   readme.txt
+        new file:   new_script.sh</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 3 — Reading History</div>
+                    <p class="content-text">You spend more time reading code history than writing it.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">History Commands</span></div>
+                        <pre><code><span class="command">git</span> log --oneline --graph
+<span class="comment">* a1b2c3d (HEAD -> main) Fix typo in config
+* 9f8e7d6 Add database connection
+* 1a2b3c4 Initial commit</span>
+
+<span class="command">git</span> diff                  <span class="comment"># What did I change right now? (Working vs Staged)</span>
+<span class="command">git</span> diff --staged         <span class="comment"># What am I about to commit? (Staged vs Last Commit)</span>
+<span class="command">git</span> diff 1a2b3c4 9f8e7d6  <span class="comment"># What changed between these two commits?</span>
+
+<span class="command">git</span> show a1b2c3d          <span class="comment"># Show me exactly what was changed in this commit</span>
+<span class="command">git</span> blame file.txt        <span class="comment"># Who wrote line 42? (Shows commit hash and author per line)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 4 — Remotes Explained</div>
+                    <p class="content-text">A "remote" is just a URL to a Git repo hosted elsewhere (like GitHub). By default, it's named <code>origin</code>.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Working with Remotes</span></div>
+                        <pre><code><span class="command">git</span> remote -v
+<span class="comment">origin  https://github.com/user/repo.git (fetch)
+origin  https://github.com/user/repo.git (push)</span>
+
+<span class="comment"># Pushing for the first time sets the "upstream tracking" (-u)</span>
+<span class="comment"># This links your local 'main' to origin's 'main' so future pushes just need 'git push'</span>
+<span class="command">git</span> push -u origin main</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Branching & Merging ============ -->
+                <section class="content-section" id="branch-merge">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌿</div>
+                        <h2>4. Branching &amp; Merging</h2>
+                    </div>
+                    
+                    <div class="content-subheading">The Pointer Concept</div>
+                    <p class="content-text">
+                        A <strong>branch</strong> is not a physical copy of your files. It is simply a lightweight, movable pointer to a commit. In fact, a branch is literally just a 41-byte text file containing a commit hash. Because they are just pointers, branching in Git is instantaneous and takes almost no disk space. You should branch for <em>every</em> new feature or bugfix.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Branching Basics</span></div>
+                        <pre><code><span class="command">git</span> branch feature-login          <span class="comment"># Create branch</span>
+<span class="command">git</span> switch feature-login          <span class="comment"># Switch to branch</span>
+<span class="command">git</span> switch -c feature-login       <span class="comment"># Create AND switch (shortcut)</span>
+<span class="command">git</span> branch -d feature-login       <span class="comment"># Delete branch</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Fast-Forward vs 3-Way Merge</div>
+                    <p class="content-text">When you merge <code>feature</code> into <code>main</code>, Git does one of two things:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Merge Types</span></div>
+                        <pre><code><span class="comment"># 1. Fast-Forward Merge: If 'main' hasn't changed since you branched off.</span>
+<span class="comment"># Git simply moves the 'main' pointer forward to point to 'feature'. No new commit needed.</span>
+Before: main(A) --- feature(B)
+After:  main,feature(B)
+
+<span class="comment"># 2. 3-Way Merge: If 'main' HAS changed since you branched off.</span>
+<span class="comment"># Git must combine the two divergent paths, creating a brand new "Merge Commit" (F).</span>
+main:      A --- B --- C ------- F (Merge Commit)
+                        \       /
+feature:                 D --- E</code></pre>
+                    </div>
+                    
+                    <div class="content-subheading">The Merge Conflict Deep-Dive</div>
+                    <p class="content-text">
+                        Merge conflicts happen when Git can't figure out how to combine changes—usually because two people modified the exact same lines. Resolving them is just text editing.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Resolving a Conflict</span></div>
+                        <pre><code><span class="command">git</span> merge feature-branch
+<span class="comment">Auto-merging app.py
+CONFLICT (content): Merge conflict in app.py
+Automatic merge failed; fix conflicts and then commit the result.</span>
+
+<span class="comment"># You panic? You can always abort:</span>
+<span class="command">git</span> merge --abort
+
+<span class="comment"># Or you open app.py and find the Conflict Markers:</span>
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Current Branch)
+<span class="command">print</span>("Hello from main branch")
+=======
+<span class="command">print</span>("Hello from feature branch")
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-branch
+
+<span class="comment"># Edit the file to keep the correct line, delete the &lt;&lt;&lt; === &gt;&gt;&gt; markers, then:</span>
+<span class="command">git</span> add app.py
+<span class="command">git</span> commit -m <span class="string">"Merge feature-branch, resolved conflict in app"</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Git Workflows ============ -->
+                <section class="content-section" id="git-workflows">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛣️</div>
+                        <h2>5. Git Workflows (Deep Dive)</h2>
+                    </div>
+                    <p class="content-text">How should your team organize branches? The industry relies on three main patterns. Choosing the wrong workflow can paralyze a team's delivery speed.</p>
+                    
+                    <div class="content-subheading">1. GitFlow (The Legacy Standard)</div>
+                    <p class="content-text">GitFlow uses strict, heavily separated branches. It separates day-to-day development (<code>develop</code>) from production (<code>main</code>), and uses specific branches for features, releases, and hotfixes. Best for apps with slow, scheduled release cycles (e.g. enterprise software released every 3 months).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">GitFlow Example</span></div>
+                        <pre><code>main:    v1.0.0 ------------------------------------&gt; v1.1.0
+                 \                                     /
+release:          \                                   / (Release QA)
+                   \                                 /
+develop:            --- A --- B --- C --- D --- E ---
+                             /           \
+feature:                    /             \
+                   feature/login       feature/cart</code></pre>
+                    </div>
+
+                    <div class="content-subheading">2. GitHub Flow (The Modern Standard)</div>
+                    <p class="content-text">Simple and agile. The <code>main</code> branch is considered highly sacred and is <em>always</em> deployable to production. All new work happens in short-lived feature branches and is merged back into <code>main</code> via Pull Requests (PRs). Best for Web apps, SaaS, and continuous delivery.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">GitHub Flow Example</span></div>
+                        <pre><code><span class="comment"># Every feature branch merges directly to main via PR</span>
+main:      A --- B --- C -------------- F (Deployed to Prod)
+                        \              /
+feature:                 D --- E (PR) -</code></pre>
+                    </div>
+
+                    <div class="content-subheading">3. Trunk-Based Development (Elite Speed)</div>
+                    <p class="content-text">Extreme continuous integration. Everyone commits directly to the <code>main</code> branch (the trunk) multiple times a day, or uses extremely short-lived branches (hours, not days). Instead of isolating features in branches, teams isolate features in code using <strong>Feature Flags</strong> (e.g., <code>if (feature_enabled)</code>). Best for high-maturity DevOps teams (Google, Netflix).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Trunk-Based Example</span></div>
+                        <pre><code><span class="comment"># No long branches. Everyone pushes to main constantly.</span>
+<span class="comment"># Broken or unfinished code is hidden behind feature flags.</span>
+main (Trunk):  A --- B (Dev 1) --- C (Dev 2) --- D (Dev 1) --- E (Dev 3)</code></pre>
+                    </div>
+                    
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The DevOps Verdict</div>
+                        <p><strong>GitHub Flow and Trunk-Based Development dominate modern DevOps.</strong> GitFlow is considered an anti-pattern for continuous delivery because long-lived <code>develop</code> and <code>release</code> branches delay integration and cause massive, painful merge conflicts. <strong>Merge small, merge often.</strong></p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Pull Requests ============ -->
+                <section class="content-section" id="pull-requests">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">👀</div>
+                        <h2>6. Pull Requests &amp; Code Reviews</h2>
+                    </div>
+                    <p class="content-text">
+                        A <strong>Pull Request (PR)</strong> (or Merge Request in GitLab) is a request to merge your feature branch into the main codebase. It acts as the gatekeeper for code quality.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The PR Lifecycle</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Branch<br><small>(checkout -b)</small></span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Commit &amp; Push<br><small>(to remote)</small></span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Open PR<br><small>(on GitHub)</small></span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">CI Checks Run<br><small>(tests pass)</small></span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Peer Review<br><small>(approved)</small></span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Merge<br><small>(to main)</small></span>
+                        </div>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Branch Protection Rules:</strong> GitHub allows you to enforce rules on <code>main</code>: e.g., "Require at least 1 approval," "Require CI tests to pass," or "Block force pushes."</li>
+                        <li><strong>CODEOWNERS:</strong> A file that automatically assigns PR reviews to specific people based on which files were changed (e.g., frontend team reviews UI files).</li>
+                        <li><strong>What Reviewers Look For:</strong> Logic errors, missing tests, poor performance, security flaws, and readability.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 7. Rebase vs Merge ============ -->
+                <section class="content-section" id="rebase-merge">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚖️</div>
+                        <h2>7. Rebase vs Merge</h2>
+                    </div>
+                    <p class="content-text">
+                        The ultimate interview question. Both integrate changes from one branch into another, but they do it differently.
+                    </p>
+                    
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Merge vs Rebase Visualized</span></div>
+                        <pre><code><span class="comment"># BEFORE (You are on feature, and main has moved forward)</span>
+main:      A --- B --- C
+                        \
+feature:                 D --- E
+
+<span class="comment"># 1. MERGE (Railroad Tracks) - Preserves exact history, adds Merge Commit (F)</span>
+main:      A --- B --- C ------- F
+                        \       /
+feature:                 D --- E
+
+<span class="comment"># 2. REBASE (Straight Line) - Rewrites history, replaying D and E onto C</span>
+main:      A --- B --- C
+                        \
+feature:                 D' --- E'</code></pre>
+                    </div>
+                    <div class="content-subheading">Merge</div>
+                    <p class="content-text">Takes the two endpoints and joins them with a new <em>merge commit</em>. Preserves absolute historical timeline, but creates messy "railroad track" graphs.</p>
+                    
+                    <div class="content-subheading">Rebase</div>
+                    <p class="content-text">Takes your feature branch commits and replays them, one by one, on top of the latest <code>main</code>. Creates a perfectly linear, clean history, but rewrites the commit hashes.</p>
+                    
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The Golden Rule of Rebase</div>
+                        <p><strong>NEVER rebase a public/shared branch.</strong> If you rebase a branch that others have already pulled, you rewrite history. When they try to pull again, Git will fail spectacularly. Only rebase your local, private feature branches before opening a PR.</p>
+                    </div>
+
+                    <p class="content-text"><strong>Squash Merges:</strong> GitHub allows you to "Squash and Merge" a PR. This takes all 20 messy WIP commits from your feature branch and squashes them into a single, clean commit on <code>main</code>. This is the preferred strategy for most teams.</p>
+                </section>
+
+                <!-- ============ 8. Stash, Reset, Revert ============ -->
+                <section class="content-section" id="stash-reset">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧰</div>
+                        <h2>8. Stash, Cherry-pick, Reset, Revert (The "Oops" Toolkit)</h2>
+                    </div>
+                    
+                    <div class="content-subheading">Stashing</div>
+                    <p class="content-text">Temporarily shelves your uncommitted changes so you can quickly switch branches.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Stash Workflow</span></div>
+                        <pre><code><span class="command">git</span> stash
+<span class="comment">Saved working directory and index state WIP on main: a1b2c3d Update README</span>
+
+<span class="comment"># ... switch branches, do emergency work ...</span>
+
+<span class="command">git</span> stash pop
+<span class="comment">On branch main
+Changes not staged for commit:
+  modified:   app.py
+Dropped refs/stash@{0}</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Modern Git: Switch and Restore</div>
+                    <p class="content-text"><code>git checkout</code> used to do too much. Modern Git split it into two safer commands:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Switch & Restore vs Checkout</span></div>
+                        <pre><code><span class="comment"># Switching branches</span>
+<span class="command">git</span> switch feature-login      <span class="comment"># Modern replacement for git checkout feature-login</span>
+<span class="command">git</span> switch -c new-branch      <span class="comment"># Modern replacement for git checkout -b new-branch</span>
+
+<span class="comment"># Restoring files</span>
+<span class="command">git</span> restore file.txt          <span class="comment"># Discard uncommitted changes (replaces git checkout -- file.txt)</span>
+<span class="command">git</span> restore --staged file.txt <span class="comment"># Unstage a file (replaces git reset HEAD file.txt)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Reset vs Revert</div>
+                    <table class="content-table">
+                        <thead><tr><th>Command</th><th>What it does</th><th>Safe for Shared Branches?</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><strong><code>git revert</code></strong></td>
+                                <td>Creates a <em>new</em> commit that does the exact opposite of an old commit.</td>
+                                <td><strong>Yes.</strong> History only moves forward. Best for reverting production bugs.</td>
+                            </tr>
+                            <tr>
+                                <td><strong><code>git reset</code></strong></td>
+                                <td>Moves the branch pointer backward in time, effectively erasing recent history.</td>
+                                <td><strong>No.</strong> Rewrites history. Only use locally before you push.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Reset Modes</span></div>
+                        <pre><code><span class="comment"># --soft: Moves branch pointer, keeps changes STAGED</span>
+<span class="command">git</span> reset --soft HEAD~1
+
+<span class="comment"># --mixed (default): Moves branch pointer, keeps changes UNSTAGED</span>
+<span class="command">git</span> reset --mixed HEAD~1
+
+<span class="comment"># --hard: DANGER. Moves branch pointer, DESTROYS all changes</span>
+<span class="command">git</span> reset --hard HEAD~1</code></pre>
+                    </div>
+
+                    <div class="content-subheading">The "Undo Anything" Decision Table</div>
+                    <table class="content-table">
+                        <thead><tr><th>Oops...</th><th>How to fix it</th></tr></thead>
+                        <tbody>
+                            <tr><td>Staged the wrong file</td><td><code>git restore --staged &lt;file&gt;</code></td></tr>
+                            <tr><td>Bad commit message (not pushed)</td><td><code>git commit --amend</code></td></tr>
+                            <tr><td>Committed to wrong branch (not pushed)</td><td><code>git cherry-pick &lt;hash&gt;</code> to new branch, then <code>git reset --hard HEAD~1</code> on old branch</td></tr>
+                            <tr><td>Deleted everything with a hard reset</td><td><code>git reflog</code> to find the lost hash, then <code>git reset --hard &lt;hash&gt;</code></td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 9. .gitignore ============ -->
+                <section class="content-section" id="gitignore">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🙈</div>
+                        <h2>9. .gitignore &amp; Best Practices</h2>
+                    </div>
+                    <p class="content-text">
+                        The <code>.gitignore</code> file tells Git which files or directories it should ignore completely.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">A Real DevOps .gitignore</span></div>
+                        <pre><code><span class="comment"># Dependencies</span>
+node_modules/
+__pycache__/
+
+<span class="comment"># Environment variables & secrets (CRITICAL)</span>
+.env
+*.pem
+*.key
+
+<span class="comment"># Terraform state files</span>
+*.tfstate
+*.tfstate.backup
+
+<span class="comment"># Build output</span>
+/dist
+/build
+*.jar</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ Leaking Secrets in Git</div>
+                        <p>If you commit an AWS access key or a password to Git, it is forever recorded in the history. Even if you delete the file in the next commit, hackers can just look at the previous commit. <strong>If you leak a secret, consider it compromised immediately.</strong> You must revoke the key in AWS/Azure immediately. Do not try to clean the Git history (tools like BFG exist, but revocation is the only secure path).</p>
+                    </div>
+
+                    <div class="content-subheading">Conventional Commits</div>
+                    <p class="content-text">Use a standard format for commit messages to enable automated changelogs and semantic versioning:</p>
+                    <ul class="content-list">
+                        <li><code>feat: add login page</code> (New feature)</li>
+                        <li><code>fix: resolve null pointer in payment gateway</code> (Bug fix)</li>
+                        <li><code>docs: update README deployment steps</code></li>
+                        <li><code>ci: update GitHub Actions node version</code></li>
+                    </ul>
+                </section>
+
+                <!-- ============ 10. Tags & SemVer ============ -->
+                <section class="content-section" id="tags-semver">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏷️</div>
+                        <h2>10. Tags &amp; Semantic Versioning</h2>
+                    </div>
+                    <p class="content-text">
+                        A tag is a permanent, immutable bookmark to a specific commit. While branches move forward, tags stay exactly where they were created. They are universally used to mark releases.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Semantic Versioning (SemVer)</div>
+                        <div class="visual-flow" style="font-size: 1.5rem; justify-content: center; font-family: 'JetBrains Mono', monospace;">
+                            v <span style="color: #ef4444;">2</span> . <span style="color: #3b82f6;">4</span> . <span style="color: #22c55e;">1</span>
+                        </div>
+                        <ul class="content-list" style="margin-top: 1rem;">
+                            <li><strong style="color: #ef4444;">MAJOR (2):</strong> Breaking changes, incompatible API updates.</li>
+                            <li><strong style="color: #3b82f6;">MINOR (4):</strong> New features, but backwards-compatible.</li>
+                            <li><strong style="color: #22c55e;">PATCH (1):</strong> Bug fixes only.</li>
+                        </ul>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Lightweight tag:</strong> Just a pointer (<code>git tag v1.0.0</code>)</li>
+                        <li><strong>Annotated tag:</strong> Stored as a full object with creator info, date, and a message (<code>git tag -a v1.0.0 -m "Release v1.0.0"</code>). Use these for official releases.</li>
+                        <li><strong>CI/CD Tie-in:</strong> In Jenkins or GitHub Actions (Modules 07/09), pushing a tag matching <code>v*</code> is usually the trigger that tells the pipeline to deploy to Production.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 11. GitHub Platform ============ -->
+                <section class="content-section" id="github-intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐙</div>
+                        <h2>11. GitHub Platform Intro</h2>
+                    </div>
+                    <p class="content-text">
+                        Git is the tool; GitHub is the hosting platform and collaboration ecosystem. (GitLab and Bitbucket are the main competitors, providing nearly identical features).
+                    </p>
+                    <ul class="content-list">
+                        <li><strong>SSH Key Setup:</strong> Reuse your knowledge from Module 02. Generate a key (<code>ssh-keygen -t ed25519</code>), add the public key to your GitHub Settings &gt; SSH Keys, and you'll never need to type a password to push again.</li>
+                        <li><strong>Issues &amp; Projects:</strong> GitHub provides Agile tracking. You can link a commit to an issue simply by typing <code>Fixes #42</code> in your commit message (this auto-closes the issue when merged).</li>
+                        <li><strong>GitHub Actions (Teaser):</strong> Built-in CI/CD. You can run automated tests every time someone opens a Pull Request. We will cover this extensively in later CI/CD modules.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 12. Advanced Scenarios ============ -->
+                <section class="content-section" id="advanced-scenarios">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>12. Advanced Real-Time DevOps Scenarios</h2>
+                    </div>
+                    <p class="content-text">As a DevOps engineer, you will face complex Git challenges beyond standard branching. Here are real-world scenarios and how to solve them.</p>
+
+                    <div class="content-subheading">Scenario 1: The "Split Brain" Monorepo Refactor</div>
+                    <p class="content-text"><strong>Context:</strong> Your company has a massive 50GB monorepo. The architecture team decided to extract the <code>payments-microservice/</code> folder into its own standalone Git repository, but you <em>must</em> preserve all commit history for auditing purposes.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Solution: git subtree or filter-repo</span></div>
+                        <pre><code><span class="comment"># Using the modern git filter-repo tool (requires python)</span>
+<span class="command">git</span> clone https://github.com/org/monorepo.git payments-service
+<span class="command">cd</span> payments-service
+<span class="command">git</span> filter-repo --path payments-microservice/ --to-subdirectory-filter .
+<span class="comment"># Now, this repo ONLY contains the payments microservice and its full commit history.</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Scenario 2: The "Needle in a Haystack" Bug</div>
+                    <p class="content-text"><strong>Context:</strong> The CI pipeline is failing on the <code>main</code> branch. The last known good release was a week ago (commit <code>a1b2c3d</code>), and 50 commits have been pushed since then. You need to find exactly which commit broke the build.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Solution: git bisect</span></div>
+                        <pre><code><span class="command">git</span> bisect start
+<span class="command">git</span> bisect bad                 <span class="comment"># The current commit is broken</span>
+<span class="command">git</span> bisect good a1b2c3d        <span class="comment"># The commit from last week worked</span>
+<span class="comment"># Git will checkout a commit exactly in the middle. Run your test:</span>
+<span class="command">npm</span> run test
+<span class="comment"># If it fails, type `git bisect bad`. If it passes, type `git bisect good`.</span>
+<span class="comment"># Git will binary-search the 50 commits and find the exact culprit in ~6 steps.</span>
+<span class="command">git</span> bisect reset               <span class="comment"># Exit when done</span></code></pre>
+                    </div>
+                    
+                    <div class="content-subheading">Scenario 3: Submodules for Shared Infrastructure</div>
+                    <p class="content-text"><strong>Context:</strong> You have a highly optimized Terraform module for deploying AWS EKS. You want 10 different application teams to use this exact code in their own repositories without copy-pasting it.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Solution: git submodules</span></div>
+                        <pre><code><span class="comment"># In the application repository:</span>
+<span class="command">git</span> submodule add https://github.com/org/terraform-eks-module.git infrastructure/eks
+<span class="comment"># This creates a pointer to a specific commit of the EKS module repo.</span>
+<span class="comment"># When the app team clones their repo, they run:</span>
+<span class="command">git</span> clone --recurse-submodules https://github.com/org/app-repo.git</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 13. Practical Exams ============ -->
+                <section class="content-section" id="practical-exams">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚔️</div>
+                        <h2>13. DevOps Git Gauntlet (Practical Exams)</h2>
+                    </div>
+                    <p class="content-text">Test your mastery with these hands-on challenges. Try them locally in a dummy repository.</p>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Exam 1</span>
+                            <h4>The Rebase Rescue</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <strong>Setup:</strong> Create a branch <code>feature-login</code>. Make 5 separate commits, each adding one word to a file. The commits have terrible messages like "wip", "typo fix", "more stuff".<br><br>
+                            <strong>Challenge:</strong> Before merging to main, use <strong>Interactive Rebase</strong> (<code>git rebase -i HEAD~5</code>) to:<br>
+                            1. Squash all 5 commits into a single commit.<br>
+                            2. Rename the final commit message to <code>feat: implement secure login module</code>.<br><br>
+                            <strong>Success Criteria:</strong> <code>git log</code> on your branch should show only one clean commit instead of five messy ones.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Exam 2</span>
+                            <h4>The P0 Incident Interrupt</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <strong>Setup:</strong> You are on <code>feature-infra</code> editing <code>main.tf</code>. Suddenly, production goes down. You must fix it immediately on the <code>main</code> branch, but your current Terraform work is halfway done and broken, so you can't commit it.<br><br>
+                            <strong>Challenge:</strong><br>
+                            1. Use <code>git stash</code> to save your broken <code>main.tf</code>.<br>
+                            2. <code>git checkout main</code> and create a new branch <code>hotfix-p0</code>.<br>
+                            3. Edit a file to fix the bug, commit, and simulate merging to main.<br>
+                            4. Go back to <code>feature-infra</code> and use <code>git stash pop</code> to retrieve your broken Terraform code and continue working.<br><br>
+                            <strong>Success Criteria:</strong> You successfully deployed a hotfix without losing your in-progress feature work.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Exam 3</span>
+                            <h4>The Reflog Resurrection</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <strong>Setup:</strong> Create a commit on <code>main</code> that adds a file called <code>crucial_data.txt</code>. Now, simulate a catastrophic mistake by running <code>git reset --hard HEAD~1</code>. The file is gone, the commit is gone. You never pushed this to GitHub.<br><br>
+                            <strong>Challenge:</strong><br>
+                            1. Run <code>git reflog</code> to view the chronological history of your HEAD pointer.<br>
+                            2. Find the SHA hash of the commit right before you ran the hard reset.<br>
+                            3. Run <code>git reset --hard &lt;hash&gt;</code> to bring the lost commit (and <code>crucial_data.txt</code>) back from the dead.<br><br>
+                            <strong>Success Criteria:</strong> <code>crucial_data.txt</code> exists in your directory again. You have survived the worst Git disaster.
+                        </div></div>
+                    </div>
+                </section>
+                <!-- ============ 14. Cheat Sheet & Pro Tips ============ -->
+                <section class="content-section" id="cheat-sheet">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📝</div>
+                        <h2>14. Daily Git Cheat Sheet &amp; Pro Tips</h2>
+                    </div>
+                    <p class="content-text">The 15 commands you will type every single day as a DevOps Engineer.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">The Daily 15</span></div>
+                        <pre><code><span class="comment"># === THE BASICS ===</span>
+<span class="command">git</span> status                  <span class="comment"># ⭐ The map. Where am I and what changed?</span>
+<span class="command">git</span> pull                    <span class="comment"># ⭐ Download and merge latest changes from remote</span>
+<span class="command">git</span> add .                   <span class="comment"># ⭐ Stage all changes in current directory</span>
+<span class="command">git</span> commit -m "msg"         <span class="comment"># ⭐ Save staged changes with a message</span>
+<span class="command">git</span> push                    <span class="comment"># ⭐ Upload commits to remote</span>
+
+<span class="comment"># === BRANCHING ===</span>
+<span class="command">git</span> switch -c feature-x     <span class="comment"># ⭐ Create a new branch and switch to it</span>
+<span class="command">git</span> switch main             <span class="comment"># ⭐ Switch back to main</span>
+<span class="command">git</span> branch                  <span class="comment"># ⭐ List all local branches</span>
+<span class="command">git</span> branch -d feature-x     <span class="comment"># ⭐ Delete a local branch (safely)</span>
+
+<span class="comment"># === HISTORY &amp; RECOVERY ===</span>
+<span class="command">git</span> log --oneline --graph   <span class="comment"># ⭐ View history compactly</span>
+<span class="command">git</span> diff                    <span class="comment"># ⭐ Show unstaged changes</span>
+<span class="command">git</span> stash                   <span class="comment"># ⭐ Temporarily shelve changes</span>
+<span class="command">git</span> stash pop               <span class="comment"># ⭐ Bring shelved changes back</span>
+<span class="command">git</span> restore file.txt        <span class="comment"># ⭐ Discard local unstaged changes to a file</span>
+<span class="command">git</span> reset --soft HEAD~1     <span class="comment"># ⭐ Undo the last commit (keep files staged)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Pro Tip 1: Git Aliases</div>
+                    <p class="content-text">Stop typing full commands. Set up global aliases in your <code>~/.gitconfig</code>.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Setup Aliases</span></div>
+                        <pre><code><span class="command">git</span> config --global alias.co checkout
+<span class="command">git</span> config --global alias.sw switch
+<span class="command">git</span> config --global alias.st status
+<span class="command">git</span> config --global alias.cm commit
+<span class="command">git</span> config --global alias.lg "log --oneline --graph"
+
+<span class="comment"># Now you can just type:</span>
+<span class="command">git</span> st
+<span class="command">git</span> sw -c new-branch</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Pro Tip 2: git pull --rebase</div>
+                    <p class="content-text">A standard <code>git pull</code> executes a <code>fetch</code> followed by a <code>merge</code>. If you and a coworker both made commits to the same branch, this creates an ugly "Merge branch 'main' into main" commit. Instead, use <code>--rebase</code> to pull their changes and cleanly apply yours on top.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Pull with Rebase</span></div>
+                        <pre><code><span class="comment"># Keeps history linear and clean:</span>
+<span class="command">git</span> pull --rebase
+
+<span class="comment"># Make it the default behavior for all pulls:</span>
+<span class="command">git</span> config --global pull.rebase true</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Team Collaboration Git Workflow</h2>
+                        <p>Create a multi-branch project on GitHub. Simulate a team workflow: create feature branches, raise pull requests, resolve merge conflicts, use git rebase, tag releases with semantic versioning, and set up branch protection rules. Portfolio-ready GitHub repo as the artifact.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Repo Setup</h3>
+                            <p>Create a new repository on GitHub. Clone it locally. Add a <code>README.md</code>, an <code>app.py</code> script (just a print statement), and a DevOps <code>.gitignore</code>. Commit and push to main.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Terminal</span></div>
+                                <pre><code><span class="command">git</span> init my-project
+<span class="command">cd</span> my-project
+<span class="command">echo</span> "# My Project" > README.md
+<span class="command">echo</span> 'print("v1.0")' > app.py
+<span class="command">echo</span> "node_modules/" > .gitignore
+<span class="command">git</span> add .
+<span class="command">git</span> commit -m "Initial commit"
+<span class="comment"># Link to GitHub and push</span>
+<span class="command">git</span> remote add origin https://github.com/your-username/my-project.git
+<span class="command">git</span> push -u origin main</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="2">
+                            <h3>Branch Protection (GitHub UI)</h3>
+                            <p>We must lock down <code>main</code> so nobody can push directly to production.</p>
+                            <ul class="content-list">
+                                <li>Go to your repository on GitHub.</li>
+                                <li>Click <strong>Settings</strong> &gt; <strong>Branches</strong>.</li>
+                                <li>Click <strong>Add branch ruleset</strong>. Name it "Protect Main".</li>
+                                <li>Set Target branches to include the default branch (<code>main</code>).</li>
+                                <li>Check <strong>Require a pull request before merging</strong>.</li>
+                                <li>Check <strong>Do not allow bypassing the above settings</strong>.</li>
+                                <li>Save changes. You are now locked out of pushing directly to main.</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-step" data-step="3">
+                            <h3>Feature Branches (The Simulation)</h3>
+                            <p>Create <code>feature-A</code> and <code>feature-B</code> locally. Make conflicting changes to the same line in <code>app.py</code>.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Terminal</span></div>
+                                <pre><code><span class="comment"># Simulate Developer 1 (Feature A)</span>
+<span class="command">git</span> switch -c feature-A
+<span class="command">echo</span> 'print("Feature A active")' > app.py
+<span class="command">git</span> add app.py
+<span class="command">git</span> commit -m "Add feature A"
+<span class="command">git</span> push -u origin feature-A
+
+<span class="comment"># Simulate Developer 2 (Feature B) starting from main</span>
+<span class="command">git</span> switch main
+<span class="command">git</span> switch -c feature-B
+<span class="command">echo</span> 'print("Feature B active")' > app.py
+<span class="command">git</span> add app.py
+<span class="command">git</span> commit -m "Add feature B"</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="4">
+                            <h3>Pull Request &amp; Self-Review</h3>
+                            <p>Push <code>feature-A</code> to GitHub and merge it via PR.</p>
+                            <ul class="content-list">
+                                <li>Go to GitHub, you will see a prompt to "Compare & pull request" for <code>feature-A</code>.</li>
+                                <li>Click it. Since it's a solo project, you may need to temporarily disable the "Require approvals" rule to merge it yourself.</li>
+                                <li>Click <strong>Merge pull request</strong>. Delete the branch on GitHub.</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-step" data-step="5">
+                            <h3>Engineered Merge Conflict</h3>
+                            <p>Switch to <code>feature-B</code>. Pull the updated <code>main</code> to trigger a conflict.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Terminal</span></div>
+                                <pre><code><span class="command">git</span> switch feature-B
+<span class="command">git</span> pull origin main
+<span class="comment">CONFLICT (content): Merge conflict in app.py
+Automatic merge failed; fix conflicts and then commit the result.</span>
+
+<span class="comment"># Open app.py, resolve the markers to keep BOTH features:</span>
+<span class="comment">print("Feature A active")
+print("Feature B active")</span>
+
+<span class="command">git</span> add app.py
+<span class="command">git</span> commit -m "Resolve merge conflict with feature A"
+<span class="command">git</span> push -u origin feature-B</code></pre>
+                            </div>
+                            <p>Now open a PR for <code>feature-B</code> and merge it on GitHub.</p>
+                        </div>
+
+                        <div class="project-step" data-step="6">
+                            <h3>Rebase Practice</h3>
+                            <p>Create <code>feature-C</code> off main. Add 3 messy WIP commits and squash them into one clean commit before pushing.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Terminal</span></div>
+                                <pre><code><span class="command">git</span> switch main
+<span class="command">git</span> pull origin main
+<span class="command">git</span> switch -c feature-C
+
+<span class="command">echo</span> 'print("WIP 1")' >> app.py && <span class="command">git</span> commit -am "WIP"
+<span class="command">echo</span> 'print("WIP 2")' >> app.py && <span class="command">git</span> commit -am "more WIP"
+<span class="command">echo</span> 'print("WIP 3")' >> app.py && <span class="command">git</span> commit -am "done"
+
+<span class="comment"># Interactive rebase the last 3 commits</span>
+<span class="command">git</span> rebase -i HEAD~3
+<span class="comment"># Change 'pick' to 'squash' (or 's') for the bottom two commits.</span>
+<span class="comment"># Save and close the editor. Then write a clean commit message.</span>
+
+<span class="command">git</span> push -u origin feature-C</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="7">
+                            <h3>Tag Release v1.0.0</h3>
+                            <p>Get all merged features and create a release tag.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Terminal</span></div>
+                                <pre><code><span class="command">git</span> switch main
+<span class="command">git</span> pull origin main
+
+<span class="comment"># Create annotated tag</span>
+<span class="command">git</span> tag -a v1.0.0 -m "Initial Production Release"
+
+<span class="comment"># Push tag to GitHub</span>
+<span class="command">git</span> push origin v1.0.0</code></pre>
+                            </div>
+                            <p>Go to your GitHub repository, click <strong>Tags</strong>, and verify <code>v1.0.0</code> is listed as a Release.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💬</div>
+                        <h2>Interview Questions</h2>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q1</span>
+                            <h4>Merge vs Rebase. Which do you prefer and why?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Merge preserves the exact historical timeline and creates a merge commit, which is safe for shared branches but can create a messy graph. Rebase replays your commits on top of the target branch, creating a perfectly linear history, but rewrites commit hashes. I prefer rebasing local, unshared feature branches against main to keep my PR clean, but rely on Squash &amp; Merge on GitHub to actually integrate into main. I never rebase shared/public branches.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q2</span>
+                            <h4>What is the difference between git fetch and git pull?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <code>git fetch</code> only downloads new data from the remote repository to your local <code>.git/</code> directory; it does not change any of your files in the working directory. <code>git pull</code> executes a <code>fetch</code> and then immediately tries to <code>merge</code> those incoming changes into your current active branch.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q3</span>
+                            <h4>A bad commit was pushed to production (main). How do you undo it? Reset or Revert?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Always use <code>git revert &lt;commit_hash&gt;</code>. This creates a new commit that safely negates the changes of the bad commit, moving the history forward. If you used <code>git reset</code>, you would rewrite history on a shared branch, breaking the repository for all other developers on the team when they next try to push or pull.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q4</span>
+                            <h4>How exactly do you resolve a merge conflict?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            I run <code>git status</code> to find files marked "both modified". I open each file in my editor and look for the conflict markers (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch-name</code>). I review the two competing code blocks, manually edit the code to the correct final state, and delete the marker lines. Then, I <code>git add</code> the resolved files and run <code>git commit</code> to complete the merge.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q5</span>
+                            <h4>Explain GitFlow vs Trunk-Based Development.</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            GitFlow is a heavy branching model with separate branches for master, develop, features, releases, and hotfixes—useful for software with strict, infrequent release cycles. Trunk-Based Development has developers committing to a single trunk (main) multiple times a day (or using very short-lived feature branches). Trunk-based relies heavily on automated testing and feature flags and is the standard for modern CI/CD and DevOps.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q6</span>
+                            <h4>You accidentally committed an AWS access key and pushed it to GitHub. What happens, and what do you do?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            What happens: Bots scrape public GitHub repos 24/7; my key is compromised within seconds, potentially costing the company thousands in spun-up crypto miners. What to do: Do NOT just make a new commit deleting the key—the key is still in the history! Step 1: Immediately revoke/delete the compromised key in the AWS Console. Step 2: Generate a new key and handle it properly using secrets management or environment variables.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q7</span>
+                            <h4>What does it mean to be in a "detached HEAD" state?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Normally, HEAD points to a branch name (like <code>main</code>), which in turn points to the latest commit. If you check out a specific commit hash directly (e.g., <code>git checkout abc1234</code>), HEAD points directly to that commit, not a branch. You are now "detached". Any new commits made here will be orphaned and lost when you switch away, unless you create a new branch from this state.
+                        </div></div>
+                    </div>
+                </section>
+
+                <!-- Footer nav -->
+                <div class="module-nav">
+                    <a href="module-02.html" class="module-nav-card">
+                        <span class="module-nav-label">← Previous</span>
+                        <span class="module-nav-title">02 · Operating Systems &amp; Linux</span>
+                    </a>
+                    <a href="module-04.html" class="module-nav-card next">
+                        <span class="module-nav-label">Next Module →</span>
+                        <span class="module-nav-title">04 · Networking &amp; Security Fundamentals</span>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

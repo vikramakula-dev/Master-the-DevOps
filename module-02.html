@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 02 — Operating Systems &amp; Linux | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 2: Operating Systems & Linux — virtualization, Linux file system, CLI commands, permissions, users, packages, processes, networking, Bash scripting, cron, SSH, and editors.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 02 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level beginner">Beginner</span>
+                    <span class="module-hero-duration">Phase 1 · Foundations</span>
+                </div>
+                <h1>Module 02 — Operating Systems &amp; <span class="gradient-text">Linux</span></h1>
+                <p class="module-hero-desc">
+                    Linux runs ~96% of the world's servers, every Docker container, and every Kubernetes node.
+                    Master the Linux command line, system administration, and shell scripting — this is the
+                    single most-used skill in a DevOps engineer's day.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Linux</span>
+                    <span class="tech-tag">Ubuntu</span>
+                    <span class="tech-tag">Bash</span>
+                    <span class="tech-tag">SSH</span>
+                    <span class="tech-tag">systemd</span>
+                    <span class="tech-tag">VirtualBox</span>
+                    <span class="tech-tag">Vim</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#os-intro" class="toc-link">1. Operating Systems</a></li>
+                    <li><a href="#virtualization" class="toc-link">2. Virtualization</a></li>
+                    <li><a href="#install" class="toc-link">3. Installing Linux (Ubuntu)</a></li>
+                    <li><a href="#filesystem" class="toc-link">4. Linux File System</a></li>
+                    <li><a href="#cli" class="toc-link">5. Essential CLI Commands</a></li>
+                    <li><a href="#permissions" class="toc-link">6. Permissions &amp; Ownership</a></li>
+                    <li><a href="#users" class="toc-link">7. Users &amp; Groups</a></li>
+                    <li><a href="#packages" class="toc-link">8. Package Management</a></li>
+                    <li><a href="#processes" class="toc-link">9. Process Management</a></li>
+                    <li><a href="#networking" class="toc-link">10. Networking Basics</a></li>
+                    <li><a href="#bash" class="toc-link">11. Bash Scripting</a></li>
+                    <li><a href="#env" class="toc-link">12. Env Variables &amp; PATH</a></li>
+                    <li><a href="#cron" class="toc-link">13. Cron &amp; Scheduling</a></li>
+                    <li><a href="#ssh" class="toc-link">14. SSH &amp; Remote Access</a></li>
+                    <li><a href="#editors" class="toc-link">15. Vim / Nano</a></li>
+                    <li><a href="#daily-commands" class="toc-link">16. Daily Commands Cheat Sheet</a></li>
+                    <li><a href="#log-analysis" class="toc-link">17. Log Analysis &amp; logrotate</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+
+                <!-- ============ 1. OS Intro ============ -->
+                <section class="content-section" id="os-intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🖥️</div>
+                        <h2>1. Introduction to Operating Systems</h2>
+                    </div>
+                    <p class="content-text">
+                        An <strong>Operating System (OS)</strong> is the software layer between hardware and
+                        applications. It manages the CPU, memory, storage, and network, and provides the interfaces
+                        (shell, system calls) that programs use. The three components you must understand:
+                    </p>
+                    <ul class="content-list">
+                        <li><strong>Kernel</strong> — the core that talks to hardware, schedules processes, and manages memory</li>
+                        <li><strong>Shell</strong> — the command interpreter (Bash, Zsh, PowerShell) between you and the kernel</li>
+                        <li><strong>File System</strong> — how data is organized and stored on disk</li>
+                    </ul>
+                    <table class="content-table">
+                        <thead><tr><th>OS</th><th>Kernel</th><th>Typical Use</th><th>DevOps Relevance</th></tr></thead>
+                        <tbody>
+                            <tr><td>Windows</td><td>Windows NT</td><td>Desktops, enterprise apps, .NET</td><td>Some enterprise servers; WSL2 for local Linux</td></tr>
+                            <tr><td>macOS</td><td>XNU (Unix-based)</td><td>Developer workstations</td><td>Unix-like terminal, great DevOps dev machine</td></tr>
+                            <tr><td>Linux</td><td>Linux</td><td>Servers, cloud, containers, embedded</td><td><strong>The platform of DevOps</strong> — servers, containers, K8s nodes</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="content-subheading">Why Linux Dominates DevOps</div>
+                    <ul class="content-list">
+                        <li>Open source and free — no licensing at scale</li>
+                        <li>Runs ~96% of the top million web servers and nearly all cloud instances</li>
+                        <li>Docker containers share the <strong>Linux kernel</strong> — containers ARE Linux processes</li>
+                        <li>Every Kubernetes node runs Linux; every CI runner defaults to Linux</li>
+                        <li>Scriptable end-to-end — everything is a file, everything can be automated</li>
+                    </ul>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Popular Linux Distributions</div>
+                        <p><strong>Ubuntu/Debian</strong> (apt) — most common on cloud &amp; this roadmap's choice. <strong>RHEL/CentOS/Amazon Linux/Fedora</strong> (yum/dnf) — enterprise standard. <strong>Alpine</strong> — tiny (~5MB), the default base image for Docker containers.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Virtualization ============ -->
+                <section class="content-section" id="virtualization">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>2. Virtualization Concepts — VMs &amp; Hypervisors</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>Virtualization</strong> lets one physical machine run multiple isolated operating
+                        systems simultaneously, each in a <strong>Virtual Machine (VM)</strong> with its own virtual
+                        CPU, RAM, disk, and network. The software that makes this possible is the <strong>hypervisor</strong>.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Type 1 vs Type 2 Hypervisor</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Type 1 (Bare-metal): Hardware → Hypervisor → VMs</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Type 2 (Hosted): Hardware → Host OS → Hypervisor → VMs</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>Runs On</th><th>Examples</th><th>Used For</th></tr></thead>
+                        <tbody>
+                            <tr><td>Type 1 — Bare Metal</td><td>Directly on hardware</td><td>VMware ESXi, KVM, Hyper-V, Xen</td><td>Data centers, cloud providers (AWS EC2 runs on Nitro/KVM)</td></tr>
+                            <tr><td>Type 2 — Hosted</td><td>On top of your OS</td><td>VirtualBox, VMware Workstation, Parallels</td><td>Local labs and learning — what you'll use in this module</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="content-subheading">VMs vs Containers — Know the Difference Early</div>
+                    <table class="content-table">
+                        <thead><tr><th></th><th>Virtual Machine</th><th>Container</th></tr></thead>
+                        <tbody>
+                            <tr><td>Virtualizes</td><td>Hardware — full OS per VM</td><td>The OS — shares host kernel</td></tr>
+                            <tr><td>Size</td><td>GBs</td><td>MBs</td></tr>
+                            <tr><td>Boot Time</td><td>Minutes</td><td>Seconds / milliseconds</td></tr>
+                            <tr><td>Isolation</td><td>Strong (separate kernels)</td><td>Process-level (namespaces, cgroups)</td></tr>
+                            <tr><td>Example</td><td>EC2 instance, VirtualBox VM</td><td>Docker container, Kubernetes pod</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why This Matters Later</div>
+                        <p>Cloud = VMs at scale (EC2 is a VM). Docker = containers on a Linux kernel. When you reach Module 08 and 10, this mental model is the foundation everything sits on.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Install ============ -->
+                <section class="content-section" id="install">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💿</div>
+                        <h2>3. Installing Linux (Ubuntu) — VM Setup with VirtualBox</h2>
+                    </div>
+                    <p class="content-text">Your Linux lab for the whole roadmap. Three ways to get Ubuntu running:</p>
+                    <table class="content-table">
+                        <thead><tr><th>Option</th><th>How</th><th>Best For</th></tr></thead>
+                        <tbody>
+                            <tr><td>VirtualBox VM ⭐</td><td>Ubuntu Server ISO inside a VM</td><td>Learning safely — snapshot, break, restore</td></tr>
+                            <tr><td>WSL2 (Windows)</td><td><code>wsl --install -d Ubuntu</code></td><td>Quick daily driver on Windows</td></tr>
+                            <tr><td>Cloud VM</td><td>AWS EC2 free-tier Ubuntu instance</td><td>Real remote-server experience (Module 10)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="content-subheading">VirtualBox Setup Steps</div>
+                    <ul class="content-list">
+                        <li>Download <strong>VirtualBox</strong> from virtualbox.org and <strong>Ubuntu Server 24.04 LTS ISO</strong> from ubuntu.com</li>
+                        <li>New VM → Type: Linux / Ubuntu 64-bit → <strong>2+ CPUs, 4GB RAM, 25GB disk</strong></li>
+                        <li>Mount the ISO, boot, and follow the installer (choose "Install OpenSSH server" when asked)</li>
+                        <li>Set network adapter to <strong>Bridged</strong> (VM gets its own LAN IP) for easy SSH practice</li>
+                        <li>Take a <strong>snapshot</strong> after a clean install — you can always roll back</li>
+                    </ul>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — first commands after install</span></div>
+                        <pre><code><span class="comment"># Verify your system</span>
+<span class="command">lsb_release</span> -a        <span class="comment"># Ubuntu version</span>
+<span class="command">uname</span> -r              <span class="comment"># kernel version</span>
+<span class="command">df</span> -h                 <span class="comment"># disk space</span>
+<span class="command">free</span> -h               <span class="comment"># memory</span>
+<span class="command">ip</span> a                  <span class="comment"># network interfaces &amp; IP address</span>
+
+<span class="comment"># Always do this first on a new system</span>
+<span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt upgrade -y</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. File System ============ -->
+                <section class="content-section" id="filesystem">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗂️</div>
+                        <h2>4. Linux File System &amp; Directory Structure</h2>
+                    </div>
+                    <p class="content-text">
+                        Linux organizes everything under a single root <code>/</code> — there are no drive letters.
+                        The layout follows the <strong>Filesystem Hierarchy Standard (FHS)</strong>, so every Linux
+                        machine feels familiar:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Filesystem Hierarchy</span></div>
+                        <pre><code>/
+├── bin/     → essential command binaries (ls, cp, bash)
+├── boot/    → kernel &amp; bootloader files
+├── dev/     → device files (disks: /dev/sda, terminals)
+├── etc/     → system-wide CONFIGURATION files
+├── home/    → user home directories (/home/vikram)
+├── lib/     → shared libraries
+├── opt/     → optional third-party software
+├── proc/    → virtual files exposing kernel/process info
+├── root/    → home directory of the root user
+├── tmp/     → temporary files (cleared on reboot)
+├── usr/     → user programs (/usr/bin, /usr/local)
+└── var/     → variable data — LOGS (/var/log), web roots, spools</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Three You'll Live In</div>
+                        <p><code>/etc</code> — every config you'll ever edit (nginx, ssh, cron). <code>/var/log</code> — the first place you look when something breaks. <code>/home</code> — your files and dotfiles. Also remember: in Linux <strong>everything is a file</strong> — devices, sockets, even running processes (<code>/proc</code>).</p>
+                    </div>
+                    <div class="content-subheading">Absolute vs Relative Paths</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">cd</span> /var/log/nginx     <span class="comment"># absolute — starts from root /</span>
+<span class="command">cd</span> ../backups          <span class="comment"># relative — .. means parent directory</span>
+<span class="command">cd</span> ~                   <span class="comment"># ~ = your home directory</span>
+<span class="command">cd</span> -                   <span class="comment"># jump back to previous directory</span>
+<span class="command">pwd</span>                    <span class="comment"># print where you are</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. CLI ============ -->
+                <section class="content-section" id="cli">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⌨️</div>
+                        <h2>5. Essential CLI Commands</h2>
+                    </div>
+                    <p class="content-text">
+                        These commands are the vocabulary of DevOps. You will type them thousands of times —
+                        in servers, containers, and CI pipelines.
+                    </p>
+                    <div class="content-subheading">Files &amp; Directories</div>
+                    <table class="content-table">
+                        <thead><tr><th>Command</th><th>Purpose</th><th>Most Useful Form</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>ls</code></td><td>List files</td><td><code>ls -lah</code> — long, all (hidden), human sizes</td></tr>
+                            <tr><td><code>cd</code></td><td>Change directory</td><td><code>cd /var/log</code></td></tr>
+                            <tr><td><code>cp</code></td><td>Copy</td><td><code>cp -r src/ dest/</code> — recursive for directories</td></tr>
+                            <tr><td><code>mv</code></td><td>Move / rename</td><td><code>mv app.conf app.conf.bak</code></td></tr>
+                            <tr><td><code>rm</code></td><td>Delete</td><td><code>rm -rf dir/</code> — ⚠️ recursive + force, no undo</td></tr>
+                            <tr><td><code>mkdir</code></td><td>Create directory</td><td><code>mkdir -p a/b/c</code> — parents too</td></tr>
+                            <tr><td><code>touch</code></td><td>Create empty file</td><td><code>touch deploy.log</code></td></tr>
+                            <tr><td><code>cat</code> / <code>less</code></td><td>View file</td><td><code>less huge.log</code> — scrollable, q to quit</td></tr>
+                            <tr><td><code>head</code> / <code>tail</code></td><td>Start / end of file</td><td><code>tail -f app.log</code> — follow live logs ⭐</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">The Search &amp; Text Power Trio — find, grep, awk/sed</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># find — locate files by name, type, size, age</span>
+<span class="command">find</span> /var/log -name <span class="string">"*.log"</span> -mtime -1     <span class="comment"># logs modified in last 24h</span>
+<span class="command">find</span> . -type f -size +100M                <span class="comment"># files bigger than 100MB</span>
+
+<span class="comment"># grep — search text INSIDE files</span>
+<span class="command">grep</span> -i <span class="string">"error"</span> app.log                   <span class="comment"># case-insensitive search</span>
+<span class="command">grep</span> -rn <span class="string">"TODO"</span> ./src                     <span class="comment"># recursive, with line numbers</span>
+<span class="command">grep</span> -c <span class="string">"500"</span> access.log                  <span class="comment"># count matches</span>
+
+<span class="comment"># awk — column processor</span>
+<span class="command">awk</span> <span class="string">'{print $1}'</span> access.log              <span class="comment"># print first column (IPs)</span>
+<span class="command">awk</span> <span class="string">'$9 == 500 {print $7}'</span> access.log    <span class="comment"># URLs that returned HTTP 500</span>
+
+<span class="comment"># sed — stream editor (find &amp; replace)</span>
+<span class="command">sed</span> -i <span class="string">'s/8080/9090/g'</span> app.conf          <span class="comment"># replace in-place</span>
+
+<span class="comment"># Pipes chain them together — the Unix superpower</span>
+<span class="command">cat</span> access.log | <span class="command">grep</span> <span class="string">" 500 "</span> | <span class="command">awk</span> <span class="string">'{print $1}'</span> | <span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn | <span class="command">head</span>
+<span class="comment"># → top IPs causing 500 errors. This one-liner is a real interview question.</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Getting Help</div>
+                        <p><code>man ls</code> — full manual for any command. <code>ls --help</code> — quick options. <code>history</code> — your past commands; <code>!!</code> repeats the last one (<code>sudo !!</code> is the classic fix for "permission denied").</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Permissions ============ -->
+                <section class="content-section" id="permissions">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>6. File Permissions &amp; Ownership — chmod, chown, umask</h2>
+                    </div>
+                    <p class="content-text">
+                        Every file has an <strong>owner</strong>, a <strong>group</strong>, and permission bits for
+                        three audiences: <strong>u</strong>ser (owner), <strong>g</strong>roup, and <strong>o</strong>thers.
+                        Read <code>ls -l</code> output like this:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Decoding ls -l</span></div>
+                        <pre><code>-rwxr-x r-- 1 vikram devops 4096 Jul 13 10:30 deploy.sh
+│└┬┘└┬┘└┬┘   └──┬──┘ └──┬──┘
+│ │  │  │     owner    group
+│ │  │  └── others: r-- (read only)
+│ │  └───── group:  r-x (read + execute)
+│ └──────── user:   rwx (read + write + execute)
+└────────── type: - file, d directory, l symlink</code></pre>
+                    </div>
+                    <div class="content-subheading">Numeric (Octal) Notation — r=4, w=2, x=1</div>
+                    <table class="content-table">
+                        <thead><tr><th>Number</th><th>Meaning</th><th>Common Use</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>755</code></td><td>rwx r-x r-x</td><td>Scripts &amp; directories — owner full, everyone can run/enter</td></tr>
+                            <tr><td><code>644</code></td><td>rw- r-- r--</td><td>Regular files — owner edits, everyone reads</td></tr>
+                            <tr><td><code>600</code></td><td>rw- --- ---</td><td>Secrets — SSH private keys MUST be 600</td></tr>
+                            <tr><td><code>777</code></td><td>rwx rwx rwx</td><td>⚠️ Everyone everything — almost always wrong</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">chmod</span> 755 deploy.sh            <span class="comment"># numeric mode</span>
+<span class="command">chmod</span> +x deploy.sh             <span class="comment"># symbolic — add execute for all</span>
+<span class="command">chmod</span> u+x,g-w app.sh           <span class="comment"># fine-grained symbolic</span>
+<span class="command">chown</span> vikram:devops app.log    <span class="comment"># change owner AND group</span>
+<span class="command">chown</span> -R www-data:www-data /var/www   <span class="comment"># recursive — web server files</span>
+<span class="command">umask</span>                          <span class="comment"># default mask: 022 → new files 644, dirs 755</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ sudo &amp; root</div>
+                        <p><code>root</code> (UID 0) can do anything. Never work as root directly — use <code>sudo command</code> for individual privileged actions. Users allowed to sudo are configured in <code>/etc/sudoers</code> (edit only with <code>visudo</code>) or by membership of the <code>sudo</code> group.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Users & Groups ============ -->
+                <section class="content-section" id="users">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">👥</div>
+                        <h2>7. User &amp; Group Management</h2>
+                    </div>
+                    <p class="content-text">
+                        Linux is multi-user by design. Users are defined in <code>/etc/passwd</code>, password hashes
+                        in <code>/etc/shadow</code>, groups in <code>/etc/group</code>. Services get their own
+                        non-login users (e.g. <code>www-data</code> for nginx) — a core security practice.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Create a user with home directory and bash shell</span>
+<span class="command">sudo</span> useradd -m -s /bin/bash devuser
+<span class="command">sudo</span> passwd devuser                 <span class="comment"># set password</span>
+
+<span class="comment"># Groups</span>
+<span class="command">sudo</span> groupadd deployers
+<span class="command">sudo</span> usermod -aG deployers devuser  <span class="comment"># -aG = APPEND to group (never forget -a!)</span>
+<span class="command">sudo</span> usermod -aG sudo devuser       <span class="comment"># grant sudo rights (Ubuntu)</span>
+<span class="command">groups</span> devuser                      <span class="comment"># check memberships</span>
+
+<span class="comment"># Inspect &amp; switch</span>
+<span class="command">id</span> devuser                          <span class="comment"># uid, gid, groups</span>
+<span class="command">whoami</span>                              <span class="comment"># current user</span>
+<span class="command">su</span> - devuser                        <span class="comment"># switch user (login shell)</span>
+
+<span class="comment"># Remove</span>
+<span class="command">sudo</span> userdel -r devuser             <span class="comment"># -r also removes home dir</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 Classic Mistake</div>
+                        <p><code>usermod -G group user</code> (without <code>-a</code>) <strong>replaces</strong> all existing group memberships — you can lock yourself out of sudo. Always <code>usermod -aG</code>.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Packages ============ -->
+                <section class="content-section" id="packages">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📥</div>
+                        <h2>8. Package Management — apt, yum, snap</h2>
+                    </div>
+                    <p class="content-text">
+                        Package managers install, update, and remove software plus all its dependencies from trusted
+                        repositories. Which one you use depends on the distribution family:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Family</th><th>Manager</th><th>Package Format</th><th>Distros</th></tr></thead>
+                        <tbody>
+                            <tr><td>Debian</td><td><code>apt</code></td><td>.deb</td><td>Ubuntu, Debian, Mint</td></tr>
+                            <tr><td>Red Hat</td><td><code>yum</code> / <code>dnf</code></td><td>.rpm</td><td>RHEL, CentOS, Amazon Linux, Fedora</td></tr>
+                            <tr><td>Universal</td><td><code>snap</code></td><td>snap</td><td>Any — sandboxed, auto-updating apps</td></tr>
+                            <tr><td>Alpine</td><td><code>apk</code></td><td>.apk</td><td>Alpine — you'll meet it in Dockerfiles</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — apt (Ubuntu)</span></div>
+                        <pre><code><span class="command">sudo</span> apt update                 <span class="comment"># refresh package index (do this first)</span>
+<span class="command">sudo</span> apt upgrade -y             <span class="comment"># upgrade installed packages</span>
+<span class="command">sudo</span> apt install nginx -y       <span class="comment"># install</span>
+<span class="command">apt</span> search redis                <span class="comment"># find packages</span>
+<span class="command">apt</span> show nginx                  <span class="comment"># package details</span>
+<span class="command">sudo</span> apt remove nginx           <span class="comment"># uninstall (keep config)</span>
+<span class="command">sudo</span> apt purge nginx            <span class="comment"># uninstall + delete config</span>
+<span class="command">sudo</span> apt autoremove             <span class="comment"># clean unused dependencies</span>
+
+<span class="comment"># yum equivalents (RHEL/Amazon Linux):</span>
+<span class="comment">#   sudo yum install nginx / sudo yum update / sudo yum remove nginx</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 In CI/CD &amp; Dockerfiles</div>
+                        <p>You'll write <code>apt-get update &amp;&amp; apt-get install -y --no-install-recommends</code> constantly in Dockerfiles — non-interactive flags (<code>-y</code>) matter because there is no human to press Enter in a pipeline.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Processes ============ -->
+                <section class="content-section" id="processes">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>9. Process Management — ps, top, kill, systemctl</h2>
+                    </div>
+                    <p class="content-text">
+                        Every running program is a <strong>process</strong> with a PID. Long-running background
+                        processes (web servers, databases) are <strong>services/daemons</strong>, managed on modern
+                        Linux by <strong>systemd</strong>.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — inspecting processes</span></div>
+                        <pre><code><span class="command">ps</span> aux                          <span class="comment"># all processes, full detail</span>
+<span class="command">ps</span> aux | <span class="command">grep</span> nginx             <span class="comment"># find a specific process</span>
+<span class="command">top</span>                             <span class="comment"># live view — CPU/mem per process (q quits)</span>
+<span class="command">htop</span>                            <span class="comment"># nicer top (sudo apt install htop)</span>
+
+<span class="comment"># Signals</span>
+<span class="command">kill</span> 1234                       <span class="comment"># SIGTERM — polite "please stop"</span>
+<span class="command">kill</span> -9 1234                    <span class="comment"># SIGKILL — force kill, last resort</span>
+<span class="command">pkill</span> -f myapp                  <span class="comment"># kill by name/pattern</span>
+
+<span class="comment"># Background jobs</span>
+<span class="command">./long-task.sh</span> &amp;                <span class="comment"># run in background</span>
+<span class="command">nohup</span> ./server.sh &amp;             <span class="comment"># keep running after logout</span>
+<span class="command">jobs</span> / <span class="command">fg</span> / <span class="command">bg</span>                  <span class="comment"># manage shell jobs</span></code></pre>
+                    </div>
+                    <div class="content-subheading">systemctl — Managing Services (systemd)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — the service lifecycle you'll use daily</span></div>
+                        <pre><code><span class="command">sudo</span> systemctl start nginx      <span class="comment"># start now</span>
+<span class="command">sudo</span> systemctl stop nginx
+<span class="command">sudo</span> systemctl restart nginx    <span class="comment"># after config changes</span>
+<span class="command">sudo</span> systemctl reload nginx     <span class="comment"># re-read config without dropping connections</span>
+<span class="command">sudo</span> systemctl enable nginx     <span class="comment"># start automatically on boot ⭐</span>
+<span class="command">systemctl</span> status nginx          <span class="comment"># running? failed? recent log lines</span>
+<span class="command">journalctl</span> -u nginx -f          <span class="comment"># follow a service's logs live</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Troubleshooting Pattern</div>
+                        <p>Service down? The sequence is always: <code>systemctl status app</code> → <code>journalctl -u app -n 50</code> → check config in <code>/etc/</code> → <code>systemctl restart app</code>. Memorize this flow — it's half of on-call life.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 10. Networking ============ -->
+                <section class="content-section" id="networking">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>10. Networking Basics — IP, DNS, ports, curl, netstat</h2>
+                    </div>
+                    <p class="content-text">
+                        Servers talk over networks; DevOps engineers debug those conversations. The essentials:
+                        every machine has an <strong>IP address</strong>, services listen on <strong>ports</strong>
+                        (nginx: 80/443, SSH: 22, Postgres: 5432), and <strong>DNS</strong> translates names to IPs.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Port</th><th>Service</th><th>Port</th><th>Service</th></tr></thead>
+                        <tbody>
+                            <tr><td>22</td><td>SSH</td><td>443</td><td>HTTPS</td></tr>
+                            <tr><td>80</td><td>HTTP</td><td>3306</td><td>MySQL</td></tr>
+                            <tr><td>53</td><td>DNS</td><td>5432</td><td>PostgreSQL</td></tr>
+                            <tr><td>8080</td><td>HTTP alt (Jenkins!)</td><td>6379</td><td>Redis</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — the network debugging toolkit</span></div>
+                        <pre><code><span class="comment"># Who am I / can I reach the world?</span>
+<span class="command">ip</span> a                            <span class="comment"># my interfaces &amp; IPs (replaces ifconfig)</span>
+<span class="command">ping</span> -c 4 google.com            <span class="comment"># basic reachability</span>
+<span class="command">nslookup</span> example.com            <span class="comment"># DNS resolution (also: dig example.com)</span>
+
+<span class="comment"># HTTP requests from the terminal</span>
+<span class="command">curl</span> -I https://example.com     <span class="comment"># headers only — status code check</span>
+<span class="command">curl</span> -s api.example.com/health | <span class="command">jq</span>   <span class="comment"># API call, pretty JSON</span>
+<span class="command">wget</span> https://example.com/file.tar.gz  <span class="comment"># download files</span>
+
+<span class="comment"># What is listening on this server?</span>
+<span class="command">sudo</span> ss -tulpn                  <span class="comment"># modern netstat — TCP/UDP listeners + PIDs ⭐</span>
+<span class="command">sudo</span> netstat -tulpn             <span class="comment"># classic version, same idea</span>
+<span class="command">sudo</span> lsof -i :8080              <span class="comment"># which process holds port 8080?</span>
+
+<span class="comment"># Firewall (Ubuntu ufw)</span>
+<span class="command">sudo</span> ufw allow 22/tcp           <span class="comment"># ALWAYS allow SSH before enabling!</span>
+<span class="command">sudo</span> ufw allow 80,443/tcp
+<span class="command">sudo</span> ufw enable &amp;&amp; <span class="command">sudo</span> ufw status</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ "Port already in use"</div>
+                        <p>The most common deployment error. Fix: <code>sudo lsof -i :PORT</code> to find the process, then stop it properly (<code>systemctl stop</code>) or choose another port. Never blind-<code>kill -9</code> a database.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 11. Bash ============ -->
+                <section class="content-section" id="bash">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>11. Shell Scripting with Bash</h2>
+                    </div>
+                    <p class="content-text">
+                        Bash scripts turn command sequences into reusable automation — the direct ancestor of every
+                        CI/CD pipeline you'll ever write. A script is just a text file of commands with a
+                        <strong>shebang</strong> line and execute permission. We'll build up from zero.
+                    </p>
+
+                    <div class="content-subheading">Step 1 — Your Very First Script</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — hello.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># ↑ The "shebang" — MUST be line 1. Tells Linux which interpreter runs this file.</span>
+
+<span class="command">echo</span> <span class="string">"Hello, DevOps World!"</span>     <span class="comment"># echo prints text to the screen</span>
+<span class="command">echo</span> <span class="string">"Today is: $(date)"</span>        <span class="comment"># $(...) runs a command and inserts its output</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — make it executable and run it</span></div>
+                        <pre><code><span class="command">chmod</span> +x hello.sh    <span class="comment"># give the file execute permission (one time only)</span>
+<span class="command">./hello.sh</span>           <span class="comment"># ./ means "run from the current directory"</span>
+
+<span class="comment"># Output:</span>
+<span class="output"># Hello, DevOps World!</span>
+<span class="output"># Today is: Sun Jul 13 10:30:00 IST 2026</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 2 — Variables (Storing Values)</div>
+                    <p class="content-text">
+                        A variable stores a value you want to reuse. <strong>Rule 1: no spaces around <code>=</code></strong>.
+                        <strong>Rule 2: read a variable with <code>$name</code></strong>. <strong>Rule 3: always wrap in
+                        double quotes <code>"$name"</code></strong> so values with spaces don't break your script.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — variables.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># Creating variables (NO spaces around =)</span>
+NAME=<span class="string">"Vikram"</span>                    <span class="comment"># text value</span>
+APP_PORT=8080                    <span class="comment"># number value</span>
+TODAY=<span class="variable">$(date +%F)</span>                <span class="comment"># command output → variable (e.g. 2026-07-13)</span>
+SERVER_IP=<span class="variable">$(hostname -I | awk '{print $1}')</span>  <span class="comment"># pipes work inside $() too</span>
+
+<span class="comment"># Using variables — $ in front, quotes around</span>
+<span class="command">echo</span> <span class="string">"User      : $NAME"</span>
+<span class="command">echo</span> <span class="string">"Port      : $APP_PORT"</span>
+<span class="command">echo</span> <span class="string">"Date      : $TODAY"</span>
+<span class="command">echo</span> <span class="string">"Server IP : $SERVER_IP"</span>
+
+<span class="comment"># Curly braces {} when text touches the variable name</span>
+<span class="command">echo</span> <span class="string">"Log file  : ${NAME}_backup_${TODAY}.log"</span>   <span class="comment"># Vikram_backup_2026-07-13.log</span>
+
+<span class="comment"># Read input from the user</span>
+<span class="command">read</span> -p <span class="string">"Which environment (dev/prod)? "</span> ENV
+<span class="command">echo</span> <span class="string">"You chose: $ENV"</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 3 — Script Arguments ($1, $2 …)</div>
+                    <p class="content-text">
+                        Arguments are values you pass when running the script: <code>./deploy.sh prod v2.1</code>.
+                        Inside the script, <code>$1</code> is <code>prod</code>, <code>$2</code> is <code>v2.1</code>.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — args.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># Run as:  ./args.sh prod v2.1</span>
+
+<span class="command">echo</span> <span class="string">"Script name    : $0"</span>      <span class="comment"># ./args.sh</span>
+<span class="command">echo</span> <span class="string">"First argument : $1"</span>      <span class="comment"># prod</span>
+<span class="command">echo</span> <span class="string">"Second argument: $2"</span>      <span class="comment"># v2.1</span>
+<span class="command">echo</span> <span class="string">"Argument count : $#"</span>      <span class="comment"># 2</span>
+<span class="command">echo</span> <span class="string">"All arguments  : $@"</span>      <span class="comment"># prod v2.1</span>
+
+<span class="comment"># Default value if the argument was not given</span>
+ENVIRONMENT=<span class="variable">${1:-dev}</span>            <span class="comment"># use $1, or "dev" if $1 is empty</span>
+<span class="command">echo</span> <span class="string">"Deploying to   : $ENVIRONMENT"</span>
+
+<span class="comment"># Fail fast if a required argument is missing</span>
+<span class="keyword">if</span> [ $# -lt 1 ]; <span class="keyword">then</span>
+    <span class="command">echo</span> <span class="string">"Usage: $0 &lt;environment&gt; [version]"</span>
+    <span class="keyword">exit</span> 1                       <span class="comment"># non-zero exit = failure</span>
+<span class="keyword">fi</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 4 — If / Else &amp; Test Operators</div>
+                    <p class="content-text">
+                        Conditions live inside <code>[ ]</code> (spaces required inside the brackets!).
+                        These are the operators you'll use constantly:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Operator</th><th>True When…</th><th>Operator</th><th>True When…</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>-f file</code></td><td>File exists</td><td><code>-eq</code></td><td>Numbers equal</td></tr>
+                            <tr><td><code>-d dir</code></td><td>Directory exists</td><td><code>-ne</code></td><td>Numbers not equal</td></tr>
+                            <tr><td><code>-z "$var"</code></td><td>String is empty</td><td><code>-gt</code> / <code>-lt</code></td><td>Greater / less than</td></tr>
+                            <tr><td><code>-n "$var"</code></td><td>String is NOT empty</td><td><code>=</code> / <code>!=</code></td><td>Strings equal / not equal</td></tr>
+                            <tr><td><code>-x file</code></td><td>File is executable</td><td><code>&amp;&amp;</code> / <code>||</code></td><td>AND / OR</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — conditions.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+
+CONFIG=<span class="string">"/etc/nginx/nginx.conf"</span>
+
+<span class="comment"># if / elif / else — mind the spaces inside [ ]</span>
+<span class="keyword">if</span> [ -f <span class="string">"$CONFIG"</span> ]; <span class="keyword">then</span>
+    <span class="command">echo</span> <span class="string">"✔ Config file exists"</span>
+<span class="keyword">elif</span> [ -d <span class="string">"/etc/nginx"</span> ]; <span class="keyword">then</span>
+    <span class="command">echo</span> <span class="string">"Directory exists but config is missing"</span>
+<span class="keyword">else</span>
+    <span class="command">echo</span> <span class="string">"✖ Nginx is not installed"</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># Comparing numbers — disk usage alert</span>
+USAGE=<span class="variable">$(df / | awk 'NR==2 {print $5}' | tr -d '%')</span>   <span class="comment"># e.g. 82</span>
+<span class="keyword">if</span> [ <span class="string">"$USAGE"</span> -gt 80 ]; <span class="keyword">then</span>
+    <span class="command">echo</span> <span class="string">"⚠ Disk is ${USAGE}% full — clean up!"</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># Comparing strings</span>
+<span class="keyword">if</span> [ <span class="string">"$1"</span> = <span class="string">"prod"</span> ]; <span class="keyword">then</span>
+    <span class="command">echo</span> <span class="string">"Production deploy — extra careful!"</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># One-line shortcuts with &amp;&amp; (and) / || (or)</span>
+[ -f app.pid ] &amp;&amp; <span class="command">echo</span> <span class="string">"App is running"</span> || <span class="command">echo</span> <span class="string">"App is stopped"</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 5 — Loops (for &amp; while)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — loops.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># FOR over a list — check several services</span>
+<span class="keyword">for</span> service <span class="keyword">in</span> nginx docker sshd; <span class="keyword">do</span>
+    <span class="command">echo</span> <span class="string">"Checking $service..."</span>
+    systemctl is-active --quiet <span class="string">"$service"</span> &amp;&amp; <span class="command">echo</span> <span class="string">"  ✔ running"</span> || <span class="command">echo</span> <span class="string">"  ✖ down"</span>
+<span class="keyword">done</span>
+
+<span class="comment"># FOR over files — compress every .log file</span>
+<span class="keyword">for</span> f <span class="keyword">in</span> /var/log/myapp/*.log; <span class="keyword">do</span>
+    <span class="command">gzip</span> <span class="string">"$f"</span>
+    <span class="command">echo</span> <span class="string">"Compressed: $f"</span>
+<span class="keyword">done</span>
+
+<span class="comment"># FOR over numbers</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> {1..5}; <span class="keyword">do</span>
+    <span class="command">echo</span> <span class="string">"Attempt $i of 5"</span>
+<span class="keyword">done</span>
+
+<span class="comment"># WHILE — retry until a service responds (real deployment pattern ⭐)</span>
+RETRIES=0
+<span class="keyword">while</span> ! <span class="command">curl</span> -s http://localhost:8080/health &gt; /dev/null; <span class="keyword">do</span>
+    RETRIES=$((RETRIES + 1))            <span class="comment"># $(( )) = arithmetic</span>
+    [ <span class="string">"$RETRIES"</span> -ge 10 ] &amp;&amp; { <span class="command">echo</span> <span class="string">"✖ App never came up"</span>; <span class="keyword">exit</span> 1; }
+    <span class="command">echo</span> <span class="string">"Waiting for app... ($RETRIES/10)"</span>
+    <span class="command">sleep</span> 3
+<span class="keyword">done</span>
+<span class="command">echo</span> <span class="string">"✔ App is healthy"</span>
+
+<span class="comment"># WHILE reading a file line by line</span>
+<span class="keyword">while</span> IFS= <span class="command">read</span> -r line; <span class="keyword">do</span>
+    <span class="command">echo</span> <span class="string">"Server: $line"</span>
+<span class="keyword">done</span> &lt; servers.txt</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 6 — Functions &amp; Case</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — functions.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># A function = named block you can call many times</span>
+<span class="function">log</span>() {
+    <span class="comment"># $1 here is the FUNCTION's first argument, not the script's</span>
+    <span class="command">echo</span> <span class="string">"[$(date '+%H:%M:%S')] $1"</span>
+}
+
+<span class="function">check_service</span>() {
+    <span class="keyword">local</span> name=<span class="string">"$1"</span>                 <span class="comment"># local = variable exists only inside function</span>
+    <span class="keyword">if</span> systemctl is-active --quiet <span class="string">"$name"</span>; <span class="keyword">then</span>
+        <span class="function">log</span> <span class="string">"$name is UP"</span>
+        <span class="keyword">return</span> 0                    <span class="comment"># function exit code: 0 = success</span>
+    <span class="keyword">else</span>
+        <span class="function">log</span> <span class="string">"$name is DOWN"</span>
+        <span class="keyword">return</span> 1
+    <span class="keyword">fi</span>
+}
+
+<span class="function">check_service</span> nginx               <span class="comment"># call it like a command</span>
+<span class="function">check_service</span> docker
+
+<span class="comment"># CASE — clean menus instead of long if/elif chains</span>
+<span class="keyword">case</span> <span class="string">"$1"</span> <span class="keyword">in</span>
+    start)   <span class="function">log</span> <span class="string">"Starting app"</span>;  systemctl start myapp ;;
+    stop)    <span class="function">log</span> <span class="string">"Stopping app"</span>;  systemctl stop myapp ;;
+    restart) <span class="function">log</span> <span class="string">"Restarting"</span>;    systemctl restart myapp ;;
+    status)  systemctl status myapp ;;
+    *)       <span class="command">echo</span> <span class="string">"Usage: $0 {start|stop|restart|status}"</span>; <span class="keyword">exit</span> 1 ;;
+<span class="keyword">esac</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">Step 7 — Putting It All Together: A Real Script</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — anatomy of a real script</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># backup.sh — everything below is genuine daily-use syntax</span>
+set -euo pipefail          <span class="comment"># exit on error/unset var/pipe failure — ALWAYS ⭐</span>
+
+<span class="comment"># Variables (no spaces around =)</span>
+APP_NAME=<span class="string">"myapp"</span>
+BACKUP_DIR=<span class="string">"/backups"</span>
+TIMESTAMP=<span class="variable">$(date +%F_%H-%M)</span>          <span class="comment"># command substitution</span>
+
+<span class="comment"># Arguments: $1 = first arg, $# = count, $@ = all</span>
+ENVIRONMENT=<span class="variable">${1:-dev}</span>                 <span class="comment"># default value if not passed</span>
+
+<span class="comment"># Conditionals</span>
+<span class="keyword">if</span> [ ! -d <span class="string">"$BACKUP_DIR"</span> ]; <span class="keyword">then</span>
+    <span class="command">mkdir</span> -p <span class="string">"$BACKUP_DIR"</span>
+    <span class="command">echo</span> <span class="string">"Created $BACKUP_DIR"</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># Functions</span>
+<span class="function">log</span>() {
+    <span class="command">echo</span> <span class="string">"[$(date '+%H:%M:%S')] $1"</span>
+}
+
+<span class="comment"># Loops</span>
+<span class="keyword">for</span> service <span class="keyword">in</span> nginx postgresql redis; <span class="keyword">do</span>
+    <span class="keyword">if</span> systemctl is-active --quiet <span class="string">"$service"</span>; <span class="keyword">then</span>
+        <span class="function">log</span> <span class="string">"$service is running ✔"</span>
+    <span class="keyword">else</span>
+        <span class="function">log</span> <span class="string">"$service is DOWN ✖"</span>
+    <span class="keyword">fi</span>
+<span class="keyword">done</span>
+
+<span class="comment"># Exit codes: 0 = success, anything else = failure</span>
+<span class="command">tar</span> -czf <span class="string">"$BACKUP_DIR/${APP_NAME}_${TIMESTAMP}.tar.gz"</span> /var/www/<span class="variable">$APP_NAME</span> \
+    &amp;&amp; <span class="function">log</span> <span class="string">"Backup complete"</span> \
+    || { <span class="function">log</span> <span class="string">"Backup FAILED"</span>; <span class="keyword">exit</span> 1; }</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — run it</span></div>
+                        <pre><code><span class="command">chmod</span> +x backup.sh
+<span class="command">./backup.sh</span> prod                <span class="comment"># $1 = "prod"</span>
+<span class="command">echo</span> $?                         <span class="comment"># exit code of last command</span></code></pre>
+                    </div>
+                    <div class="content-subheading">Step 8 — Level-Up Extras (Arrays, Strings, trap, Debugging)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — advanced.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># ARRAYS — lists of values</span>
+SERVERS=(<span class="string">"web1"</span> <span class="string">"web2"</span> <span class="string">"db1"</span>)
+<span class="command">echo</span> <span class="string">"First   : ${SERVERS[0]}"</span>        <span class="comment"># web1</span>
+<span class="command">echo</span> <span class="string">"All     : ${SERVERS[@]}"</span>        <span class="comment"># web1 web2 db1</span>
+<span class="command">echo</span> <span class="string">"Count   : ${#SERVERS[@]}"</span>       <span class="comment"># 3</span>
+<span class="keyword">for</span> s <span class="keyword">in</span> <span class="string">"${SERVERS[@]}"</span>; <span class="keyword">do</span>
+    <span class="command">echo</span> <span class="string">"Deploying to $s..."</span>
+<span class="keyword">done</span>
+
+<span class="comment"># STRING MANIPULATION — built into ${}, no external tools needed</span>
+FILE=<span class="string">"/backups/app_backup_2026-07-13.tar.gz"</span>
+<span class="command">echo</span> <span class="string">"${FILE##*/}"</span>        <span class="comment"># app_backup_2026-07-13.tar.gz  (strip path)</span>
+<span class="command">echo</span> <span class="string">"${FILE%.tar.gz}"</span>    <span class="comment"># strip extension from the end</span>
+<span class="command">echo</span> <span class="string">"${FILE/backup/BKP}"</span> <span class="comment"># replace first match</span>
+VERSION=<span class="string">"v2.1.3"</span>
+<span class="command">echo</span> <span class="string">"${VERSION#v}"</span>        <span class="comment"># 2.1.3 (strip leading v)</span>
+
+<span class="comment"># TRAP — always clean up, even when the script crashes or is Ctrl+C'd ⭐</span>
+TMPDIR=<span class="variable">$(mktemp -d)</span>
+<span class="function">cleanup</span>() {
+    <span class="command">echo</span> <span class="string">"Cleaning up $TMPDIR"</span>
+    <span class="command">rm</span> -rf <span class="string">"$TMPDIR"</span>
+}
+<span class="keyword">trap</span> cleanup EXIT             <span class="comment"># cleanup() runs on ANY exit — success, error, Ctrl+C</span>
+
+<span class="comment"># HERE-DOC — write multi-line files from a script (configs!)</span>
+<span class="command">cat</span> &gt; /tmp/app.conf &lt;&lt;EOF
+server_name myapp.com
+listen 8080
+env production
+EOF</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — debugging your scripts</span></div>
+                        <pre><code><span class="command">bash</span> -n script.sh               <span class="comment"># syntax check only — does not run it</span>
+<span class="command">bash</span> -x script.sh               <span class="comment"># trace mode — prints every command as it runs ⭐</span>
+set -x                          <span class="comment"># turn tracing on inside a script...</span>
+set +x                          <span class="comment"># ...and off again (wrap the buggy part)</span>
+
+<span class="comment"># shellcheck — the linter EVERY professional uses</span>
+<span class="command">sudo</span> apt install shellcheck
+<span class="command">shellcheck</span> script.sh            <span class="comment"># catches quoting bugs, typos, bad practices ⭐</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Professional Habit</div>
+                        <p>Run <code>shellcheck</code> on every script before it goes anywhere near a server — many teams enforce it in CI. Combined with <code>set -euo pipefail</code> and <code>trap cleanup EXIT</code>, your scripts are now safer than most you'll find in production.</p>
+                    </div>
+
+                    <div class="content-subheading">Bonus — Server Health Report Script (Line-by-Line)</div>
+                    <p class="content-text">
+                        A script you can genuinely run on any server today. Every technique above appears here:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — health-report.sh</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># health-report.sh — daily server health summary</span>
+set -euo pipefail
+
+REPORT=<span class="string">"/tmp/health_$(date +%F).txt"</span>       <span class="comment"># output file, dated</span>
+THRESHOLD=80                                <span class="comment"># disk % that triggers a warning</span>
+
+{                                           <span class="comment"># { } groups commands → one redirect at the end</span>
+    <span class="command">echo</span> <span class="string">"===== HEALTH REPORT: $(hostname) ====="</span>
+    <span class="command">echo</span> <span class="string">"Generated : $(date)"</span>
+    <span class="command">echo</span> <span class="string">"Uptime    : $(uptime -p)"</span>
+
+    <span class="command">echo</span> -e <span class="string">"\n--- CPU &amp; Memory ---"</span>
+    <span class="command">top</span> -bn1 | <span class="command">grep</span> <span class="string">"Cpu(s)"</span>              <span class="comment"># -bn1 = batch mode, one sample</span>
+    <span class="command">free</span> -h | <span class="command">awk</span> <span class="string">'NR&lt;=2'</span>                 <span class="comment"># first two lines: header + RAM</span>
+
+    <span class="command">echo</span> -e <span class="string">"\n--- Disk ---"</span>
+    <span class="command">df</span> -h --output=target,pcent | <span class="command">tail</span> -n +2 | <span class="keyword">while</span> <span class="command">read</span> -r mount pct; <span class="keyword">do</span>
+        usage=<span class="variable">${pct%\%}</span>                    <span class="comment"># strip the % sign</span>
+        <span class="keyword">if</span> [ <span class="string">"$usage"</span> -ge <span class="string">"$THRESHOLD"</span> ]; <span class="keyword">then</span>
+            <span class="command">echo</span> <span class="string">"⚠ $mount at $pct — NEEDS ATTENTION"</span>
+        <span class="keyword">else</span>
+            <span class="command">echo</span> <span class="string">"✔ $mount at $pct"</span>
+        <span class="keyword">fi</span>
+    <span class="keyword">done</span>
+
+    <span class="command">echo</span> -e <span class="string">"\n--- Top 5 Memory-Hungry Processes ---"</span>
+    <span class="command">ps</span> aux --sort=-%mem | <span class="command">head</span> -6         <span class="comment"># header + top 5</span>
+
+    <span class="command">echo</span> -e <span class="string">"\n--- Failed systemd Services ---"</span>
+    systemctl --failed --no-legend || <span class="command">echo</span> <span class="string">"None ✔"</span>
+
+    <span class="command">echo</span> -e <span class="string">"\n--- Last 5 SSH Logins ---"</span>
+    <span class="command">last</span> -5
+} &gt; <span class="string">"$REPORT"</span>                              <span class="comment"># everything above lands in the file</span>
+
+<span class="command">echo</span> <span class="string">"Report saved to $REPORT"</span>
+<span class="command">cat</span> <span class="string">"$REPORT"</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Make It Automatic</div>
+                        <p>Schedule it with cron — <code>0 8 * * * /home/vikram/health-report.sh</code> — and you've built your first tiny monitoring system, the ancestor of what Prometheus does in Module 16.</p>
+                    </div>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why Exit Codes Matter</div>
+                        <p>CI/CD pipelines decide pass/fail purely from exit codes. <code>set -e</code> makes your script stop at the first failure instead of blundering on — exactly how Jenkins and GitHub Actions treat each step. Quote your variables (<code>"$VAR"</code>) to survive spaces in values.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 12. Env vars ============ -->
+                <section class="content-section" id="env">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧬</div>
+                        <h2>12. Environment Variables &amp; PATH</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>Environment variables</strong> are key-value pairs available to processes — the
+                        standard way to configure applications without changing code (this idea becomes Kubernetes
+                        ConfigMaps and pipeline secrets later).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">echo</span> <span class="variable">$HOME</span> <span class="variable">$USER</span> <span class="variable">$SHELL</span>       <span class="comment"># built-in variables</span>
+<span class="command">env</span>                             <span class="comment"># list all environment variables</span>
+
+MY_VAR=<span class="string">"hello"</span>                  <span class="comment"># shell variable — this shell only</span>
+<span class="keyword">export</span> DB_HOST=<span class="string">"10.0.1.5"</span>       <span class="comment"># exported — visible to child processes ⭐</span>
+DB_PASS=secret <span class="command">./app.sh</span>         <span class="comment"># set for one command only</span>
+<span class="command">unset</span> MY_VAR
+
+<span class="comment"># PATH — where the shell looks for commands, in order</span>
+<span class="command">echo</span> <span class="variable">$PATH</span>                      <span class="comment"># /usr/local/bin:/usr/bin:/bin...</span>
+<span class="keyword">export</span> PATH=<span class="string">"$HOME/bin:$PATH"</span>   <span class="comment"># add your own tools dir</span>
+<span class="command">which</span> terraform                 <span class="comment"># which binary will actually run?</span>
+
+<span class="comment"># Make it permanent → add export lines to ~/.bashrc, then:</span>
+<span class="command">source</span> ~/.bashrc</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Config Files Order</div>
+                        <p><code>~/.bashrc</code> runs for every interactive shell (aliases, PATH, exports go here). <code>/etc/environment</code> is system-wide. "Command not found" after installing a tool? 90% of the time it's a PATH problem — check with <code>which</code>.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 13. Cron ============ -->
+                <section class="content-section" id="cron">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⏰</div>
+                        <h2>13. Cron Jobs &amp; Task Scheduling</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>cron</strong> runs commands on a schedule — backups, cleanups, report generation,
+                        certificate renewals. Each user has a crontab with five time fields:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">crontab syntax</span></div>
+                        <pre><code>┌──────── minute        (0–59)
+│ ┌────── hour          (0–23)
+│ │ ┌──── day of month  (1–31)
+│ │ │ ┌── month         (1–12)
+│ │ │ │ ┌ day of week   (0–7, 0/7 = Sunday)
+│ │ │ │ │
+* * * * *  command_to_run</code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Expression</th><th>Meaning</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>0 2 * * *</code></td><td>Every day at 02:00 (classic backup slot)</td></tr>
+                            <tr><td><code>*/15 * * * *</code></td><td>Every 15 minutes</td></tr>
+                            <tr><td><code>0 9 * * 1-5</code></td><td>09:00 on weekdays</td></tr>
+                            <tr><td><code>0 0 1 * *</code></td><td>Midnight on the 1st of each month</td></tr>
+                            <tr><td><code>@reboot</code></td><td>Once at startup</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">crontab</span> -e                      <span class="comment"># edit your crontab</span>
+<span class="command">crontab</span> -l                      <span class="comment"># list current jobs</span>
+
+<span class="comment"># Example entry — daily backup at 2 AM, log the output</span>
+0 2 * * * /home/vikram/backup.sh &gt;&gt; /var/log/backup.log 2&gt;&amp;1</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Cron Gotchas</div>
+                        <p>Cron runs with a minimal environment — <strong>no your PATH, no your aliases</strong>. Always use absolute paths in cron commands and redirect output (<code>&gt;&gt; log 2&gt;&amp;1</code>) or failures vanish silently. Validate schedules at crontab.guru.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 14. SSH ============ -->
+                <section class="content-section" id="ssh">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>14. SSH Key-Based Authentication &amp; Remote Access</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>SSH (Secure Shell)</strong> is how you manage every remote server. Key-based
+                        authentication replaces passwords with a cryptographic key pair: the <strong>private key</strong>
+                        stays on your machine (never share it), the <strong>public key</strong> goes on the server.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Key-Based Auth Flow</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">ssh-keygen (create pair)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Public key → server's authorized_keys</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ssh user@server (no password)</span>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># 1. Generate a modern key pair (on YOUR machine)</span>
+<span class="command">ssh-keygen</span> -t ed25519 -C <span class="string">"vikram@laptop"</span>
+<span class="comment">#   → ~/.ssh/id_ed25519 (private, chmod 600) + id_ed25519.pub (public)</span>
+
+<span class="comment"># 2. Install the public key on the server</span>
+<span class="command">ssh-copy-id</span> vikram@192.168.1.50
+<span class="comment">#   (or manually append .pub content to ~/.ssh/authorized_keys on server)</span>
+
+<span class="comment"># 3. Connect — no password prompt</span>
+<span class="command">ssh</span> vikram@192.168.1.50
+<span class="command">ssh</span> -p 2222 vikram@server       <span class="comment"># custom port</span>
+
+<span class="comment"># Copy files over SSH</span>
+<span class="command">scp</span> app.tar.gz vikram@server:/tmp/
+<span class="command">rsync</span> -avz ./site/ vikram@server:/var/www/   <span class="comment"># sync — only changed files</span>
+
+<span class="comment"># ~/.ssh/config — aliases save your sanity</span>
+<span class="comment"># Host web1</span>
+<span class="comment">#     HostName 192.168.1.50</span>
+<span class="comment">#     User vikram</span>
+<span class="comment">#     IdentityFile ~/.ssh/id_ed25519</span>
+<span class="comment"># → now just:  ssh web1</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Server Hardening Basics</div>
+                        <p>In <code>/etc/ssh/sshd_config</code>: set <code>PasswordAuthentication no</code> and <code>PermitRootLogin no</code>, then <code>sudo systemctl restart sshd</code>. Key-only SSH is also exactly how GitHub authentication and Ansible connections work in later modules.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 15. Editors ============ -->
+                <section class="content-section" id="editors">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">✏️</div>
+                        <h2>15. Vim / Nano Editor Basics</h2>
+                    </div>
+                    <p class="content-text">
+                        On a server there is no VS Code — you edit configs in the terminal. <strong>Nano</strong> is
+                        simple (shortcuts shown at the bottom of the screen); <strong>Vim</strong> is everywhere and
+                        fast once you know its modes.
+                    </p>
+                    <div class="content-subheading">Nano — Zero Learning Curve</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">nano</span></div>
+                        <pre><code><span class="command">nano</span> /etc/nginx/nginx.conf
+<span class="comment"># Ctrl+O = save   Ctrl+X = exit   Ctrl+W = search   Ctrl+K = cut line</span></code></pre>
+                    </div>
+                    <div class="content-subheading">Vim — The Survival Kit</div>
+                    <table class="content-table">
+                        <thead><tr><th>Key</th><th>Action</th><th>Key</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>i</code></td><td>Insert mode (start typing)</td><td><code>Esc</code></td><td>Back to Normal mode</td></tr>
+                            <tr><td><code>:w</code></td><td>Save</td><td><code>:q</code></td><td>Quit</td></tr>
+                            <tr><td><code>:wq</code></td><td>Save &amp; quit</td><td><code>:q!</code></td><td>Quit WITHOUT saving ⭐</td></tr>
+                            <tr><td><code>dd</code></td><td>Delete line</td><td><code>u</code></td><td>Undo</td></tr>
+                            <tr><td><code>yy</code> / <code>p</code></td><td>Copy line / paste</td><td><code>/text</code></td><td>Search (n = next match)</td></tr>
+                            <tr><td><code>gg</code> / <code>G</code></td><td>Top / bottom of file</td><td><code>:%s/old/new/g</code></td><td>Replace everywhere</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Joke That's Also True</div>
+                        <p>"How do you generate a truly random string? Put a junior dev in Vim and ask them to exit." Now you know: <code>Esc</code> then <code>:q!</code>. Run <code>vimtutor</code> in your terminal for the best 20-minute Vim lesson ever made.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 16. Daily Commands ============ -->
+                <section class="content-section" id="daily-commands">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧾</div>
+                        <h2>16. Daily DevOps Commands — The Complete Cheat Sheet</h2>
+                    </div>
+                    <p class="content-text">
+                        These are the commands a working DevOps engineer actually types every single day —
+                        organized by situation. Bookmark this section; it's your on-call companion.
+                    </p>
+
+                    <div class="content-subheading">🔎 "What is this server?" — System Information</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">hostname</span>                        <span class="comment"># server name</span>
+<span class="command">hostname</span> -I                     <span class="comment"># all IP addresses</span>
+<span class="command">uname</span> -a                        <span class="comment"># kernel + architecture</span>
+<span class="command">lsb_release</span> -a                  <span class="comment"># distro &amp; version (Ubuntu)</span>
+<span class="command">cat</span> /etc/os-release             <span class="comment"># works on every distro</span>
+<span class="command">uptime</span>                          <span class="comment"># how long up + load average</span>
+<span class="command">who</span> / <span class="command">w</span>                         <span class="comment"># who is logged in right now</span>
+<span class="command">last</span> -10                        <span class="comment"># last 10 logins (security check)</span>
+<span class="command">nproc</span>                           <span class="comment"># number of CPU cores</span>
+<span class="command">lscpu</span>                           <span class="comment"># CPU details</span>
+<span class="command">date</span> &amp;&amp; <span class="command">timedatectl</span>             <span class="comment"># time &amp; timezone (wrong TZ breaks logs!)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">💾 "Are we out of space?" — Disk &amp; Storage</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">df</span> -h                           <span class="comment"># free space per filesystem ⭐ daily</span>
+<span class="command">du</span> -sh /var/log                 <span class="comment"># total size of one directory</span>
+<span class="command">du</span> -sh /var/* | <span class="command">sort</span> -rh | <span class="command">head</span> <span class="comment"># biggest directories — find the space eater ⭐</span>
+<span class="command">du</span> -ah /var/log | <span class="command">sort</span> -rh | <span class="command">head</span> -20   <span class="comment"># biggest individual files</span>
+<span class="command">lsblk</span>                           <span class="comment"># disks &amp; partitions layout</span>
+<span class="command">find</span> / -size +500M -type f 2&gt;/dev/null   <span class="comment"># all files over 500MB</span>
+<span class="command">truncate</span> -s 0 huge.log          <span class="comment"># empty a log WITHOUT deleting it (safe)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">🧠 "Why is it slow?" — CPU, Memory &amp; Load</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">top</span>                             <span class="comment"># live process view (P = sort by CPU, M = by memory)</span>
+<span class="command">htop</span>                            <span class="comment"># prettier top</span>
+<span class="command">free</span> -h                         <span class="comment"># RAM + swap usage ⭐ daily</span>
+<span class="command">ps</span> aux --sort=-%cpu | <span class="command">head</span> -6   <span class="comment"># top 5 CPU processes</span>
+<span class="command">ps</span> aux --sort=-%mem | <span class="command">head</span> -6   <span class="comment"># top 5 memory processes</span>
+<span class="command">uptime</span>                          <span class="comment"># load average: 1min, 5min, 15min</span>
+<span class="comment">#   rule of thumb: load &gt; number of cores (nproc) = overloaded</span>
+<span class="command">vmstat</span> 1 5                      <span class="comment"># CPU/memory/IO samples, 1s apart</span>
+<span class="command">iostat</span> -x 1 3                   <span class="comment"># disk I/O — is the disk the bottleneck?</span>
+<span class="command">watch</span> -n 2 free -h              <span class="comment"># re-run any command every 2 seconds ⭐</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">📜 "What do the logs say?" — Logs &amp; Journals</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">tail</span> -f /var/log/nginx/error.log        <span class="comment"># follow a log live ⭐ constant use</span>
+<span class="command">tail</span> -100 app.log                       <span class="comment"># last 100 lines</span>
+<span class="command">journalctl</span> -u nginx -f                  <span class="comment"># follow a service's journal live</span>
+<span class="command">journalctl</span> -u nginx --since <span class="string">"1 hour ago"</span>
+<span class="command">journalctl</span> -p err -b                    <span class="comment"># all errors since boot</span>
+<span class="command">grep</span> -i error /var/log/syslog | <span class="command">tail</span> -20
+<span class="command">zgrep</span> <span class="string">"OutOfMemory"</span> /var/log/app.log.*.gz   <span class="comment"># search inside rotated (gzipped) logs</span>
+<span class="command">dmesg</span> -T | <span class="command">tail</span> -20                     <span class="comment"># kernel messages — OOM-killer lives here</span>
+<span class="command">dmesg</span> -T | <span class="command">grep</span> -i <span class="string">"killed process"</span>    <span class="comment"># did the OOM killer murder your app? ⭐</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">🌐 "Is the network OK?" — Connectivity &amp; Ports</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">ping</span> -c 4 8.8.8.8               <span class="comment"># raw connectivity (no DNS involved)</span>
+<span class="command">ping</span> -c 4 google.com            <span class="comment"># connectivity + DNS together</span>
+<span class="command">dig</span> +short myapp.com            <span class="comment"># what does DNS resolve to?</span>
+<span class="command">curl</span> -I https://myapp.com       <span class="comment"># HTTP status + headers ⭐ daily</span>
+<span class="command">curl</span> -s -o /dev/null -w <span class="string">"%{http_code} in %{time_total}s\n"</span> https://myapp.com
+<span class="comment">#   ↑ just status code + response time — perfect for quick health checks</span>
+<span class="command">curl</span> -v telnet://db-host:5432   <span class="comment"># can I reach that port? (firewall test)</span>
+<span class="command">ss</span> -tulpn                       <span class="comment"># everything listening + owning PIDs ⭐</span>
+<span class="command">ss</span> -tn state established | <span class="command">wc</span> -l    <span class="comment"># how many open connections right now?</span>
+<span class="command">sudo</span> lsof -i :443               <span class="comment"># which process owns port 443?</span>
+<span class="command">traceroute</span> myapp.com            <span class="comment"># where does the path break?</span>
+<span class="command">ip</span> route                       <span class="comment"># routing table / default gateway</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">📦 "Move this stuff" — Archives, Transfer &amp; Sync</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">tar</span> -czf backup.tar.gz /var/www         <span class="comment"># Create gZipped File ⭐</span>
+<span class="command">tar</span> -xzf backup.tar.gz -C /restore      <span class="comment"># eXtract to a directory ⭐</span>
+<span class="command">tar</span> -tzf backup.tar.gz                  <span class="comment"># lisT contents without extracting</span>
+<span class="command">zip</span> -r site.zip ./site  /  <span class="command">unzip</span> site.zip
+<span class="command">scp</span> app.jar user@server:/opt/app/       <span class="comment"># copy one file over SSH</span>
+<span class="command">scp</span> -r user@server:/var/log/app ./logs  <span class="comment"># copy FROM remote, recursive</span>
+<span class="command">rsync</span> -avz --delete ./site/ user@server:/var/www/   <span class="comment"># sync only changes ⭐</span>
+<span class="command">wget</span> https://example.com/tool.tar.gz    <span class="comment"># download</span>
+<span class="command">curl</span> -LO https://example.com/tool.tar.gz <span class="comment"># same with curl (-L follows redirects)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">🧩 "Glue commands together" — Pipes, Redirects &amp; Helpers</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code>cmd &gt; out.txt                   <span class="comment"># stdout → file (overwrite)</span>
+cmd &gt;&gt; out.txt                  <span class="comment"># append</span>
+cmd 2&gt; err.txt                  <span class="comment"># stderr → file</span>
+cmd &gt; all.txt 2&gt;&amp;1              <span class="comment"># BOTH streams → one file ⭐ (cron essential)</span>
+cmd1 | cmd2                     <span class="comment"># pipe output → input</span>
+cmd | <span class="command">tee</span> out.txt               <span class="comment"># see output AND save it ⭐</span>
+<span class="command">xargs</span>                          <span class="comment"># turn stdin into arguments:</span>
+<span class="command">find</span> . -name <span class="string">"*.tmp"</span> | <span class="command">xargs</span> rm         <span class="comment"># delete everything find found</span>
+<span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn      <span class="comment"># count occurrences, biggest first ⭐</span>
+<span class="command">wc</span> -l file                      <span class="comment"># count lines</span>
+<span class="command">cut</span> -d: -f1 /etc/passwd         <span class="comment"># split by delimiter, take field 1</span>
+<span class="command">diff</span> file1 file2                <span class="comment"># what changed between two files?</span>
+<span class="command">ln</span> -s /opt/app/v2 /opt/app/current      <span class="comment"># symlink — atomic deploy switch</span>
+<span class="command">alias</span> ll=<span class="string">'ls -lah'</span>              <span class="comment"># shortcuts (put in ~/.bashrc)</span>
+<span class="command">history</span> | <span class="command">grep</span> ssh              <span class="comment"># find that command you ran last week ⭐</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">🖥️ "Don't lose my work" — tmux (Sessions That Survive Disconnects)</div>
+                    <p class="content-text">
+                        SSH drops = your running command dies. <strong>tmux</strong> keeps sessions alive on the
+                        server — you can disconnect, go home, reconnect, and everything is still running.
+                        Non-negotiable for long tasks (migrations, big downloads, builds).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">sudo</span> apt install tmux
+<span class="command">tmux</span> new -s deploy              <span class="comment"># start a named session</span>
+<span class="comment"># ... run your long task, then detach: press  Ctrl+b  then  d</span>
+<span class="command">tmux</span> ls                        <span class="comment"># list sessions (even after re-login)</span>
+<span class="command">tmux</span> attach -t deploy           <span class="comment"># reattach — task still running ⭐</span>
+<span class="comment"># Inside tmux: Ctrl+b c = new window · Ctrl+b n = next · Ctrl+b % = split pane</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">🔐 "Certs, secrets &amp; data formats" — openssl, base64, jq, checksums</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Is the TLS certificate expiring? (real production incident cause #1)</span>
+<span class="command">openssl</span> s_client -connect myapp.com:443 -servername myapp.com 2&gt;/dev/null \
+    | <span class="command">openssl</span> x509 -noout -dates                 <span class="comment"># notBefore / notAfter ⭐</span>
+<span class="command">openssl</span> x509 -in cert.pem -noout -text          <span class="comment"># inspect a cert file</span>
+
+<span class="comment"># base64 — how Kubernetes stores every Secret</span>
+<span class="command">echo</span> -n <span class="string">"supersecret"</span> | <span class="command">base64</span>                  <span class="comment"># encode → c3VwZXJzZWNyZXQ=</span>
+<span class="command">echo</span> <span class="string">"c3VwZXJzZWNyZXQ="</span> | <span class="command">base64</span> -d             <span class="comment"># decode ⭐ (K8s Module 11)</span>
+
+<span class="comment"># jq — JSON processor. APIs, cloud CLIs, K8s all speak JSON ⭐⭐</span>
+<span class="command">curl</span> -s https://api.github.com/repos/torvalds/linux | <span class="command">jq</span> .stargazers_count
+<span class="command">curl</span> -s api.example.com/users | <span class="command">jq</span> <span class="string">'.[] | {name, email}'</span>
+<span class="command">cat</span> config.json | <span class="command">jq</span> <span class="string">'.database.host'</span>
+<span class="comment"># yq — the same for YAML (Kubernetes manifests, CI configs)</span>
+<span class="command">yq</span> <span class="string">'.spec.replicas'</span> deployment.yaml
+
+<span class="comment"># Verify downloads — did the file arrive intact / untampered?</span>
+<span class="command">sha256sum</span> terraform.zip                         <span class="comment"># compare with vendor's checksum</span>
+<span class="command">md5sum</span> backup.tar.gz</code></pre>
+                    </div>
+
+                    <div class="content-subheading">🕵️ "Go deeper" — Advanced Diagnostics</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Network — beyond ping</span>
+<span class="command">nc</span> -zv db-host 5432             <span class="comment"># is that port open? cleanest test ⭐</span>
+<span class="command">mtr</span> myapp.com                   <span class="comment"># ping + traceroute live — where is packet loss?</span>
+<span class="command">sudo</span> tcpdump -i any port 8080 -c 20    <span class="comment"># capture 20 packets — see actual traffic</span>
+<span class="command">host</span> myapp.com                  <span class="comment"># quick DNS lookup</span>
+
+<span class="comment"># Processes — beyond ps</span>
+<span class="command">pgrep</span> -f nginx                  <span class="comment"># just the PIDs (script-friendly)</span>
+<span class="command">pstree</span> -p                       <span class="comment"># process tree — who started what?</span>
+<span class="command">sudo</span> strace -p 1234             <span class="comment"># what syscalls is a stuck process making?</span>
+<span class="command">sudo</span> fuser -v /var/log/app.log  <span class="comment"># which processes have this file open?</span>
+<span class="command">nice</span> -n 19 ./heavy-job.sh       <span class="comment"># run at low priority — don't starve the app</span>
+
+<span class="comment"># Limits &amp; kernel — the "weird production issue" fixers</span>
+<span class="command">ulimit</span> -n                       <span class="comment"># max open files — "Too many open files" errors ⭐</span>
+<span class="command">sysctl</span> vm.max_map_count         <span class="comment"># kernel params (Elasticsearch demands this one)</span>
+<span class="command">sudo</span> sysctl -w vm.max_map_count=262144   <span class="comment"># set live; persist in /etc/sysctl.conf</span>
+
+<span class="comment"># Storage — mounting volumes (cloud disks in Module 10)</span>
+<span class="command">lsblk</span> -f                        <span class="comment"># disks, partitions, filesystems, mountpoints</span>
+<span class="command">sudo</span> mount /dev/sdb1 /data      <span class="comment"># attach a filesystem to a directory</span>
+<span class="command">sudo</span> umount /data               <span class="comment"># detach (fails if files are open — see fuser)</span>
+<span class="command">cat</span> /etc/fstab                  <span class="comment"># mounts that persist across reboots</span>
+
+<span class="comment"># Odds &amp; ends you'll be glad you know</span>
+<span class="command">time</span> ./slow-script.sh           <span class="comment"># how long did it take?</span>
+<span class="command">dd</span> if=/dev/zero of=/tmp/t bs=1M count=1024 oflag=direct   <span class="comment"># quick disk write-speed test</span>
+<span class="command">stat</span> app.conf                   <span class="comment"># exact timestamps + permissions of a file</span>
+<span class="command">file</span> mystery.bin                <span class="comment"># what IS this file?</span>
+<span class="command">type</span> ll                        <span class="comment"># is this an alias, builtin, or binary?</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">⚡ The On-Call Six — Run These First on Any Sick Server</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — 60-second triage</span></div>
+                        <pre><code><span class="command">uptime</span>                          <span class="comment"># 1. load — is the box overloaded?</span>
+<span class="command">df</span> -h                           <span class="comment"># 2. disk — is anything 100% full?</span>
+<span class="command">free</span> -h                         <span class="comment"># 3. memory — swapping? nearly empty?</span>
+<span class="command">top</span> -bn1 | <span class="command">head</span> -15             <span class="comment"># 4. which process is eating the box?</span>
+systemctl --failed              <span class="comment"># 5. any services in failed state?</span>
+<span class="command">journalctl</span> -p err --since <span class="string">"10 min ago"</span>  <span class="comment"># 6. recent errors</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Practice Plan</div>
+                        <p>Don't memorize this page — <strong>use</strong> it. For one week, do everything on your Ubuntu VM through the terminal only: check disk before installing, follow logs while restarting nginx, transfer files with scp. By day seven your fingers know these commands better than your brain does.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 17. Log Analysis ============ -->
+                <section class="content-section" id="log-analysis">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔬</div>
+                        <h2>17. Log Analysis &amp; logrotate</h2>
+                    </div>
+                    <p class="content-text">
+                        Logs are where every production mystery is solved. Before you get Loki and Grafana
+                        (Module 16), you must be able to interrogate raw log files with nothing but the terminal —
+                        because during a real incident, that is often all you have.
+                    </p>
+
+                    <div class="content-subheading">Know Your /var/log</div>
+                    <table class="content-table">
+                        <thead><tr><th>File</th><th>What's In It</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>/var/log/syslog</code></td><td>General system messages (Ubuntu/Debian)</td></tr>
+                            <tr><td><code>/var/log/auth.log</code></td><td>Logins, sudo usage, SSH attempts — <strong>security audits start here</strong></td></tr>
+                            <tr><td><code>/var/log/kern.log</code></td><td>Kernel messages</td></tr>
+                            <tr><td><code>/var/log/nginx/access.log</code></td><td>Every HTTP request nginx served</td></tr>
+                            <tr><td><code>/var/log/nginx/error.log</code></td><td>Nginx problems — config errors, upstream failures</td></tr>
+                            <tr><td><code>/var/log/dpkg.log</code></td><td>Package installs/removals — "what changed recently?"</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Reading an Nginx Access Log Line</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">access.log — one line decoded</span></div>
+                        <pre><code>203.0.113.45 - - [13/Jul/2026:10:31:22 +0530] "GET /api/orders HTTP/1.1" 500 1234 "-" "Mozilla/5.0"
+└────┬──────┘   └──────────┬─────────────┘   └───────┬────────────────┘ └┬┘ └─┬┘
+  client IP           timestamp                method + URL + protocol   │    └ response bytes
+                                                                          └ HTTP status ⭐
+<span class="comment"># Status codes: 2xx OK · 3xx redirect · 4xx client error · 5xx SERVER ERROR (your problem)</span></code></pre>
+                    </div>
+
+                    <div class="content-subheading">The Analysis One-Liners (Real Incident Toolkit)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — log forensics</span></div>
+                        <pre><code>LOG=/var/log/nginx/access.log
+
+<span class="comment"># 1. How many requests per status code? (health overview)</span>
+<span class="command">awk</span> <span class="string">'{print $9}'</span> <span class="variable">$LOG</span> | <span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn
+<span class="output">#  45231 200    ← healthy traffic</span>
+<span class="output">#    892 404    ← broken links or scanners</span>
+<span class="output">#    117 500    ← YOUR BUG</span>
+
+<span class="comment"># 2. Which URLs are throwing 500s?</span>
+<span class="command">awk</span> <span class="string">'$9 == 500 {print $7}'</span> <span class="variable">$LOG</span> | <span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn | <span class="command">head</span>
+
+<span class="comment"># 3. Top 10 IPs by request volume (DDoS / abuse check)</span>
+<span class="command">awk</span> <span class="string">'{print $1}'</span> <span class="variable">$LOG</span> | <span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn | <span class="command">head</span>
+
+<span class="comment"># 4. Requests per minute — find the exact moment traffic spiked</span>
+<span class="command">awk</span> <span class="string">-F'[' '{print substr($2, 1, 17)}'</span> <span class="variable">$LOG</span> | <span class="command">uniq</span> -c | <span class="command">tail</span> -30
+
+<span class="comment"># 5. Everything one suspicious IP did</span>
+<span class="command">grep</span> <span class="string">"203.0.113.45"</span> <span class="variable">$LOG</span> | <span class="command">awk</span> <span class="string">'{print $4, $6, $7, $9}'</span> | <span class="command">less</span>
+
+<span class="comment"># 6. Failed SSH login attempts — who is attacking me?</span>
+<span class="command">grep</span> <span class="string">"Failed password"</span> /var/log/auth.log | <span class="command">awk</span> <span class="string">'{print $(NF-3)}'</span> | <span class="command">sort</span> | <span class="command">uniq</span> -c | <span class="command">sort</span> -rn | <span class="command">head</span>
+
+<span class="comment"># 7. Errors in a specific time window (during the incident)</span>
+<span class="command">awk</span> <span class="string">'/13\/Jul\/2026:10:2[0-9]/ &amp;&amp; $9 &gt;= 500'</span> <span class="variable">$LOG</span> | <span class="command">wc</span> -l</code></pre>
+                    </div>
+
+                    <div class="content-subheading">logrotate — Why Your Disk Isn't Full of Logs</div>
+                    <p class="content-text">
+                        Logs grow forever unless rotated. <strong>logrotate</strong> (runs daily via cron/systemd)
+                        renames the current log, compresses old ones, and deletes the oldest — that's why you see
+                        <code>app.log</code>, <code>app.log.1</code>, <code>app.log.2.gz</code> on every server.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">/etc/logrotate.d/myapp</span></div>
+                        <pre><code>/var/log/myapp/*.log {
+    daily                 <span class="comment"># rotate every day (or: weekly, monthly, size 100M)</span>
+    rotate 14             <span class="comment"># keep 14 old logs, delete older</span>
+    compress              <span class="comment"># gzip rotated logs</span>
+    delaycompress         <span class="comment"># keep newest rotation uncompressed (still being read)</span>
+    missingok             <span class="comment"># no error if the log doesn't exist</span>
+    notifempty            <span class="comment"># skip rotation if the file is empty</span>
+    create 0640 myapp myapp   <span class="comment"># recreate the log file with these permissions</span>
+    postrotate
+        systemctl reload myapp &gt; /dev/null 2&gt;&amp;1 || true   <span class="comment"># tell the app to reopen its log file</span>
+    endscript
+}</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — test &amp; run</span></div>
+                        <pre><code><span class="command">sudo</span> logrotate -d /etc/logrotate.d/myapp    <span class="comment"># -d = dry run, shows what WOULD happen</span>
+<span class="command">sudo</span> logrotate -f /etc/logrotate.d/myapp    <span class="comment"># -f = force a rotation right now</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Bigger Picture</div>
+                        <p>Everything here scales up later: these awk pipelines become <strong>LogQL queries in Loki</strong> (Module 16), and logrotate's job is done by log shippers and retention policies in Kubernetes. Learn it raw first — the concepts transfer exactly.</p>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Linux Server Setup &amp; Automation Scripts</h2>
+                        <p>Set up an Ubuntu server on a VM. Write Bash scripts to automate user creation, install required packages (Nginx, Node.js), configure firewall rules, and set up cron jobs for automated backups. SSH into the server remotely and manage services.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Provision the VM</h3>
+                            <p>Create an Ubuntu Server 24.04 VM in VirtualBox (2 CPU / 4GB RAM / 25GB disk, bridged network, OpenSSH server enabled). Take a clean-install snapshot. Note the VM's IP with <code>ip a</code>.</p>
+                        </div>
+                        <div class="project-step" data-step="2">
+                            <h3>Set Up Key-Based SSH</h3>
+                            <p>From your host machine: <code>ssh-keygen -t ed25519</code>, then <code>ssh-copy-id user@VM_IP</code>. Confirm passwordless login works, then disable password authentication in <code>/etc/ssh/sshd_config</code> and restart sshd. All remaining steps are done over SSH — like a real remote server.</p>
+                        </div>
+                        <div class="project-step" data-step="3">
+                            <h3>Write user-setup.sh</h3>
+                            <p>A script that takes a username as <code>$1</code>, creates the user with a home directory, adds them to a <code>deployers</code> group, sets up their <code>~/.ssh/authorized_keys</code> with correct permissions (700 dir, 600 file), and prints a summary. Use <code>set -euo pipefail</code> and check the user doesn't already exist.</p>
+                        </div>
+                        <div class="project-step" data-step="4">
+                            <h3>Write install-stack.sh</h3>
+                            <p>Automate <code>apt update</code>, install Nginx and Node.js, <code>systemctl enable --now nginx</code>, and verify each service with <code>systemctl is-active</code>. Echo clear ✔/✖ status lines and exit non-zero if anything failed — pipeline discipline from day one.</p>
+                        </div>
+                        <div class="project-step" data-step="5">
+                            <h3>Configure the Firewall</h3>
+                            <p>Write <code>firewall.sh</code>: allow 22, 80, 443 with ufw, enable it, and print <code>ufw status</code>. Order matters — allow SSH before enabling, or you lock yourself out (this is why we have a snapshot!).</p>
+                        </div>
+                        <div class="project-step" data-step="6">
+                            <h3>Automated Backups with Cron</h3>
+                            <p>Write <code>backup.sh</code> that tars <code>/var/www</code> and <code>/etc/nginx</code> into <code>/backups/backup_$(date +%F).tar.gz</code> and deletes archives older than 7 days (<code>find /backups -mtime +7 -delete</code>). Schedule it: <code>0 2 * * *</code> with output redirected to a log file. Verify with <code>crontab -l</code> and by running it manually.</p>
+                        </div>
+                        <div class="project-step" data-step="7">
+                            <h3>Publish to Your Portfolio</h3>
+                            <p>Push all scripts to a GitHub repo (<code>linux-server-automation</code>) with a README documenting each script, usage examples, and screenshots of the running services. This repo grows into your Ansible playbooks in Module 15.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💬</div>
+                        <h2>Interview Questions</h2>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q1</span>
+                            <h4>A service is down on a Linux server. Walk me through your troubleshooting steps.</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Check service state with <code>systemctl status app</code>; read recent logs with <code>journalctl -u app -n 100</code> and application logs in <code>/var/log</code>; verify resources (<code>df -h</code> for disk full, <code>free -h</code> for memory, <code>top</code> for CPU); check the port isn't taken (<code>ss -tulpn</code>); validate recent config changes; then restart and watch logs live with <code>journalctl -u app -f</code>. Disk-full and port-conflict are the two most common real causes.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q2</span>
+                            <h4>Explain chmod 755 vs 644. Why must an SSH private key be 600?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Digits are owner/group/others with r=4, w=2, x=1. 755 = rwx for owner, r-x for group and others — right for scripts and directories. 644 = rw- for owner, read-only for everyone else — right for data files. A private key must be 600 (owner read/write only) because the SSH client refuses keys readable by others — any other user on the machine could steal your identity.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q3</span>
+                            <h4>What's the difference between a process and a service? How does systemd fit in?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            A process is any running program with a PID. A service (daemon) is a long-running background process managed by the init system — on modern Linux that's systemd (PID 1). systemd starts services from unit files, restarts them on failure, handles dependencies and boot order (<code>systemctl enable</code>), and captures their logs into the journal (<code>journalctl</code>).
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q4</span>
+                            <h4>How would you find the top 5 IPs generating errors in an access log?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <code>grep " 500 " access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -5</code> — grep filters error lines, awk extracts the IP column, sort groups identical IPs together, uniq -c counts them, sort -rn orders by count descending, head takes the top 5. Explaining each stage of the pipe is exactly what the interviewer wants to hear.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q5</span>
+                            <h4>What does set -euo pipefail do and why use it in every script?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            <code>-e</code> exits the script when any command fails; <code>-u</code> errors on undefined variables (catches typos like <code>rm -rf $TYPO/</code> becoming <code>rm -rf /</code>); <code>-o pipefail</code> makes a pipeline fail if any stage fails, not just the last. Without these, scripts continue past failures and cause damage silently — in CI/CD, a script that hides failure is worse than one that crashes loudly.
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q6</span>
+                            <h4>How does SSH key-based authentication work?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Asymmetric cryptography: <code>ssh-keygen</code> creates a private key (stays on the client, 600 permissions) and a public key (added to <code>~/.ssh/authorized_keys</code> on the server). At login the server sends a challenge that only the holder of the private key can sign; the server verifies the signature with the public key. No secret ever crosses the network, which is why it's safer than passwords and standard for automation (Git, Ansible, CI/CD).
+                        </div></div>
+                    </div>
+
+                    <div class="interview-card">
+                        <div class="interview-q" onclick="toggleInterview(this)">
+                            <span class="interview-q-num">Q7</span>
+                            <h4>The disk is 100% full on a production server. What do you do?</h4>
+                            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="interview-a"><div class="interview-a-inner">
+                            Confirm with <code>df -h</code> (which mount?), then locate the biggest consumers: <code>du -sh /var/* | sort -rh | head</code> — it's usually logs in <code>/var/log</code>. Free space safely: truncate a huge active log (<code>truncate -s 0 big.log</code>) rather than deleting it (a deleted file still held open by a process frees nothing — find those with <code>lsof | grep deleted</code>). Long-term fix: configure logrotate and disk-usage alerts in monitoring.
+                        </div></div>
+                    </div>
+                </section>
+
+                <!-- Footer nav -->
+                <div class="module-nav">
+                    <a href="module-01.html" class="module-nav-card">
+                        <span class="module-nav-label">← Previous</span>
+                        <span class="module-nav-title">01 · Introduction to DevOps</span>
+                    </a>
+                    <a href="module-03.html" class="module-nav-card next">
+                        <span class="module-nav-label">Next Module →</span>
+                        <span class="module-nav-title">03 · Version Control with Git &amp; GitHub</span>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

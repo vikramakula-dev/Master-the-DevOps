@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 07 — CI/CD with Jenkins | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 7: CI/CD with Jenkins — Pipelines, Jenkinsfiles, Groovy, Webhooks, and Agents.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 07 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level intermediate">Intermediate</span>
+                    <span class="module-hero-duration">Phase 2 · CI/CD &amp; Containers</span>
+                </div>
+                <h1>Module 07 — <span class="gradient-text">CI/CD with Jenkins</span></h1>
+                <p class="module-hero-desc">
+                    Modules 02–06 taught you every step by hand. Jenkins is where you teach a robot to do it on every push. A pipeline is just your Bash discipline wrapped in stages—nothing magical, which is exactly why you can debug it.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Jenkins</span>
+                    <span class="tech-tag">Jenkinsfile</span>
+                    <span class="tech-tag">Groovy</span>
+                    <span class="tech-tag">Webhooks</span>
+                    <span class="tech-tag">Agents</span>
+                    <span class="tech-tag">Nexus</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#recap" class="toc-link">1. CI/CD Concepts Recap</a></li>
+                    <li><a href="#install" class="toc-link">2. Installing Jenkins on Ubuntu</a></li>
+                    <li><a href="#ui" class="toc-link">3. UI, Jobs &amp; Credentials</a></li>
+                    <li><a href="#freestyle" class="toc-link">4. Freestyle vs Pipeline</a></li>
+                    <li><a href="#syntax" class="toc-link">5. Jenkinsfile Declarative Syntax</a></li>
+                    <li><a href="#real-pipeline" class="toc-link">6. The Real Pipeline</a></li>
+                    <li><a href="#webhooks" class="toc-link">7. Multi-Branch &amp; Webhooks</a></li>
+                    <li><a href="#shared-libs" class="toc-link">8. Shared Libraries</a></li>
+                    <li><a href="#agents" class="toc-link">9. Agents &amp; Distributed Builds</a></li>
+                    <li><a href="#alternatives" class="toc-link">10. GitHub Actions &amp; GitLab</a></li>
+                    <li><a href="#incidents" class="toc-link">11. Real-Time Incidents 🔥</a></li>
+                    <li><a href="#admin" class="toc-link">12. Backup &amp; Hardening</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+                
+                <!-- ============ 1. Concepts Recap ============ -->
+                <section class="content-section" id="recap">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>1. CI/CD Concepts Recap &amp; Practice</h2>
+                    </div>
+                    <p class="content-text">
+                        Module 01 introduced the theory of Continuous Integration. Now you have the tools to actually build it. A "Pipeline" is simply a robot that automatically runs the Bash commands you learned in Module 02, the Git pulls from Module 03, the builds from Module 05, and the uploads from Module 06.
+                    </p>
+
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.85rem;">
+                            <span>Git Push (M03)</span> →
+                            <span style="font-weight: bold; border-color: var(--primary);">Jenkins Webhook</span> →
+                            <span>Build &amp; Test (M05)</span> →
+                            <span>Publish to Nexus (M06)</span>
+                        </div>
+                    </div>
+
+                    <p class="content-text">
+                        <strong>The Social Contract:</strong> "Broken Build = Stop the Line." If the Jenkins test stage fails (exit code > 0), the developer stops writing new code and fixes the build immediately. This ensures the <code>main</code> branch is <em>always</em> deployable. This drives our DORA metrics (Deployment Frequency &amp; Lead Time).
+                    </p>
+                </section>
+
+                <!-- ============ 2. Installation ============ -->
+                <section class="content-section" id="install">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>2. Installing Jenkins on Ubuntu</h2>
+                    </div>
+                    <p class="content-text">
+                        Let's provision a server next to our Nexus server. Jenkins runs on Java, and we install it as a <code>systemd</code> service (the exact ritual you learned in Module 06).
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># 1. Install Java 17</span>
+<span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt install openjdk-17-jre -y
+
+<span class="comment"># 2. Add Jenkins Debian Repo Key</span>
+<span class="command">curl</span> -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | <span class="command">sudo</span> tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+<span class="command">echo</span> deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | <span class="command">sudo</span> tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+<span class="comment"># 3. Install Jenkins</span>
+<span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt install jenkins -y
+
+<span class="comment"># 4. Open Firewall (Jenkins defaults to port 8080)</span>
+<span class="command">sudo</span> ufw allow 8080
+
+<span class="comment"># 5. Fetch Initial Admin Password</span>
+<span class="command">sudo</span> cat /var/lib/jenkins/secrets/initialAdminPassword</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 JVM Sizing for Jenkins</div>
+                        <p>Jenkins is memory-hungry. A 1GB VM will crash. Use a 2GB+ VM, and edit <code>/lib/systemd/system/jenkins.service</code> (or <code>/etc/default/jenkins</code> depending on OS version) to set <code>JAVA_OPTS="-Xmx1g"</code> to limit the heap size.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. UI, Jobs & Credentials ============ -->
+                <section class="content-section" id="ui">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>3. Jenkins UI, Jobs &amp; Credentials</h2>
+                    </div>
+                    <p class="content-text">
+                        The Jenkins UI is old but powerful. The most critical configuration screen for DevOps engineers is <strong>Manage Credentials</strong>.
+                    </p>
+
+                    <div class="content-subheading">The Golden Rule of Secrets</div>
+                    <p class="content-text">In Module 03, we learned never to commit passwords to Git. Your <code>Jenkinsfile</code> is stored in Git. Therefore, you can never hardcode the Nexus password in the Jenkinsfile. You store it securely inside Jenkins' encrypted Credential Store, and inject it at runtime.</p>
+                    
+                    <ul class="content-list">
+                        <li><strong>Username with Password:</strong> (e.g., <code>nexus-deploy-creds</code>)</li>
+                        <li><strong>Secret Text:</strong> (e.g., a Slack Webhook token or GitHub PAT)</li>
+                        <li><strong>SSH Username with Private Key:</strong> (e.g., to connect to remote Agents)</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 4. Freestyle vs Pipeline ============ -->
+                <section class="content-section" id="freestyle">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>4. Freestyle Jobs vs Pipeline-as-Code</h2>
+                    </div>
+                    <p class="content-text">
+                        Historically, Jenkins users clicked around a UI to define a "Freestyle Job" (click Add Build Step &gt; Execute Shell). We <strong>never</strong> do this in modern DevOps.
+                    </p>
+
+                    <table class="content-table">
+                        <thead><tr><th>Feature</th><th>Freestyle Job (UI Clicks)</th><th>Pipeline-as-Code (Jenkinsfile)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Version Control</strong></td><td>None. If someone deletes the job, it's gone.</td><td>Stored in Git. History, blame, rollbacks.</td></tr>
+                            <tr><td><strong>Code Review</strong></td><td>No PRs for UI clicks.</td><td>Jenkinsfile changes require Pull Requests.</td></tr>
+                            <tr><td><strong>Portability</strong></td><td>Locked in the Jenkins database.</td><td>Just point a new Jenkins instance to the Git repo.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 5. Declarative Syntax ============ -->
+                <section class="content-section" id="syntax">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📝</div>
+                        <h2>5. Jenkinsfile — Declarative Syntax, Line by Line</h2>
+                    </div>
+                    <p class="content-text">
+                        A <code>Jenkinsfile</code> is written in Groovy. Modern Jenkins uses <strong>Declarative Pipeline</strong> syntax.
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile</span></div>
+                        <pre><code><span class="comment">/* Step 1: The Wrapper */</span>
+pipeline {
+    <span class="comment">/* Step 2: Where does this run? */</span>
+    agent any
+
+    <span class="comment">/* Step 3: Global settings */</span>
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        timestamps()
+    }
+
+    <span class="comment">/* Step 4: The Meat */</span>
+    stages {
+        stage('Build') {
+            steps {
+                <span class="command">sh</span> './gradlew build'
+            }
+        }
+        stage('Deploy') {
+            <span class="comment">/* Only run this stage on the main branch */</span>
+            when { branch 'main' }
+            steps {
+                <span class="comment">/* Manual Approval Gate! */</span>
+                input message: 'Deploy to Prod?'
+                <span class="command">sh</span> './deploy.sh'
+            }
+        }
+    }
+
+    <span class="comment">/* Step 5: Cleanup &amp; Notifications */</span>
+    post {
+        always {
+            cleanWs() <span class="comment"># Delete the workspace to save disk space</span>
+        }
+        failure {
+            <span class="command">echo</span> 'Send Slack message here!'
+        }
+    }
+}</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>pipeline {}</code></strong>: The mandatory root block. Everything inside this is Declarative Pipeline syntax.</li>
+                        <li><strong><code>agent any</code></strong>: Tells Jenkins to run this on any available worker node.</li>
+                        <li><strong><code>options {}</code></strong>: Global configuration. <code>timeout</code> guarantees the build won't hang forever, and <code>timestamps</code> adds time prefixes to console logs.</li>
+                        <li><strong><code>stages {}</code></strong>: The sequence of work blocks. Each <code>stage</code> shows up as a separate column in the Jenkins UI.</li>
+                        <li><strong><code>when { branch 'main' }</code></strong>: A condition. The "Deploy" stage will only execute if this commit is on the <code>main</code> branch.</li>
+                        <li><strong><code>input message</code></strong>: Pauses the pipeline and waits for a human to click "Proceed" or "Abort" in the UI.</li>
+                        <li><strong><code>post {}</code></strong>: Runs after all stages finish (or fail). <code>cleanWs()</code> deletes the workspace to free disk space.</li>
+                    </ul>
+
+                    <div class="content-subheading">Parallel &amp; Stash</div>
+                    <p class="content-text">You can run stages simultaneously (e.g., UI tests and API tests at the same time) using <code>parallel {}</code>. To pass files between different agents, use <code>stash</code> (save) and <code>unstash</code> (load).</p>
+
+                    <p class="content-text"><em>Note: You may see "Scripted Pipeline" (using the <code>node {}</code> block) in older codebases. You should always write new pipelines in Declarative format.</em></p>
+                </section>
+
+                <!-- ============ 6. The Real Pipeline ============ -->
+                <section class="content-section" id="real-pipeline">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚀</div>
+                        <h2>6. The Real Pipeline: Build → Test → Publish</h2>
+                    </div>
+                    <p class="content-text">
+                        Here is the complete pipeline that automates the Java build from Module 05 and pushes to the Nexus repository from Module 06.
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile</span></div>
+                        <pre><code>pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                <span class="comment"># Pull the code from Git</span>
+                checkout scm
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                <span class="command">sh</span> './gradlew test'
+            }
+            post {
+                always {
+                    <span class="comment"># Tell Jenkins to read the XML report to draw the test graph</span>
+                    junit 'build/test-results/**/*.xml'
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                <span class="command">sh</span> './gradlew assemble'
+            }
+        }
+        
+        stage('Publish to Nexus') {
+            steps {
+                <span class="comment"># Inject the Nexus credentials securely!</span>
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-deploy-creds', 
+                    usernameVariable: 'NEXUS_USER', 
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    <span class="command">sh</span> './gradlew publish -PnexusUser=${NEXUS_USER} -PnexusPass=${NEXUS_PASS}'
+                }
+            }
+        }
+    }
+}</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>checkout scm</code></strong>: A built-in Jenkins command that automatically clones the exact Git commit that triggered the webhook.</li>
+                        <li><strong><code>sh './gradlew test'</code></strong>: Runs the unit tests via Bash. If tests fail (exit code &gt; 0), Jenkins instantly stops the pipeline and marks it RED.</li>
+                        <li><strong><code>junit '...'</code></strong>: The <code>post</code> block reads the generated XML test files and renders a beautiful test-success-trend graph on the Jenkins dashboard.</li>
+                        <li><strong><code>withCredentials([...])</code></strong>: Securely fetches the Nexus username and password from Jenkins Credentials, assigning them to local variables (<code>NEXUS_USER</code>). It masks these values from the console logs.</li>
+                        <li><strong><code>sh './gradlew publish ...'</code></strong>: Passes those secure variables into the Gradle build to authenticate against Nexus.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 7. Webhooks & Triggers ============ -->
+                <section class="content-section" id="webhooks">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔗</div>
+                        <h2>7. Multi-Branch Pipelines, Webhooks &amp; Triggers</h2>
+                    </div>
+                    <p class="content-text">
+                        A "Multibranch Pipeline" scans your Git repository (Module 03). For every branch that contains a <code>Jenkinsfile</code>, Jenkins automatically creates a pipeline job. If you open a Pull Request, Jenkins builds it. This is how GitHub "Require CI to pass before merging" actually works.
+                    </p>
+
+                    <div class="content-subheading">How does Jenkins know when you push code?</div>
+                    <table class="content-table">
+                        <thead><tr><th>Method</th><th>How it works</th><th>Verdict</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Webhook</strong></td><td>GitHub sends an HTTP POST to <code>YOUR_JENKINS/github-webhook/</code> the millisecond you push.</td><td><strong>Best.</strong> Instant and efficient.</td></tr>
+                            <tr><td><strong>Poll SCM</strong></td><td>Jenkins runs <code>git fetch</code> every 5 minutes to see if anything changed.</td><td>Terrible. Wastes CPU and API rate limits.</td></tr>
+                            <tr><td><strong>Cron (Scheduled)</strong></td><td>Build runs at 2am every night (e.g., <code>H/15 * * * *</code>).</td><td>Good for nightly deep-scans, not for CI. Note the <code>H</code> (Hash) instead of <code>*</code> to distribute load!</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 8. Shared Libraries ============ -->
+                <section class="content-section" id="shared-libs">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📚</div>
+                        <h2>8. Shared Libraries (Don't Repeat Yourself)</h2>
+                    </div>
+                    <p class="content-text">
+                        Imagine you have 50 microservices. Copying and pasting the 50-line <code>Jenkinsfile</code> above into 50 different Git repos is a nightmare. If you need to change the Nexus URL, you have to open 50 Pull Requests.
+                    </p>
+                    <p class="content-text">
+                        <strong>Shared Libraries</strong> allow you to write Groovy code in a central Git repo, and call it from any Jenkinsfile.
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile (Using Library)</span></div>
+                        <pre><code><span class="comment"># Import the library at the top of the file</span>
+@Library('devops-lib@v1') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Build &amp; Publish') {
+            steps {
+                <span class="comment"># Call the custom function we wrote in the library!</span>
+                buildAndPublishJava(repoUrl: 'nexus.mycompany.com')
+            }
+        }
+    }
+}</code></pre>
+                    </div>
+                    
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>@Library('devops-lib@v1') _</code></strong>: Tells Jenkins to clone the Git repository named "devops-lib" (version/tag "v1") before starting the pipeline. The underscore <code>_</code> imports everything globally.</li>
+                        <li><strong><code>buildAndPublishJava(...)</code></strong>: This is not a built-in Jenkins command. It is a custom function (a <code>.groovy</code> script) that your DevOps team wrote and stored in the shared library. It hides the 50 lines of complex Gradle and Credentials logic from the developer, leaving a clean, simple interface.</li>
+                    </ul>
+
+                    <p class="content-text">This is the seed of "Platform Engineering" (Module 19), where DevOps provides abstract, easy-to-use paved roads for developers.</p>
+                </section>
+
+                <!-- ============ 9. Agents ============ -->
+                <section class="content-section" id="agents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤖</div>
+                        <h2>9. Agents &amp; Distributed Builds</h2>
+                    </div>
+                    
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span style="font-weight: bold; border-color: var(--danger);">Jenkins Controller (Brain)</span> ↔
+                            <span>Agent 1 (Ubuntu/Java)</span><br><br>
+                            <span style="visibility: hidden">Jenkins Controller (Brain)</span> ↔
+                            <span>Agent 2 (Windows/C++)</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">The Golden Rule of Architecture</div>
+                    <p class="content-text"><strong>The Controller builds nothing.</strong> The Controller's only job is to serve the UI, manage credentials, and assign tasks. If you run <code>npm install</code> on the Controller, it will run out of memory and crash the UI for the whole company. We set the Controller's Executors to <code>0</code>.</p>
+                    <p class="content-text">We connect worker machines ("Agents" or "Nodes") via SSH (Module 02 callback!). We assign them labels. In the Jenkinsfile, we ask for them:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Groovy</span></div>
+                        <pre><code>agent { label 'linux &amp;&amp; java17' }</code></pre>
+                    </div>
+                    <p class="content-text"><em>Module 09 Preview: Manually patching Ubuntu VMs with Java is annoying. Soon, we will use Docker to spin up ephemeral agents on-demand!</em></p>
+                </section>
+
+                <!-- ============ 10. GitHub Actions ============ -->
+                <section class="content-section" id="alternatives">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐙</div>
+                        <h2>10. GitHub Actions &amp; GitLab CI (Alternatives)</h2>
+                    </div>
+                    <p class="content-text">
+                        Why learn Jenkins if GitHub Actions is newer? Because <strong>the concepts transfer 1:1</strong>. If you understand Jenkins, you can learn GitHub Actions in 20 minutes. Here is the exact same pipeline in GitHub Actions format (<code>.github/workflows/ci.yml</code>):
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml</span></div>
+                        <pre><code>name: Java CI
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  <span class="comment"># This is the "agent"</span>
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        
+    - name: Build and Publish
+      env:
+        NEXUS_USER: ${{ secrets.NEXUS_USER }}  <span class="comment"># This is "withCredentials"</span>
+        NEXUS_PASS: ${{ secrets.NEXUS_PASS }}
+      run: ./gradlew publish -PnexusUser=$NEXUS_USER -PnexusPass=$NEXUS_PASS</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>on: push</code></strong>: Equivalent to the Jenkins GitHub Webhook trigger.</li>
+                        <li><strong><code>runs-on: ubuntu-latest</code></strong>: Equivalent to <code>agent { label 'linux' }</code> in Jenkins.</li>
+                        <li><strong><code>uses: actions/checkout@v3</code></strong>: Equivalent to <code>checkout scm</code>.</li>
+                        <li><strong><code>${{ secrets.NEXUS_USER }}</code></strong>: Equivalent to Jenkins' <code>withCredentials</code> block. Fetches the secret from GitHub Repository Secrets and injects it as an environment variable securely.</li>
+                    </ul>
+
+                    <table class="content-table">
+                        <thead><tr><th>Concept</th><th>Jenkins</th><th>GitHub Actions</th><th>GitLab CI</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Worker Machine</strong></td><td>Agent</td><td>Runner</td><td>Runner</td></tr>
+                            <tr><td><strong>Task Block</strong></td><td>Stage</td><td>Job</td><td>Stage / Job</td></tr>
+                            <tr><td><strong>File Name</strong></td><td>Jenkinsfile</td><td>.github/workflows/*.yml</td><td>.gitlab-ci.yml</td></tr>
+                            <tr><td><strong>Code Reuse</strong></td><td>Shared Library</td><td>Composite Actions</td><td>Includes</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 11. Incidents & Troubleshooting ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>11. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+                    <p class="content-text">
+                        When the CI server breaks, the entire engineering organization is blocked. Here is how you debug the most common real-world Jenkins failures.
+                    </p>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 1: "Jenkins is down" (UI dead)</div>
+                        <p><strong>Symptom:</strong> 502 Bad Gateway or the UI won't load.</p>
+                        <p><strong>Investigation:</strong> SSH into the controller. Run <code>systemctl status jenkins</code>. Then read the logs: <code>journalctl -u jenkins -n 50</code>. You see <code>java.lang.OutOfMemoryError: Java heap space</code> after a plugin update.</p>
+                        <p><strong>Fix:</strong> Increase memory in the systemd override (<code>-Xmx2g</code>), or rollback the plugin from <code>/var/lib/jenkins/plugins/*.bak</code>.</p>
+                        <p><strong>Prevention:</strong> Setup monitoring (Module 16) to alert when JVM Heap is > 85%.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 2: "The build hangs forever"</div>
+                        <p><strong>Symptom:</strong> A pipeline has been running for 4 hours on a 2-minute stage.</p>
+                        <p><strong>Investigation:</strong> Is it waiting for manual input, or is it a network hang? Go to <code>YOUR_JENKINS/threadDump</code> to see exactly what Java is doing. It's stuck trying to download from a dead Nexus proxy.</p>
+                        <p><strong>Fix:</strong> Abort the build manually.</p>
+                        <p><strong>Prevention:</strong> NEVER write a pipeline without a timeout. <code>options { timeout(time: 15, unit: 'MINUTES') }</code>.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 3: "Disk full, all builds failing"</div>
+                        <p><strong>Symptom:</strong> Builds fail immediately with <code>No space left on device</code>.</p>
+                        <p><strong>Investigation:</strong> (Module 02 forensics). Run <code>df -h</code>. See `/` is at 100%. Run <code>sudo du -sh /var/lib/jenkins/*</code>. Discover <code>/workspaces</code> and <code>/jobs</code> are 500GB.</p>
+                        <p><strong>Fix:</strong> Delete old workspaces manually. Configure <code>buildDiscarder(logRotator(numToKeepStr: '10'))</code> on jobs to only keep the last 10 build logs. Add <code>cleanWs()</code> to the <code>post { always {} }</code> block in all Jenkinsfiles.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 4: "Webhook doesn't trigger"</div>
+                        <p><strong>Symptom:</strong> A developer pushes code to GitHub, but Jenkins does nothing.</p>
+                        <p><strong>Investigation (The 4-layer check):</strong><br>
+                        1. <em>GitHub side:</em> Go to repo Settings &gt; Webhooks. Look at "Recent Deliveries". Is it getting a 200 OK or a 403 Forbidden?<br>
+                        2. <em>Network side:</em> Did the Jenkins IP change? Is the AWS Security Group blocking port 8080 from GitHub IPs? (Module 04).<br>
+                        3. <em>Path side:</em> Is the webhook URL exactly <code>/github-webhook/</code> (with the trailing slash)?<br>
+                        4. <em>Job side:</em> Did the Multibranch Pipeline actually scan and find the branch?</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 5: "Credentials leaked in console log"</div>
+                        <p><strong>Symptom:</strong> Someone added <code>set -x</code> to their bash script to debug it, and now the Nexus password is printed in plain text in the Jenkins log.</p>
+                        <p><strong>Fix:</strong> IMMEDIATE ROTATION. Treat the password as compromised. Generate a new password in Nexus, update the Jenkins Credential Store, and delete the offending Jenkins build log.</p>
+                        <p><strong>Prevention:</strong> Use <code>withCredentials</code> which automatically masks variables with <code>***</code> in logs, or wrap the step in <code>MaskPasswordsBuildWrapper</code>.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 6: "Works on Controller, fails on Agent"</div>
+                        <p><strong>Symptom:</strong> The build worked yesterday. Today it ran on <code>agent-02</code> and failed saying <code>mvn: command not found</code>.</p>
+                        <p><strong>Investigation:</strong> Environmental drift. <code>agent-02</code> was provisioned yesterday and nobody installed Java/Maven on it.</p>
+                        <p><strong>Fix/Prevention:</strong> Stop patching pets. We will solve this in Module 09 using Docker Agents, where the pipeline defines its own environment: <code>agent { docker { image 'maven:3-eclipse-temurin-17' } }</code>.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 12. Backup & Hardening ============ -->
+                <section class="content-section" id="admin">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛡️</div>
+                        <h2>12. Backup &amp; Jenkins Hygiene</h2>
+                    </div>
+                    <p class="content-text">
+                        Jenkins is the most frequently attacked service in a company because it literally holds all the keys to AWS, Nexus, and production databases.
+                    </p>
+                    <ul class="content-list">
+                        <li><strong>Backup:</strong> <code>$JENKINS_HOME</code> (usually <code>/var/lib/jenkins</code>) contains EVERYTHING. Your jobs, credentials, and plugins. Backing this directory up daily is mandatory. Advanced teams use <strong>JCasC</strong> (Jenkins Configuration as Code) to store settings in Git.</li>
+                        <li><strong>Hardening:</strong> Disable Anonymous Read access. Enable CSRF protection. Use "Matrix-based security" to ensure Developers can trigger builds but cannot configure jobs or read credentials.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Complete CI Pipeline with a Pager</h2>
+                        <p>You will install Jenkins, connect it to your Nexus server and GitHub repository, and build a full pipeline from scratch.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Provision &amp; Secure Jenkins</h3>
+                            <p>Install Jenkins on a new VM. Secure it by disabling Anonymous access and setting up Matrix Authorization. Create credentials for GitHub and Nexus.</p>
+                        </div>
+                        <div class="project-step" data-step="2">
+                            <h3>Setup SSH Agent</h3>
+                            <p>Provision a second VM to act as the Agent. Install Java and Docker on it. Connect it to Jenkins via SSH. Set the Controller's executors to 0.</p>
+                        </div>
+                        <div class="project-step" data-step="3">
+                            <h3>Webhooks &amp; Multibranch</h3>
+                            <p>Create a Multibranch Pipeline job pointing to your Java app repo from Module 05. Configure a GitHub Webhook so pushes trigger builds instantly.</p>
+                        </div>
+                        <div class="project-step" data-step="4">
+                            <h3>Write the Jenkinsfile</h3>
+                            <p>Commit a <code>Jenkinsfile</code> that Checks out code &rarr; Tests (publishing JUnit reports) &rarr; Builds the JAR &rarr; Publishes to Nexus using <code>withCredentials</code>.</p>
+                        </div>
+                        <div class="project-step" data-step="5">
+                            <h3>Slack/Discord Notifications</h3>
+                            <p>Add a <code>post</code> block that sends a webhook notification to your Slack or Discord server when the build passes or fails.</p>
+                        </div>
+                        <div class="project-step" data-step="6">
+                            <h3>Extract a Shared Library</h3>
+                            <p>Create a new Git repository for a Jenkins Shared Library. Move the "Build &amp; Publish" logic into a <code>vars/buildJava.groovy</code> script. Update your app to use <code>@Library</code>.</p>
+                        </div>
+                        <div class="project-step" data-step="7">
+                            <h3>Chaos Engineering Drills</h3>
+                            <p>Deliberately cause Incident 2 (infinite loop), Incident 3 (fill the agent's disk), and Incident 4 (break the webhook). Debug and fix them using the exact methods taught.</p>
+                        </div>
+                        <div class="project-step" data-step="8">
+                            <h3>Post-Mortems</h3>
+                            <p>Write an incident report for each chaos drill (Symptom, Root Cause, Fix, Prevention). Add these to your portfolio—this is a massive hiring signal for juniors.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>Jenkins is the most asked-about tool in DevOps interviews. Be ready.</p>
+                    </div>
+
+                    <div class="interview-grid">
+                        <!-- Q1 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between Declarative and Scripted pipelines?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Declarative uses the <code>pipeline {}</code> block with strict, readable syntax (stages, steps, post). Scripted uses the <code>node {}</code> block and is essentially raw Groovy code. Declarative is the modern standard because it is easier to read, validate, and maintain.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do webhooks work, and how do you debug one that fails?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>GitHub sends an HTTP POST request to Jenkins when code is pushed. If it fails, I check the 4 layers: GitHub's delivery log (did it send?), the network firewall (is 8080 open?), the URL path (is it <code>/github-webhook/</code>?), and Jenkins (is the job configured to listen?).</p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Where do you store secrets, and how do you keep them out of logs?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Secrets are stored in the Jenkins Credential Store, never in the Git repo. We inject them into the pipeline using the <code>withCredentials</code> block, which automatically masks the secret value with <code>***</code> in the console output.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why should you never run builds on the Jenkins Controller?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Builds consume CPU, memory, and disk IO. If a runaway <code>npm install</code> eats all the RAM, the Controller will crash, taking down the UI and breaking CI for the entire company. The Controller should only manage jobs; Agents do the actual work.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What problem does the `post { always { cleanWs() } }` block solve?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>It solves the "Disk Full" incident. Jenkins keeps the workspace (source code + build artifacts) on the agent's disk after the build finishes. Running <code>cleanWs()</code> ensures the workspace is deleted, preventing the agent from running out of space over time.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why use a Multibranch Pipeline instead of a Freestyle job?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A Multibranch Pipeline automatically discovers branches and Pull Requests, building them instantly without human intervention. Freestyle jobs require manual UI clicks to create, can't be version-controlled, and don't scale to feature-branch workflows.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Jenkins disk is full at 3am. Walk me through your response.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I log into the server and run <code>df -h</code> and <code>du -sh /var/lib/jenkins/*</code> to find the culprit. It's usually old workspaces or archived artifacts. I manually delete them to restore service, then configure <code>buildDiscarder</code> and <code>cleanWs()</code> in the pipeline to prevent it from happening again.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q8 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How would you migrate a Jenkins pipeline to GitHub Actions?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The concepts are 1:1. Jenkins Agents become GH Runners. Jenkins Stages become GH Jobs. Shared Libraries become Composite Actions. <code>withCredentials</code> becomes GitHub Secrets. I would translate the Groovy steps into YAML <code>run:</code> commands.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-06.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 06 — Nexus</span>
+                </div>
+            </a>
+            
+            <a href="module-08.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 08 — Docker</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+
+</body>
+</html>

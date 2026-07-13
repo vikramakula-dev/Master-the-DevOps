@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 08 — Containers with Docker | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 8: Containers with Docker — Images, Dockerfiles, Networking, Volumes, and Compose.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 08 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level intermediate">Intermediate</span>
+                    <span class="module-hero-duration">Phase 2 · CI/CD &amp; Containers</span>
+                </div>
+                <h1>Module 08 — <span class="gradient-text">Containers with Docker</span></h1>
+                <p class="module-hero-desc">
+                    Stop deploying "apps onto servers" and start shipping immutable artifacts that carry their own environment. This module builds the most important skill shift of the roadmap: killing "works on my machine" forever.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Docker</span>
+                    <span class="tech-tag">Dockerfile</span>
+                    <span class="tech-tag">Compose</span>
+                    <span class="tech-tag">Volumes</span>
+                    <span class="tech-tag">Networking</span>
+                    <span class="tech-tag">ECR/Nexus</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><div class="toc-subtitle">🟢 Beginner</div></li>
+                    <li><a href="#intro" class="toc-link">1. Why Containers Exist</a></li>
+                    <li><a href="#arch" class="toc-link">2. Docker Architecture</a></li>
+                    <li><a href="#commands" class="toc-link">3. First Commands</a></li>
+                    <li><a href="#images" class="toc-link">4. Images (Pull/Tag/Push)</a></li>
+                    <li><div class="toc-subtitle">🟡 Practitioner</div></li>
+                    <li><a href="#dockerfile" class="toc-link">5. Dockerfile, Line by Line</a></li>
+                    <li><a href="#networking" class="toc-link">6. Docker Networking</a></li>
+                    <li><a href="#volumes" class="toc-link">7. Volumes &amp; Persistence</a></li>
+                    <li><a href="#compose" class="toc-link">8. Docker Compose</a></li>
+                    <li><div class="toc-subtitle">🔴 Advanced</div></li>
+                    <li><a href="#best-practices" class="toc-link">9. Best Practices</a></li>
+                    <li><a href="#under-hood" class="toc-link">10. Under the Hood</a></li>
+                    <li><a href="#incidents" class="toc-link">11. Real-Time Incidents 🔥</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+                
+                <!-- ============ 1. Why Containers Exist ============ -->
+                <section class="content-section" id="intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>1. Why Containers Exist (The "Works on My Machine" Problem)</h2>
+                    </div>
+                    <p class="content-text">
+                        In Module 05, we built a Java app and a Node.js app. What happens if Developer A has Java 11 installed, but the Production server has Java 17? Or if two Node.js apps on the same server need conflicting versions of <code>node_modules</code>? The app crashes in production with the classic excuse: <em>"Well, it works on my machine!"</em>
+                    </p>
+                    <p class="content-text">
+                        Containers solve this by packaging the code <strong>and</strong> the entire environment (OS libraries, Java/Node runtime, dependencies) into a single, immutable box.
+                    </p>
+
+                    <table class="content-table">
+                        <thead><tr><th>Feature</th><th>Virtual Machines (VMware/EC2)</th><th>Containers (Docker)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Architecture</strong></td><td>Hardware → Host OS → Hypervisor → <strong>Guest OS</strong> → App</td><td>Hardware → Host OS → Docker Engine → App</td></tr>
+                            <tr><td><strong>Isolation</strong></td><td>Full hardware virtualization (heavy)</td><td>Linux Namespaces &amp; cgroups (lightweight)</td></tr>
+                            <tr><td><strong>Boot Time</strong></td><td>Minutes (booting an entire OS)</td><td>Milliseconds (starting a process)</td></tr>
+                            <tr><td><strong>Size</strong></td><td>Gigabytes</td><td>Megabytes</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Matrix Reality</div>
+                        <p>A container is not a tiny VM. It is just a regular Linux process that has been lied to. Linux <strong>Namespaces</strong> restrict what the process can see (it thinks it's the only process on the machine). Linux <strong>cgroups</strong> restrict what it can use (it thinks the machine only has 512MB RAM). If you run <code>ps aux</code> on the Docker host, you can see the containerized process running right alongside your system services!</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Docker Architecture ============ -->
+                <section class="content-section" id="arch">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. Docker Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>Docker Client (CLI)</span> ↔
+                            <span style="font-weight: bold; border-color: var(--primary);">Docker Daemon (dockerd)</span> ↔
+                            <span>Registry (Docker Hub / Nexus)</span>
+                        </div>
+                    </div>
+                    <p class="content-text">
+                        <strong>Image vs. Container:</strong> Think of an Image as a Class (the blueprint, stored on disk), and a Container as an Object (a running instance of that image in RAM). You can spin up 100 containers from 1 image.
+                    </p>
+
+                    <div class="content-subheading">Security Warning (Module 02 Callback)</div>
+                    <p class="content-text">When you install Docker on Ubuntu, it creates a <code>docker</code> user group. Adding your user to this group allows you to run docker commands without <code>sudo</code>. <strong>WARNING:</strong> Anyone in the <code>docker</code> group effectively has <code>root</code> access to the host server, because they can mount the host's root filesystem into a container.</p>
+                </section>
+
+                <!-- ============ 3. First Commands ============ -->
+                <section class="content-section" id="commands">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💻</div>
+                        <h2>3. First Commands, Step-by-Step</h2>
+                    </div>
+                    <p class="content-text">Let's start an Nginx web server. Notice how we map port 8080 on the host to port 80 inside the container (Module 04 payoff).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Run Nginx in the background (-d), mapping ports (-p host:container)</span>
+<span class="command">docker</span> run -d -p 8080:80 --name my-web nginx
+
+<span class="comment"># See what is running</span>
+<span class="command">docker</span> ps
+
+<span class="comment"># Follow the logs (The most important debugging command!) ⭐</span>
+<span class="command">docker</span> logs -f my-web
+
+<span class="comment"># "SSH" into the running container (Technically, spawn a bash process inside its namespace) ⭐</span>
+<span class="command">docker</span> exec -it my-web bash
+
+<span class="comment"># Kill and remove it</span>
+<span class="command">docker</span> stop my-web
+<span class="command">docker</span> rm my-web</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Images ============ -->
+                <section class="content-section" id="images">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🖼️</div>
+                        <h2>4. Images — Pull, Tag, Push</h2>
+                    </div>
+                    <p class="content-text">
+                        How do images travel from your laptop to production? Through a Registry (like Docker Hub, AWS ECR, or our Nexus server from Module 06).
+                    </p>
+                    <p class="content-text">Image naming syntax: <code>registry_url/repository:tag</code></p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Pull an image</span>
+<span class="command">docker</span> pull ubuntu:22.04
+
+<span class="comment"># Rename (tag) it for our private Nexus registry</span>
+<span class="command">docker</span> tag ubuntu:22.04 nexus.mycompany.com:8082/my-ubuntu:v1
+
+<span class="comment"># Push it (Requires `docker login` first)</span>
+<span class="command">docker</span> push nexus.mycompany.com:8082/my-ubuntu:v1</code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The `latest` Trap</div>
+                        <p>The tag <code>:latest</code> does NOT mean "the newest version." It is just a default string applied if you don't specify a tag. If a developer pushes a breaking change tagged as <code>latest</code>, and your prod server pulls it, production goes down. In DevOps, we ALWAYS use specific, immutable tags (like the Git commit SHA from Module 05).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Dockerfile ============ -->
+                <section class="content-section" id="dockerfile">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>5. Dockerfile, Line by Line</h2>
+                    </div>
+                    <p class="content-text">
+                        A Dockerfile is the script used to build an image. It executes from top to bottom. Each line creates a new "Layer", which is cached.
+                    </p>
+
+                    <div class="content-subheading">Example 1: Node.js (Layer Caching)</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Dockerfile (Node)</span></div>
+                        <pre><code><span class="comment"># 1. Base image (Alpine is a tiny 5MB Linux distro)</span>
+FROM node:20-alpine
+
+<span class="comment"># 2. Set the working directory inside the container</span>
+WORKDIR /app
+
+<span class="comment"># 3. COPY package.json FIRST. Why? Docker caches layers. </span>
+<span class="comment"># If we copied the whole codebase first, any code change would bust the npm install cache!</span>
+COPY package*.json ./
+RUN npm ci
+
+<span class="comment"># 4. Now copy the rest of the application code</span>
+COPY . .
+
+<span class="comment"># 5. Security: Don't run as root!</span>
+USER node
+
+<span class="comment"># 6. Document the port (does not actually publish it)</span>
+EXPOSE 3000
+
+<span class="comment"># 7. The command to run when the container starts</span>
+CMD ["node", "server.js"]</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>FROM node:20-alpine</code></strong>: Defines the foundation of the image. "Alpine" is a security-focused, tiny Linux distribution (~5MB). We use it to keep our container small and reduce the attack surface.</li>
+                        <li><strong><code>WORKDIR /app</code></strong>: Creates a directory named <code>/app</code> inside the container and CD's into it. All subsequent <code>COPY</code> and <code>RUN</code> commands happen here.</li>
+                        <li><strong><code>COPY package*.json ./</code></strong>: Copies only the dependency definitions first. Docker caches this layer! If we don't change package.json, Docker skips the <code>npm install</code> on the next build, saving minutes of build time.</li>
+                        <li><strong><code>RUN npm ci</code></strong>: Runs a clean install of our Node dependencies inside the image.</li>
+                        <li><strong><code>COPY . .</code></strong>: Copies the rest of our application code (index.js, etc.) from our host laptop into the image.</li>
+                        <li><strong><code>USER node</code></strong>: Switches from the <code>root</code> user to a limited user named <code>node</code>. If a hacker breaches our app, they won't have root permissions to destroy the container.</li>
+                    </ul>
+
+                    <table class="content-table" style="margin-top: 20px;">
+                        <thead><tr><th>Instruction</th><th>Behavior</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>CMD</strong></td><td>Provides a default command. Can be easily overridden at runtime (e.g., <code>docker run my-image bash</code> overrides CMD).</td></tr>
+                            <tr><td><strong>ENTRYPOINT</strong></td><td>Hardcodes the executable. Arguments passed at runtime are appended to it. (e.g., if ENTRYPOINT is <code>ping</code>, <code>docker run my-image google.com</code> runs <code>ping google.com</code>).</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Example 2: Java Multi-Stage Build</div>
+                    <p class="content-text">A JDK (Java Development Kit) is 500MB+. A JRE (Java Runtime Environment) is 50MB+. You need the JDK to <em>build</em> the code, but only the JRE to <em>run</em> it. Multi-stage builds solve this.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Dockerfile (Java)</span></div>
+                        <pre><code><span class="comment"># Stage 1: Build (Huge image)</span>
+FROM eclipse-temurin:17-jdk-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN ./gradlew build
+
+<span class="comment"># Stage 2: Run (Tiny image)</span>
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+<span class="comment"># Copy ONLY the compiled JAR from Stage 1. Discard the rest of the 500MB build environment!</span>
+COPY --from=builder /app/build/libs/app.jar .
+CMD ["java", "-jar", "app.jar"]</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>AS builder</code></strong>: We name this first stage "builder". It contains the heavy 500MB JDK required to run Gradle.</li>
+                        <li><strong><code>COPY --from=builder ...</code></strong>: The magic of multi-stage builds. In Stage 2, we grab the single `.jar` file we compiled in Stage 1 and move it into our new, tiny JRE image. The 500MB JDK from Stage 1 is completely thrown away.</li>
+                        <li><strong><code>CMD ["java", "-jar", "app.jar"]</code></strong>: The default command executed when a container spins up from this final image.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 6. Networking ============ -->
+                <section class="content-section" id="networking">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>6. Docker Networking</h2>
+                    </div>
+                    <p class="content-text">
+                        The biggest beginner trap: inside a container, <code>localhost</code> means the container itself, NOT your Mac/Windows host. To let containers talk to each other, we put them on a <strong>Custom Bridge Network</strong>.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>Custom Network: "my-net"</span><br><br>
+                            <span style="border-color: var(--warning);">Container A (name: web)</span> ↔
+                            <span style="border-color: var(--primary);">Container B (name: db)</span>
+                        </div>
+                    </div>
+                    <p class="content-text">
+                        ⭐ <strong>The Magic Feature:</strong> On a custom network, Docker provides built-in DNS. Container A can connect to Container B simply by pinging <code>http://db:5432</code>. Docker resolves the name to the correct internal IP automatically.
+                    </p>
+                </section>
+
+                <!-- ============ 7. Volumes ============ -->
+                <section class="content-section" id="volumes">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💾</div>
+                        <h2>7. Volumes &amp; Persistence</h2>
+                    </div>
+                    <p class="content-text">
+                        Containers are ephemeral (cattle, not pets). If you run a PostgreSQL container, write 10 rows of data, and then <code>docker rm</code> the container... <strong>your data is gone forever.</strong>
+                    </p>
+                    <p class="content-text">
+                        To persist data beyond the container's lifecycle, we use Volumes.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>Syntax</th><th>Use Case</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Named Volume</strong></td><td><code>-v my-data:/var/lib/postgresql/data</code></td><td><strong>Production.</strong> Managed by Docker (lives in <code>/var/lib/docker/volumes/</code>). Fast and safe.</td></tr>
+                            <tr><td><strong>Bind Mount</strong></td><td><code>-v /Users/vikra/code:/app</code></td><td><strong>Development.</strong> Mounts your laptop folder into the container so live-reloads work when you save a file.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 8. Compose ============ -->
+                <section class="content-section" id="compose">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐙</div>
+                        <h2>8. Docker Compose</h2>
+                    </div>
+                    <p class="content-text">
+                        Typing <code>docker run</code> with 15 flags for the web app, and another 15 flags for the database, is tedious. Docker Compose allows you to define the entire stack in a single YAML file.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">docker-compose.yml</span></div>
+                        <pre><code>version: '3.8'
+
+services:
+  database:
+    image: mongo:6
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend-net
+
+  api:
+    build: ./backend        <span class="comment"># Builds the Dockerfile in this folder</span>
+    ports:
+      - "3000:3000"         <span class="comment"># Host:Container</span>
+    env_file: .env          <span class="comment"># Inject secrets without hardcoding them in YAML</span>
+    depends_on:
+      - database            <span class="comment"># Starts DB before API</span>
+    networks:
+      - backend-net
+
+volumes:
+  mongo_data:               <span class="comment"># Declares the named volume</span>
+
+networks:
+  backend-net:              <span class="comment"># Declares the custom bridge network</span></code></pre>
+                    </div>
+                    
+                    <div class="content-subheading">Code Explanation</div>
+                    <ul class="content-list">
+                        <li><strong><code>services:</code></strong>: The core block where you define your containers (the database and the API).</li>
+                        <li><strong><code>image: mongo:6</code></strong>: Tells Compose to pull a pre-built image from Docker Hub instead of building it from scratch.</li>
+                        <li><strong><code>build: ./backend</code></strong>: Tells Compose to look in the <code>./backend</code> folder for a <code>Dockerfile</code> and build it on the fly.</li>
+                        <li><strong><code>env_file: .env</code></strong>: Loads secrets from a `.env` file that is in `.gitignore` (M03 callback). This keeps database passwords out of your source code repository!</li>
+                        <li><strong><code>depends_on:</code></strong>: Ensures the Database container starts <em>before</em> the API container. (Note: It only waits for the container to start, not for the database to be "ready" to accept connections. For that, use a <code>healthcheck</code>).</li>
+                        <li><strong><code>volumes: / networks:</code></strong>: Explicitly declares the Named Volume and Custom Network so that Compose can create them if they don't exist.</li>
+                    </ul>
+
+                    <div class="content-subheading">The Compose Daily Loop ⭐</div>
+                    <ul class="content-list">
+                        <li><code>docker compose up -d</code> (Start all services in background)</li>
+                        <li><code>docker compose logs -f api</code> (Watch the API logs)</li>
+                        <li><code>docker compose down</code> (Stop and remove containers)</li>
+                        <li><code>docker compose down -v</code> (⚠️ DANGER: Removes containers AND deletes the named volumes/data)</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 9. Best Practices ============ -->
+                <section class="content-section" id="best-practices">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">✅</div>
+                        <h2>9. Best Practices &amp; Optimization</h2>
+                    </div>
+                    <p class="content-text">
+                        A poorly built container is a security risk and costs money in cloud bandwidth. The production checklist:
+                    </p>
+                    <ul class="content-list">
+                        <li><strong>Small Base Images:</strong> Use <code>alpine</code> or <code>distroless</code> to shrink images from 1GB to 50MB. Faster pulls, smaller attack surface.</li>
+                        <li><strong>Non-Root User:</strong> Always declare <code>USER node</code> or <code>USER appuser</code>. If a hacker breaches your app, they are trapped as an unprivileged user inside the container.</li>
+                        <li><strong>One Process per Container:</strong> Don't run Nginx and Node in the same container. Run two containers. If Nginx crashes, it shouldn't take down Node.</li>
+                        <li><strong>Read-Only Filesystems:</strong> Run with <code>--read-only</code>. If an attacker gets in, they can't download malware to the disk.</li>
+                        <li><strong>Resource Limits:</strong> Run with <code>--memory="512m" --cpus="1.0"</code>. This prevents a memory leak in one container from crashing the entire host server (a preview of Kubernetes Limits).</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 10. Under the Hood ============ -->
+                <section class="content-section" id="under-hood">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>10. Under the Hood (How it actually works)</h2>
+                    </div>
+                    <p class="content-text">
+                        If you want to pass a Senior DevOps interview, you need to know how Docker fakes a computer.
+                    </p>
+                    
+                    <div class="content-subheading">OverlayFS (Copy-on-Write)</div>
+                    <p class="content-text">
+                        When you pull an image, Docker downloads it in read-only layers. When you run a container, Docker slaps a <strong>thin, read-write layer</strong> on top of it.
+                        If your app modifies a file, Docker copies that file from the read-only layer up into the read-write layer, and modifies it there. This is <strong>Copy-on-Write</strong>. This is why you can run 100 containers from a 1GB image, and it only consumes 1GB of disk space total!
+                    </p>
+
+                    <div class="content-subheading">Namespaces</div>
+                    <p class="content-text">
+                        If you run <code>docker inspect my-container | grep Pid</code>, you will get the actual Linux Process ID (e.g., <code>PID 4512</code>).
+                        If you run <code>ls /proc/4512/ns</code> on the host, you will see the isolated namespaces (network, mount, pid) that make this process think it's a container.
+                    </p>
+                </section>
+
+                <!-- ============ 11. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>11. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+                    
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 1: Container Exits Immediately</div>
+                        <p><strong>Symptom:</strong> You run <code>docker-compose up -d</code>, but <code>docker ps</code> shows nothing. <code>docker ps -a</code> shows the container Exited (137).</p>
+                        <p><strong>Investigation:</strong> Exit Code 137 means "Killed by signal 9 (SIGKILL)". Usually, this is the Linux OOM (Out of Memory) killer.</p>
+                        <p><strong>Fix:</strong> Check <code>dmesg -T | grep -i oom</code> (Module 02 callback!). Increase the memory limit in Compose or the VM.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 2: "Cannot connect to database"</div>
+                        <p><strong>Symptom:</strong> The API logs say <code>MongoNetworkError: failed to connect to server [localhost:27017]</code>.</p>
+                        <p><strong>Investigation:</strong> The API code is hardcoded to connect to <code>localhost</code>. But inside the API container, localhost is itself! It is not looking at the database container.</p>
+                        <p><strong>Fix:</strong> Change the code (or Env Var) to connect to <code>mongodb://database:27017</code>, utilizing Docker's built-in DNS.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 3: Host Disk is 100% Full</div>
+                        <p><strong>Symptom:</strong> Everything crashes. <code>df -h</code> shows <code>/var/lib/docker</code> is consuming 100GB.</p>
+                        <p><strong>Investigation:</strong> Run <code>docker system df</code>. You will see Gigabytes of "Dangling Images" (untagged images from old builds) and stopped containers.</p>
+                        <p><strong>Fix:</strong> Run <code>docker system prune -a --volumes</code>. <strong>Prevention:</strong> Setup log rotation in <code>daemon.json</code> (max-size: 10m) and run prune via cron weekly.</p>
+                    </div>
+
+                    <div class="tip-box tip-danger" style="margin-top: 20px;">
+                        <div class="tip-box-title">Incident 4: Build is painfully slow</div>
+                        <p><strong>Symptom:</strong> <code>docker build</code> takes 5 minutes every time you change 1 line of CSS.</p>
+                        <p><strong>Investigation:</strong> You put <code>COPY . .</code> before <code>RUN npm install</code>. Because the CSS file changed, Docker busts the cache for the COPY layer, which forces it to re-run the `npm install` layer every time!</p>
+                        <p><strong>Fix:</strong> Reorder the Dockerfile. Copy <code>package.json</code> first, run install, THEN copy the code.</p>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Dockerize a Full-Stack App</h2>
+                        <p>You will take the raw Node.js + React + MongoDB application from Module 05, write optimal Dockerfiles, and orchestrate them with Compose.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        
+                        <div class="project-step" data-step="1">
+                            <h3>Install Docker Securely</h3>
+                            <p>Install Docker on your M02 Ubuntu VM. Add your user to the <code>docker</code> group so you don't need `sudo` (remembering the root-equivalence security warning).</p>
+                            <div class="code-block" style="margin-top: 10px;">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt install -y docker.io docker-compose
+<span class="command">sudo</span> usermod -aG docker $USER
+<span class="comment"># Log out and log back in for group changes to take effect</span>
+<span class="command">docker</span> run hello-world</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="2">
+                            <h3>Dockerize the Node Backend (Optimized)</h3>
+                            <p>Write an optimized single-stage <code>Dockerfile</code> for the backend: use <code>alpine</code>, implement the <code>COPY package.json</code> caching trick, and add a non-root <code>USER node</code>.</p>
+                            <div class="code-block" style="margin-top: 10px;">
+                                <div class="code-block-header"><span class="code-block-lang">backend/Dockerfile</span></div>
+                                <pre><code>FROM node:20-alpine
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+<span class="comment"># Secure the container by running as a non-root user</span>
+USER node
+EXPOSE 5000
+CMD ["node", "index.js"]</code></pre>
+                            </div>
+                            <p>Build it: <code>docker build -t my-backend:v1 ./backend</code></p>
+                        </div>
+
+                        <div class="project-step" data-step="3">
+                            <h3>Dockerize React (Multi-stage)</h3>
+                            <p>Write a multi-stage build for the frontend. Stage 1 (Node) runs <code>npm run build</code>. Stage 2 (Nginx) copies the static files from Stage 1 into <code>/usr/share/nginx/html</code> (M04 payoff!).</p>
+                            <div class="code-block" style="margin-top: 10px;">
+                                <div class="code-block-header"><span class="code-block-lang">frontend/Dockerfile</span></div>
+                                <pre><code><span class="comment"># Stage 1: Build the React static files</span>
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+<span class="comment"># Stage 2: Serve with Nginx</span>
+FROM nginx:alpine
+<span class="comment"># Copy ONLY the static build output. Discard the heavy Node image!</span>
+COPY --from=builder /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+                            </div>
+                            <p>Build it: <code>docker build -t my-frontend:v1 ./frontend</code></p>
+                        </div>
+
+                        <div class="project-step" data-step="4">
+                            <h3>Write the Compose File</h3>
+                            <p>Create <code>docker-compose.yml</code> at the root of your project. Define Mongo DB (with a named volume), the API (with an <code>env_file</code>), and the React frontend.</p>
+                            <div class="code-block" style="margin-top: 10px;">
+                                <div class="code-block-header"><span class="code-block-lang">docker-compose.yml</span></div>
+                                <pre><code>version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6-jammy
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    env_file: .env
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:
+    driver: bridge</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="5">
+                            <h3>Run &amp; Chaos Engineering Drills</h3>
+                            <p>Run the stack: <code>docker-compose up -d</code>. Then, deliberately trigger Incident 1 (OOM kill a container by modifying compose to limit memory to 10MB), Incident 2 (break the DNS by renaming the <code>mongodb</code> service but forgetting to update the backend `.env`), and Incident 4 (ruin the layer cache by moving <code>COPY . .</code> to line 3). Fix them using the exact methods taught.</p>
+                        </div>
+
+                        <div class="project-step" data-step="6">
+                            <h3>Post-Mortems</h3>
+                            <p>Write an incident report for each chaos drill (Symptom, Root Cause, Fix, Prevention). Add these to your portfolio repository. This proves you know how to debug, not just write YAML.</p>
+                        </div>
+
+                        <div class="project-step" data-step="7">
+                            <h3>Publish to Registries</h3>
+                            <p>Tag your optimized images with the current Git commit SHA. Push them to Docker Hub and to your private Nexus repository from Module 06.</p>
+                            <div class="code-block" style="margin-top: 10px;">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="comment"># Tag the locally built images</span>
+<span class="command">docker</span> tag my-backend:v1 mydockerhubuser/backend:1.0.0-a1b2c3d
+<span class="command">docker</span> tag my-frontend:v1 mydockerhubuser/frontend:1.0.0-a1b2c3d
+
+<span class="comment"># Login and push</span>
+<span class="command">docker</span> login
+<span class="command">docker</span> push mydockerhubuser/backend:1.0.0-a1b2c3d
+<span class="command">docker</span> push mydockerhubuser/frontend:1.0.0-a1b2c3d</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>Docker is the foundation of modern infrastructure. You must answer these flawlessly.</p>
+                    </div>
+
+                    <div class="interview-grid">
+                        <!-- Q1 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the exact difference between a Container and a VM?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A VM virtualizes the hardware and runs a full Guest OS (heavy, slow boot). A container virtualizes the OS. It shares the host's Linux Kernel and uses Namespaces and cgroups for isolation. Containers are just regular processes (lightweight, instant boot).</p>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between CMD and ENTRYPOINT?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>CMD</code> provides default arguments that are easily overridden by typing a command at the end of <code>docker run</code>. <code>ENTRYPOINT</code> hardcodes the executable so it cannot be easily overridden; any arguments passed to <code>docker run</code> are appended to the ENTRYPOINT.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why is layer order important in a Dockerfile?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Docker caches each line. If a layer changes, all subsequent layers are invalidated. We copy <code>package.json</code> and run <code>npm install</code> BEFORE copying the rest of the source code. If we didn't, changing a single line of CSS would bust the cache and force a 5-minute npm reinstall.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is a multi-stage build and why use it?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>It allows us to use a heavy image (like a JDK) to compile our code in Stage 1, and then copy ONLY the compiled artifact into a tiny runtime image (like a JRE) in Stage 2. This drastically reduces image size and attack surface.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: A container exits with code 137. What happened?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Exit Code 137 means it was killed by SIGKILL (Signal 9). In Docker, this almost always means the Linux Out of Memory (OOM) Killer terminated the container because it exceeded its memory limit or the host ran out of RAM.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do containers on a Custom Bridge Network find each other?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Docker provides an embedded DNS server for custom bridge networks. If my web container needs to talk to my DB container (named `database`), it simply requests `http://database`. Docker automatically resolves the container name to its internal IP address.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between a Named Volume and a Bind Mount?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A Named Volume is fully managed by Docker and stored in <code>/var/lib/docker/volumes</code>; it is used in production for databases. A Bind Mount maps a specific host directory (like <code>/Users/me/code</code>) into the container; it is used in development for live-reloading code changes.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q8 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you optimize a Docker image for production?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I use small base images (alpine/distroless), utilize multi-stage builds to discard build tools, run as a non-root user, carefully order layers to maximize cache hits, and avoid installing unnecessary packages like curl or vim.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-07.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 07 — Jenkins</span>
+                </div>
+            </a>
+            
+            <a href="module-09.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 09 — CI/CD + Docker</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+
+</body>
+</html>

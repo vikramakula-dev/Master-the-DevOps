@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 05 — Build &amp; Package Manager Tools | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 5: Build & Package Manager Tools — Maven, Gradle, npm, pip, Makefiles, and Artifacts.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 05 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level beginner">Beginner</span>
+                    <span class="module-hero-duration">Phase 1 · Foundations</span>
+                </div>
+                <h1>Module 05 — Build &amp; <span class="gradient-text">Package Manager Tools</span></h1>
+                <p class="module-hero-desc">
+                    A DevOps engineer rarely writes the application — but owns the build. Every CI pipeline is just these commands automated. This module teaches you to build other people's code confidently across four ecosystems.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Maven</span>
+                    <span class="tech-tag">Gradle</span>
+                    <span class="tech-tag">npm</span>
+                    <span class="tech-tag">pip</span>
+                    <span class="tech-tag">JAR</span>
+                    <span class="tech-tag">Artifacts</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#intro" class="toc-link">1. Build Tools &amp; The Pipeline</a></li>
+                    <li><a href="#java" class="toc-link">2. Java — Maven &amp; Gradle</a></li>
+                    <li><a href="#js" class="toc-link">3. JavaScript — npm</a></li>
+                    <li><a href="#python" class="toc-link">4. Python — pip &amp; venv</a></li>
+                    <li><a href="#makefiles" class="toc-link">5. Makefiles</a></li>
+                    <li><a href="#toolchains" class="toc-link">6. JDK/Toolchain Management</a></li>
+                    <li><a href="#security" class="toc-link">7. Dependency Security</a></li>
+                    <li><a href="#tests" class="toc-link">8. Tests in the Build</a></li>
+                    <li><a href="#packaging" class="toc-link">9. Packaging (JAR, TAR, ZIP)</a></li>
+                    <li><a href="#versioning" class="toc-link">10. Artifacts &amp; Versioning</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+                
+                <!-- ============ 1. Build Tools & Pipeline ============ -->
+                <section class="content-section" id="intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>1. What Are Build Tools &amp; Why You Need Them</h2>
+                    </div>
+                    <p class="content-text">
+                        A DevOps engineer rarely writes the application code, but you <strong>own the build</strong>. When a developer says "just run the build," you need to know exactly what that means. Every CI pipeline (Module 07) is just these local commands automated.
+                    </p>
+
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>Source Code</span> →
+                            <span>Fetch Dependencies</span> →
+                            <span>Compile</span> →
+                            <span>Test</span> →
+                            <span>Package</span> →
+                            <span>Artifact (JAR/ZIP)</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Compiled vs Interpreted</div>
+                    <ul class="content-list">
+                        <li><strong>Compiled (Java, Go, C++):</strong> Code must be translated into machine-readable binaries before it can run. The "build" step is mandatory and heavy.</li>
+                        <li><strong>Interpreted (Python, JavaScript/Node.js):</strong> Code runs directly via an interpreter. The "build" step usually just means installing dependencies or minifying files.</li>
+                    </ul>
+
+                    <div class="content-subheading">The DevOps Decoder Ring</div>
+                    <p class="content-text">How do you know what to do when you clone a random repository? Look at the root files:</p>
+                    <table class="content-table">
+                        <thead><tr><th>Ecosystem</th><th>If you see this file...</th><th>Use this Build Tool</th><th>To produce this Artifact</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Java</strong></td><td><code>pom.xml</code></td><td>Maven</td><td><code>.jar</code> or <code>.war</code></td></tr>
+                            <tr><td><strong>Java / Kotlin</strong></td><td><code>build.gradle</code></td><td>Gradle</td><td><code>.jar</code> or <code>.war</code></td></tr>
+                            <tr><td><strong>JavaScript / Node</strong></td><td><code>package.json</code></td><td>npm / yarn</td><td><code>dist/</code> folder or Docker Image</td></tr>
+                            <tr><td><strong>Python</strong></td><td><code>requirements.txt</code></td><td>pip</td><td><code>.whl</code> or Docker Image</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 2. Java (Maven & Gradle) ============ -->
+                <section class="content-section" id="java">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☕</div>
+                        <h2>2. Java — Maven &amp; Gradle</h2>
+                    </div>
+                    <p class="content-text">
+                        Java powers enterprise backends. Its two massive build ecosystems are Maven and Gradle.
+                    </p>
+
+                    <div class="content-subheading">Decoding pom.xml (Maven)</div>
+                    <p class="content-text">Maven uses XML. The most critical part is the <strong>GAV Coordinates</strong> (GroupId, ArtifactId, Version). This is how your app is uniquely identified in the world.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">pom.xml</span></div>
+                        <pre><code>&lt;project&gt;
+    &lt;!-- GAV Coordinates --&gt;
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;my-app&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Fetch Spring Boot from Maven Central --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+            &lt;version&gt;3.1.2&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;</code></pre>
+                    </div>
+
+                    <div class="content-subheading">The Maven Lifecycle</div>
+                    <p class="content-text">Maven has sequential phases. If you run <code>package</code>, it automatically runs <code>validate</code>, <code>compile</code>, and <code>test</code> first.</p>
+                    <ul class="content-list">
+                        <li><code>mvn clean package</code> ⭐ — The daily command. Deletes the old <code>target/</code> folder, compiles, tests, and builds the JAR.</li>
+                        <li><code>mvn install</code> — Packages the JAR and copies it to your local cache (<code>~/.m2/repository</code>).</li>
+                        <li><code>mvn clean package -DskipTests</code> — Packages the app but skips unit tests (useful for quick local iterations, <strong>forbidden in CI</strong>).</li>
+                        <li><code>mvn dependency:tree</code> ⭐ — Shows the entire tree of dependencies. Crucial for debugging "dependency hell" (version conflicts).</li>
+                    </ul>
+
+                    <div class="content-subheading">Gradle &amp; The Wrapper (<code>./gradlew</code>)</div>
+                    <p class="content-text">Gradle uses Groovy/Kotlin instead of XML (<code>build.gradle</code>). It is much faster than Maven because of advanced daemon caching.</p>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why CI always uses the Wrapper</div>
+                        <p>You will almost never type <code>gradle build</code>. You type <code>./gradlew build</code>. The <strong>Wrapper</strong> is a small script committed to Git that downloads the <em>exact</em> version of Gradle the project needs. This prevents the classic "It works on my machine (Gradle 8), but failed in Jenkins (Gradle 7)" issue.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. JavaScript (npm) ============ -->
+                <section class="content-section" id="js">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🟨</div>
+                        <h2>3. JavaScript — npm</h2>
+                    </div>
+                    <p class="content-text">
+                        The Node.js ecosystem revolves around <code>package.json</code> and the dreaded <code>node_modules/</code> folder.
+                    </p>
+
+                    <div class="content-subheading">Decoding package.json</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">package.json</span></div>
+                        <pre><code>{
+  "name": "my-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js",
+    "build": "webpack --mode production",  // Compiles React into raw JS/CSS
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2"   // Needed in production
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"      // Only needed for testing/building, NOT in production
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The CI-Critical Distinction: npm install vs npm ci</div>
+                        <p><code>npm install</code> reads <code>package.json</code>. If a dependency has a caret (<code>^1.2.3</code>), it might install <code>1.2.9</code> if a new minor version was released today. <strong>This means your build is not reproducible.</strong></p>
+                        <p><code>npm ci</code> (Clean Install) completely deletes <code>node_modules/</code> and strictly reads <code>package-lock.json</code> to install the <strong>exact</strong> versions that were tested locally. <strong>Never use <code>npm install</code> in a Jenkins pipeline or Dockerfile. Always use <code>npm ci</code>.</strong></p>
+                    </div>
+
+                    <div class="content-subheading">The node_modules Horror</div>
+                    <p class="content-text">Running <code>npm install</code> creates a <code>node_modules/</code> folder that can contain 50,000 files and weigh 1GB. <strong>Never commit node_modules to Git.</strong> It goes in your <code>.gitignore</code> (Module 03). The CI server will generate it fresh.</p>
+                </section>
+
+                <!-- ============ 4. Python (pip & venv) ============ -->
+                <section class="content-section" id="python">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐍</div>
+                        <h2>4. Python — pip &amp; virtualenv</h2>
+                    </div>
+                    <p class="content-text">
+                        Python's biggest challenge is dependency isolation. If you run <code>pip install flask</code> on your laptop, it installs it globally. If Project A needs Flask 1.0 and Project B needs Flask 2.0, you have a conflict.
+                    </p>
+
+                    <div class="content-subheading">The Virtual Environment (venv) Workflow</div>
+                    <p class="content-text">To solve this, we create isolated environments for every project.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># 1. Create a virtual environment folder named '.venv'</span>
+<span class="command">python3</span> -m venv .venv
+
+<span class="comment"># 2. Activate it (changes your shell prompt)</span>
+<span class="command">source</span> .venv/bin/activate
+
+<span class="comment"># 3. Install dependencies from the requirements file</span>
+<span class="command">pip</span> install -r requirements.txt
+
+<span class="comment"># 4. Freeze your current dependencies into the file (locks versions)</span>
+<span class="command">pip</span> freeze > requirements.txt</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The "Broken Toolbox" Incident</div>
+                        <p>Many DevOps tools (like AWS CLI and Ansible) are actually Python programs. If you run <code>sudo pip install some-random-package</code> globally, you can overwrite a dependency that Ansible was relying on, instantly breaking your own CI/CD server! Always use <code>venv</code>.</p>
+                    </div>
+                    <p class="content-text"><em>Note:</em> The Python ecosystem is modernizing. You may encounter tools like <strong>Poetry</strong> or <strong>uv</strong> which handle dependencies much more gracefully than raw <code>pip</code>.</p>
+                </section>
+
+                <!-- ============ 5. Makefiles ============ -->
+                <section class="content-section" id="makefiles">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>5. Makefiles — The Universal Interface</h2>
+                    </div>
+                    <p class="content-text">
+                        If a company uses Java, Node, Python, and Go, how does the DevOps team write a Jenkins pipeline that knows which build command to run for each repo? They don't. They force the developers to provide a <strong>Makefile</strong>.
+                    </p>
+                    <p class="content-text">A Makefile acts as a universal frontend. The CI pipeline just runs <code>make build</code> and <code>make test</code>, and the Makefile translates that to the correct ecosystem command.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Makefile</span></div>
+                        <pre><code><span class="comment"># A Python Project Makefile</span>
+build:
+	pip install -r requirements.txt
+
+test:
+	pytest
+
+<span class="comment"># A Java Project Makefile</span>
+build:
+	./gradlew build -x test
+
+test:
+	./gradlew test</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. JDK / Toolchains ============ -->
+                <section class="content-section" id="toolchains">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>6. JDK &amp; Toolchain Management</h2>
+                    </div>
+                    <p class="content-text">
+                        Build tools need the underlying language runtimes (JDK for Java, Node.js for npm). Managing these across build servers is a massive pain point.
+                    </p>
+
+                    <div class="content-subheading">JAVA_HOME and Paths</div>
+                    <p class="content-text">When you install Java, how does Maven know where it is? It looks for an environment variable called <code>JAVA_HOME</code>.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">export</span> JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+<span class="command">export</span> PATH=$JAVA_HOME/bin:$PATH</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ "Unsupported Class Version Error"</div>
+                        <p>One of the top 3 build failures: A developer writes code using Java 17 features. They push to GitHub. Jenkins pulls it, but Jenkins has Java 11 installed. The build fails. <strong>Lesson:</strong> CI environments must strictly pin and match the language versions used locally by the team. (This is why Docker, in Module 08, is revolutionary—it solves this entirely).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Security Scanning ============ -->
+                <section class="content-section" id="security">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛡️</div>
+                        <h2>7. Dependency Security (DevSecOps Preview)</h2>
+                    </div>
+                    <p class="content-text">
+                        Modern apps are 90% open-source dependencies and 10% custom code. If a library you download has a vulnerability, your app is vulnerable.
+                    </p>
+
+                    <div class="content-subheading">Supply Chain Attacks</div>
+                    <ul class="content-list">
+                        <li><strong>Log4Shell:</strong> A vulnerability in the popular Java <code>log4j</code> library allowed hackers to take over millions of servers worldwide.</li>
+                        <li><strong>left-pad:</strong> A developer deleted an 11-line NPM package, breaking thousands of builds across the internet (including React).</li>
+                    </ul>
+
+                    <p class="content-text">DevOps engineers integrate scanning tools into the build pipeline to catch these before they reach production:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">npm</span> audit         <span class="comment"># Built-in Node vulnerability scanner</span>
+<span class="command">pip-audit</span>         <span class="comment"># Python equivalent</span>
+<span class="command">dependency-check</span>  <span class="comment"># OWASP tool for Java/Maven/Gradle</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Tests in the Build ============ -->
+                <section class="content-section" id="tests">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧪</div>
+                        <h2>8. Tests in the Build</h2>
+                    </div>
+                    <p class="content-text">
+                        The build pipeline is the enforcer of quality. If tests fail, the build fails. If the build fails, the artifact is not created, and the bad code cannot be deployed.
+                    </p>
+
+                    <div class="content-subheading">The Test Pyramid</div>
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem; flex-direction: column; align-items: center;">
+                            <span style="width: 30%; text-align: center;">E2E (Selenium)</span>
+                            <span style="width: 60%; text-align: center;">Integration (Postman / DB)</span>
+                            <span style="width: 100%; text-align: center; font-weight: bold;">Unit Tests (JUnit / Jest / Pytest) - The foundation of the build!</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Exit Codes (Module 02 Payoff)</div>
+                    <p class="content-text">How does Jenkins know the tests failed? The <strong>Exit Code</strong>. If <code>pytest</code> finds a failing test, it exits with code <code>1</code>. Thanks to <code>set -e</code> in Bash scripts, the entire pipeline immediately halts.</p>
+                    <p class="content-text">Test tools generate XML reports (like JUnit XML). Jenkins reads these XML files to display beautiful green/red graphs on the dashboard.</p>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The "Skip Tests" Anti-Pattern</div>
+                        <p>A developer's build is failing because a test is broken. They want to go home, so they run <code>mvn clean package -DskipTests</code> to force the build, and they manually push the artifact. <strong>They just shipped a bug to production with extra steps.</strong> DevOps must lock down the pipeline so humans cannot bypass tests.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Packaging ============ -->
+                <section class="content-section" id="packaging">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>9. Packaging (JAR, TAR, ZIP)</h2>
+                    </div>
+                    <p class="content-text">
+                        Once compiled and tested, the code must be packaged into a single, movable file called an <strong>Artifact</strong>.
+                    </p>
+
+                    <table class="content-table">
+                        <thead><tr><th>Format</th><th>What it is</th><th>How to inspect it</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>.jar</strong></td><td>Java Archive. (It's literally just a ZIP file).</td><td><code>jar -tf app.jar</code> or <code>unzip -l app.jar</code></td></tr>
+                            <tr><td><strong>.war</strong></td><td>Web Archive. Used for legacy Java apps deployed to Tomcat servers.</td><td><code>unzip -l app.war</code></td></tr>
+                            <tr><td><strong>.tar.gz</strong></td><td>Tarball. The standard Linux way to bundle source code or compiled binaries (like Go).</td><td><code>tar -tzf app.tar.gz</code></td></tr>
+                            <tr><td><strong>.whl</strong></td><td>Python Wheel. A compiled Python package ready for installation.</td><td><code>unzip -l app.whl</code></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Fat JAR vs Thin JAR</div>
+                    <p class="content-text">A "Thin JAR" only contains your code. It requires the server to already have the dependencies installed. A <strong>"Fat JAR" (or Uber JAR)</strong> packages your code <em>and all its dependencies</em> (like Spring Boot) into one massive 50MB file. You just run <code>java -jar app.jar</code> and it works anywhere.</p>
+                </section>
+
+                <!-- ============ 10. Versioning & Artifacts ============ -->
+                <section class="content-section" id="versioning">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏷️</div>
+                        <h2>10. Artifacts &amp; Versioning</h2>
+                    </div>
+                    <p class="content-text">
+                        An artifact must be <strong>Immutable</strong> (never changes once created) and strictly <strong>Versioned</strong>.
+                    </p>
+
+                    <div class="content-subheading">Snapshot vs Release (Maven)</div>
+                    <ul class="content-list">
+                        <li><code>1.0.0-SNAPSHOT</code>: This is a mutable, in-development version. Every time you build it, it overwrites the old one. Used during daily developer testing.</li>
+                        <li><code>1.0.0</code>: This is a Release. It is strictly immutable. If you try to upload a new <code>1.0.0</code> to a repository like Nexus, the repository will reject it. You must bump the version to <code>1.0.1</code>.</li>
+                    </ul>
+
+                    <div class="content-subheading">Embedding the Git SHA ⭐</div>
+                    <p class="content-text">If a server crashes, and you look at the running artifact (<code>app-1.0.0.jar</code>), how do you know exactly which commit produced it? Best practice is to embed the Git commit SHA directly into the artifact name or metadata.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># A perfect artifact name:</span>
+myapp-v1.4.2-a1b2c3d.jar</code></pre>
+                    </div>
+
+                    <div class="content-subheading">What's Next?</div>
+                    <p class="content-text">You just built <code>myapp-v1.4.2-a1b2c3d.jar</code> on your laptop. Where do you put it so the production servers can download it? You push it to an Artifact Repository Manager (Nexus) or a Docker Registry (ECR). That is the exact topic of Module 06!</p>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Multi-Language Build Pipeline (Manual)</h2>
+                        <p>Before Jenkins automates this in Module 07, you must prove you can build Java, Node, and Python apps by hand on your Linux VM.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Install Toolchains</h3>
+                            <p>First, install the underlying languages required by our build tools on your Module 02 VM.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">sudo</span> apt update
+<span class="comment"># Java 17 for Gradle/Maven</span>
+<span class="command">sudo</span> apt install openjdk-17-jdk -y
+<span class="comment"># Node.js for npm</span>
+<span class="command">sudo</span> apt install nodejs npm -y
+<span class="comment"># Python 3 and venv</span>
+<span class="command">sudo</span> apt install python3 python3-venv -y</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="2">
+                            <h3>Build Java (Gradle)</h3>
+                            <p>Clone a sample Spring Boot repository and build the Uber JAR.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">git</span> clone https://github.com/spring-projects/spring-petclinic.git
+<span class="command">cd</span> spring-petclinic
+
+<span class="comment"># Run the build using the provided wrapper</span>
+<span class="command">./gradlew</span> build
+
+<span class="comment"># Inspect the massive artifact we just created</span>
+<span class="command">ls</span> -lh build/libs/
+<span class="command">jar</span> -tf build/libs/spring-petclinic-3.1.0-SNAPSHOT.jar | head -n 10</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="3">
+                            <h3>Build Node (npm)</h3>
+                            <p>Clone a React frontend, strictly install its locked dependencies, test it, and build it.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="comment"># Use 'npm ci' to respect the package-lock.json!</span>
+<span class="command">npm</span> ci
+
+<span class="comment"># Run the test suite</span>
+<span class="command">npm</span> test
+
+<span class="comment"># Build the static HTML/JS/CSS files into the dist/ folder</span>
+<span class="command">npm</span> run build
+<span class="command">ls</span> -la dist/</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="4">
+                            <h3>Build Python (pip & venv)</h3>
+                            <p>Create an isolated environment so we don't break the system Python.</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                                <pre><code><span class="command">python3</span> -m venv .venv
+<span class="command">source</span> .venv/bin/activate
+<span class="command">pip</span> install -r requirements.txt
+<span class="command">pytest</span></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="5">
+                            <h3>Break the Build (The Chaos Test)</h3>
+                            <p>Delete <code>package-lock.json</code> in the Node repo and run <code>npm ci</code>. Note the error. This is why lockfiles are mandatory. Now, change <code>JAVA_HOME</code> to point to a non-existent directory and run <code>./gradlew build</code>. Document both errors.</p>
+                        </div>
+
+                        <div class="project-step" data-step="6">
+                            <h3>Orchestrate with Bash &amp; Make</h3>
+                            <p>Write a master <code>build-all.sh</code> script that CD's into all three directories and runs their respective build commands. Use <code>set -e</code> so if Node fails, Python doesn't start. Then, create a <code>Makefile</code> at the root that simply calls your script when you type <code>make all</code>.</p>
+                        </div>
+
+                        <div class="project-step" data-step="7">
+                            <h3>Version &amp; Publish</h3>
+                            <p>Extract the current Git commit SHA (<code>git rev-parse --short HEAD</code>). Rename your Java JAR to include this SHA (e.g., <code>app-1.0.0-a1b2c3d.jar</code>). Generate a SHA256 checksum (<code>sha256sum app-*.jar &gt; checksum.txt</code>). Create a GitHub Release and upload both files to your portfolio repository.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>You will be asked how to debug broken builds. Master these answers.</p>
+                    </div>
+
+                    <div class="interview-grid">
+                        <!-- Q1 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Walk me through what `mvn clean package` does.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>It executes two separate phases. First, <code>clean</code> deletes the old <code>target/</code> directory. Then, <code>package</code> runs through the Maven lifecycle sequentially: it validates the project, compiles the Java source code into bytecode, runs the unit tests (via Surefire), and finally packages the compiled code into a JAR or WAR file.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between `npm install` and `npm ci`? Which should CI use?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>npm install</code> reads <code>package.json</code> and can install newer minor versions of dependencies if caret ranges (<code>^</code>) are used. It also mutates the lockfile. <code>npm ci</code> (Clean Install) completely deletes <code>node_modules/</code> and strictly reads <code>package-lock.json</code> to install the exact frozen versions. <strong>CI must always use <code>npm ci</code> for reproducible builds.</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: In Maven, what is the difference between a SNAPSHOT and a Release?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A <code>SNAPSHOT</code> version (e.g., <code>1.0.0-SNAPSHOT</code>) is mutable. It represents code currently in development and can be overwritten in the artifact repository multiple times a day. A <strong>Release</strong> (e.g., <code>1.0.0</code>) is immutable. Once pushed to a repo like Nexus, it can never be overwritten; you must bump the version number.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: If a server crashes, how do you know exactly which code version is running in prod?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>By embedding the <strong>Git Commit SHA</strong> directly into the artifact. During the build pipeline, we extract the short SHA (<code>git rev-parse --short HEAD</code>) and append it to the JAR name (e.g., <code>app-v1.4.2-a1b2c3d.jar</code>) or inject it into the application's metadata/health-check endpoint.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why do we use virtual environments (venv) in Python?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>To prevent global dependency conflicts. If you install dependencies globally with <code>sudo pip install</code>, you risk breaking system-level Python tools (like Ansible or AWS CLI) or causing version conflicts between two different Python projects running on the same machine.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: "The build works on my laptop, but fails in Jenkins." Debug it.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I look for three things. 1. <strong>Language mismatch:</strong> Local uses Java 17, CI has Java 11. 2. <strong>Tool mismatch:</strong> Not using the Gradle wrapper, so CI uses an older Gradle version. 3. <strong>Dependency drift:</strong> Using <code>npm install</code> instead of <code>npm ci</code>, resulting in different package versions. 4. <strong>Cache poisoning:</strong> I'll wipe the CI workspace and run a clean build.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is a "Fat JAR" (or Uber JAR)?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A JAR file that contains both your compiled application code AND all of its dependencies (including the embedded web server, like Tomcat in Spring Boot). This makes the artifact highly portable—you only need to run <code>java -jar app.jar</code> and it works anywhere.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-04.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 04 — Networking</span>
+                </div>
+            </a>
+            
+            <a href="module-06.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 06 — Nexus</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 06 — Artifact Repository Manager (Nexus) | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 6: Artifact Repository Manager (Nexus) — Hosted, Proxy, Group Repositories, Uploads, REST API, and Access Management.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 06 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level intermediate">Intermediate</span>
+                    <span class="module-hero-duration">Phase 2 · CI/CD &amp; Containers</span>
+                </div>
+                <h1>Module 06 — <span class="gradient-text">Artifact Repository Manager (Nexus)</span></h1>
+                <p class="module-hero-desc">
+                    Module 05 ended with a question: you built the artifact — now where does it live? An artifact repository is the warehouse between "build" and "deploy." This is where the roadmap shifts from learning tools to running real servers.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Nexus</span>
+                    <span class="tech-tag">Maven Publish</span>
+                    <span class="tech-tag">npm registry</span>
+                    <span class="tech-tag">Docker Registry</span>
+                    <span class="tech-tag">REST API</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#intro" class="toc-link">1. Artifact Repository Role</a></li>
+                    <li><a href="#install" class="toc-link">2. Installing Nexus (systemd)</a></li>
+                    <li><a href="#nginx" class="toc-link">3. Reverse Proxy + HTTPS</a></li>
+                    <li><a href="#repos" class="toc-link">4. Repo Types (Hosted, Proxy, Group)</a></li>
+                    <li><a href="#upload" class="toc-link">5. Uploading Artifacts</a></li>
+                    <li><a href="#api" class="toc-link">6. Nexus REST API</a></li>
+                    <li><a href="#blob" class="toc-link">7. Blob Stores &amp; Cleanup</a></li>
+                    <li><a href="#users" class="toc-link">8. Users &amp; Roles</a></li>
+                    <li><a href="#dr" class="toc-link">9. Backup &amp; Restore</a></li>
+                    <li><a href="#sec" class="toc-link">10. Supply Chain Security</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+                
+                <!-- ============ 1. Intro ============ -->
+                <section class="content-section" id="intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏢</div>
+                        <h2>1. What Is an Artifact Repository?</h2>
+                    </div>
+                    <p class="content-text">
+                        You built a JAR file in Module 05. Why can't you just commit it to Git? (Because Git chokes on binaries). Why not upload it to an S3 bucket? (Because S3 doesn't understand Maven/npm protocols).
+                    </p>
+                    <p class="content-text">
+                        An <strong>Artifact Repository</strong> (like Sonatype Nexus, JFrog Artifactory, or AWS CodeArtifact) is a specialized database built strictly to store, version, and serve software packages.
+                    </p>
+
+                    <div class="visual-box">
+                        <div class="visual-flow" style="font-size: 0.9rem;">
+                            <span>Git (Code)</span> →
+                            <span>Jenkins (Build)</span> →
+                            <span style="font-weight: bold; border-color: var(--primary);">Nexus (Warehouse)</span> →
+                            <span>Ansible/K8s (Deploy)</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Why Do We Need It?</div>
+                    <ul class="content-list">
+                        <li><strong>Immutability:</strong> A true repository enforces that once <code>app-1.0.0.jar</code> is uploaded, it can <em>never</em> be overwritten.</li>
+                        <li><strong>Access Control:</strong> Developers can read libraries, but only the CI/CD server is allowed to publish new releases.</li>
+                        <li><strong>Proximity &amp; Speed:</strong> Caching the internet locally.</li>
+                    </ul>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Real-World Scenario: "The Internet is Down"</div>
+                        <p>Imagine npmjs.org goes offline for an hour. Normally, your Jenkins builds would instantly fail because they can't run <code>npm install</code>. If you have Nexus acting as a caching proxy, Jenkins pulls the cached packages from your local Nexus server instead. The build passes. Nobody even notices the internet is broken.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Installation ============ -->
+                <section class="content-section" id="install">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>2. Installing &amp; Running Nexus (systemd)</h2>
+                    </div>
+                    <p class="content-text">
+                        This is where Module 02 (Linux) pays off. We are going to provision a real server and install Nexus as a background service.
+                    </p>
+                    
+                    <div class="content-subheading">The Setup Steps</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># 1. Install Java (Nexus runs on Java)</span>
+<span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt install openjdk-8-jdk -y
+
+<span class="comment"># 2. Create a dedicated user (NEVER run Nexus as root!)</span>
+<span class="command">sudo</span> adduser --system --no-create-home nexus
+
+<span class="comment"># 3. Download and extract Nexus to /opt/nexus</span>
+<span class="command">wget</span> https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+<span class="command">tar</span> -xvf latest-unix.tar.gz
+<span class="command">sudo</span> chown -R nexus:nexus /opt/nexus /opt/sonatype-work</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Writing the systemd Service (Module 02 Callback)</div>
+                    <p class="content-text">We need Nexus to start automatically if the server reboots. We write a <code>systemd</code> unit file at <code>/etc/systemd/system/nexus.service</code>.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">ini</span></div>
+                        <pre><code>[Unit]
+Description=Nexus Service
+After=network.target
+
+[Service]
+Type=forking
+LimitNOFILE=65536         # Required: Nexus opens thousands of files
+User=nexus                # Run as the restricted user
+ExecStart=/opt/nexus/bin/nexus start
+ExecStop=/opt/nexus/bin/nexus stop
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ Incident: Nexus Won't Start</div>
+                        <p>Nexus is a Java application. It eats RAM. By default, it requires at least 2GB of memory. If you put it on a 1GB cloud server (like a $5 DigitalOcean droplet), the Linux OOM (Out of Memory) Killer will instantly kill it. Running <code>sudo journalctl -u nexus</code> will show you exactly that it failed due to heap size constraints.</p>
+                    </div>
+                    <p class="content-text">Open port 8081 with <code>sudo ufw allow 8081</code> (Module 04). The initial admin password is autogenerated and hidden at <code>/opt/sonatype-work/nexus3/admin.password</code>.</p>
+                </section>
+
+                <!-- ============ 3. Reverse Proxy ============ -->
+                <section class="content-section" id="nginx">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>3. Reverse Proxy + HTTPS</h2>
+                    </div>
+                    <p class="content-text">
+                        Nexus runs on port <code>8081</code> over HTTP. You should never expose port 8081 directly to the internet. We must put Nginx in front of it to provide a clean port 443 HTTPS URL (e.g., <code>https://nexus.mycompany.com</code>).
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">nginx.conf</span></div>
+                        <pre><code>server {
+    listen 443 ssl;
+    server_name nexus.mycompany.com;
+
+    ssl_certificate /etc/letsencrypt/live/nexus/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/nexus/privkey.pem;
+
+    location / {
+        <span class="comment"># Proxy all traffic to the local Nexus port</span>
+        proxy_pass http://localhost:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        
+        <span class="comment"># Required for uploading large artifacts (like a 500MB Docker image)</span>
+        client_max_body_size 1G;
+    }
+}</code></pre>
+                    </div>
+                    <p class="content-text"><em>(This is the exact reverse proxy pattern taught in Module 04!)</em></p>
+                </section>
+
+                <!-- ============ 4. Repo Types ============ -->
+                <section class="content-section" id="repos">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗂️</div>
+                        <h2>4. Repository Types (Hosted, Proxy, Group)</h2>
+                    </div>
+                    <p class="content-text">
+                        Nexus is not just one big bucket. It is split into specific repository types. Understanding the difference between Hosted, Proxy, and Group is the conceptual heart of this module.
+                    </p>
+
+                    <div class="content-subheading">1. Hosted Repositories</div>
+                    <p class="content-text">This is where <em>your</em> artifacts live. You build a JAR file locally and push it here.</p>
+                    <ul class="content-list">
+                        <li><strong>maven-releases:</strong> For immutable, production-ready artifacts (e.g., <code>1.0.0</code>).</li>
+                        <li><strong>maven-snapshots:</strong> For mutable, in-development artifacts (e.g., <code>1.0.0-SNAPSHOT</code>).</li>
+                    </ul>
+
+                    <div class="content-subheading">2. Proxy Repositories</div>
+                    <p class="content-text">A caching mirror of an external public registry (like Maven Central or npmjs.org). When a developer requests an npm package, Nexus checks if it has it. If not, it fetches it from the internet, <strong>caches it on disk</strong>, and serves it. Subsequent requests are instant and survive internet outages.</p>
+
+                    <div class="content-subheading">3. Group Repositories</div>
+                    <p class="content-text">A logical bundle. Instead of configuring developers to pull from 5 different URLs, you put the Hosted and Proxy repos inside a Group. The developer points to ONE URL, and Nexus searches all repos in the group automatically.</p>
+
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>Who writes to it?</th><th>Example Use Case</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Hosted</strong></td><td>Your CI/CD Pipeline (Jenkins)</td><td>Storing your company's proprietary <code>payment-service.jar</code></td></tr>
+                            <tr><td><strong>Proxy</strong></td><td>Nexus (fetching from internet)</td><td>Caching <code>react</code> from npmjs.org so builds don't break if npm goes down</td></tr>
+                            <tr><td><strong>Group</strong></td><td>No one (it's read-only)</td><td>The single URL developers put in their <code>~/.npmrc</code> or <code>settings.xml</code></td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 5. Uploading Artifacts ============ -->
+                <section class="content-section" id="upload">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⬆️</div>
+                        <h2>5. Uploading Artifacts (Maven, npm, Docker)</h2>
+                    </div>
+                    <p class="content-text">
+                        How do we actually get our builds from Module 05 into Nexus?
+                    </p>
+
+                    <div class="content-subheading">Maven / Gradle</div>
+                    <p class="content-text">You configure your Nexus credentials (never commit these!) and the repository URL, then run the publish command.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Maven</span>
+<span class="command">mvn</span> deploy
+
+<span class="comment"># Gradle</span>
+<span class="command">./gradlew</span> publish</code></pre>
+                    </div>
+
+                    <div class="content-subheading">npm</div>
+                    <p class="content-text">You set up an <code>.npmrc</code> file pointing your registry to your Nexus Hosted repo, log in, and publish.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Publish to the Hosted repo</span>
+<span class="command">npm</span> publish
+
+<span class="comment"># To download packages, developers install from the Group repo</span>
+<span class="command">npm</span> install</code></pre>
+                    </div>
+
+                    <div class="content-subheading">Docker (Preview)</div>
+                    <p class="content-text">Nexus can host Docker registries! Because Docker requires HTTPS, this is where that Nginx reverse proxy becomes mandatory. (We will dive deep into this in Module 08).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="command">docker</span> login nexus.mycompany.com:8082
+<span class="command">docker</span> tag my-app nexus.mycompany.com:8082/my-app:1.0
+<span class="command">docker</span> push nexus.mycompany.com:8082/my-app:1.0</code></pre>
+                    </div>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ Never Commit Credentials</div>
+                        <p>Do not hardcode Nexus passwords in <code>pom.xml</code> or <code>package.json</code>. They belong in environment variables or user-specific configuration files (like <code>~/.m2/settings.xml</code> or <code>~/.npmrc</code>) outside the Git repository.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. REST API ============ -->
+                <section class="content-section" id="api">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤖</div>
+                        <h2>6. Nexus REST API for Automation</h2>
+                    </div>
+                    <p class="content-text">
+                        A DevOps engineer automates everything. What if you are writing a deployment script and you need to ask Nexus: <em>"Give me the latest version of the payment-service JAR"</em>? You use the REST API.
+                    </p>
+
+                    <div class="content-subheading">The "Deploy Latest" Script Pattern ⭐</div>
+                    <p class="content-text">By combining <code>curl</code> and <code>jq</code> (from Module 02), you can query Nexus and extract the exact download URL of the newest artifact.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                        <pre><code><span class="comment"># Search Nexus for the latest version of an artifact, parse the JSON with jq</span>
+DOWNLOAD_URL=$(<span class="command">curl</span> -u admin:password -s \
+  "http://localhost:8081/service/rest/v1/search/assets?repository=maven-releases&amp;name=my-app&amp;sort=version&amp;direction=desc" \
+  | <span class="command">jq</span> -r '.items[0].downloadUrl')
+
+<span class="comment"># Download it</span>
+<span class="command">wget</span> $DOWNLOAD_URL</code></pre>
+                    </div>
+                    <p class="content-text">This is exactly how Ansible or a bash script on a production server pulls the code before restarting the service.</p>
+                </section>
+
+                <!-- ============ 7. Blob Stores & Cleanup ============ -->
+                <section class="content-section" id="blob">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💽</div>
+                        <h2>7. Blob Stores &amp; Cleanup Policies</h2>
+                    </div>
+                    <p class="content-text">
+                        A "Repository" is just a logical concept in Nexus. The actual physical bytes of the JAR files live on the hard drive in a <strong>Blob Store</strong>.
+                    </p>
+
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ Incident: Disk at 100%</div>
+                        <p>The #1 incident with Artifact Repositories is running out of disk space. Developers build <code>1.0.0-SNAPSHOT</code> 50 times a day. If each JAR is 100MB, that's 5GB of junk per developer, per day. If the disk fills up, Nexus crashes, and NO ONE can build or deploy code.</p>
+                    </div>
+
+                    <div class="content-subheading">Cleanup Policies &amp; Compact Blobstore</div>
+                    <p class="content-text">To prevent disk exhaustion, DevOps engineers create scheduled tasks in Nexus:</p>
+                    <ul class="content-list">
+                        <li><strong>Cleanup Policy:</strong> "Delete any SNAPSHOT older than 30 days." (Note: We never delete Releases).</li>
+                        <li><strong>Compact Blob Store:</strong> When Nexus deletes a file, it just marks it as "soft deleted." The disk space is not actually freed until the scheduled <em>Compact Blob Store</em> task runs. (A classic trap for junior engineers: "I deleted 50GB of artifacts but <code>df -h</code> still shows 99% full!").</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 8. Users & Access Management ============ -->
+                <section class="content-section" id="users">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>8. Users, Roles &amp; Access Management</h2>
+                    </div>
+                    <p class="content-text">
+                        Nexus contains the keys to production. If an attacker gains write access to Nexus, they can replace <code>payment-service.jar</code> with a malicious version.
+                    </p>
+
+                    <div class="content-subheading">The Principle of Least Privilege</div>
+                    <ul class="content-list">
+                        <li><strong>Anonymous Access:</strong> Turn this OFF on day one. No one should read or write without authenticating.</li>
+                        <li><strong>Developers:</strong> Assigned a <code>read-only</code> role. They can download dependencies, but they cannot upload to the Release repository.</li>
+                        <li><strong>CI/CD (Jenkins):</strong> We create a dedicated Service Account (e.g., user: <code>jenkins-svc</code>). It is assigned a <code>deploy-only</code> role. Only the automated pipeline is allowed to push to Nexus.</li>
+                        <li><strong>Admins:</strong> Humans never share the <code>admin</code> account. Nexus integrates with LDAP/Active Directory so engineers log in with their corporate credentials.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ 9. Backup & Restore ============ -->
+                <section class="content-section" id="dr">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚑</div>
+                        <h2>9. Backup &amp; Restore (Disaster Recovery)</h2>
+                    </div>
+                    <p class="content-text">
+                        If the Nexus server catches fire, your company cannot deploy software. How do we back it up?
+                    </p>
+                    <p class="content-text">
+                        Nexus state is split in two: the database (metadata, users, settings) and the blob store (the actual JAR files). A proper backup script must backup <strong>both</strong>. Nexus provides an "Export Databases for Backup" scheduled task. You combine that with a nightly <code>rsync</code> or AWS S3 sync of the <code>/opt/sonatype-work</code> directory.
+                    </p>
+                </section>
+
+                <!-- ============ 10. Supply Chain Security ============ -->
+                <section class="content-section" id="sec">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛑</div>
+                        <h2>10. Supply Chain Security (Proxy as a Shield)</h2>
+                    </div>
+                    <p class="content-text">
+                        By forcing all developers and CI servers to pull internet dependencies through your Nexus Proxy Repositories, you gain a chokepoint. If a massive vulnerability is announced in <code>log4j</code>, an admin can log into Nexus, block the malicious version in the Proxy repo, and instantly protect the entire company from downloading it.
+                    </p>
+                    
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Modern Deployment: Nexus in Docker</div>
+                        <p>While installing via <code>systemd</code> teaches you how Linux works, modern teams deploy Nexus as a Docker container: <code>docker run -d -p 8081:8081 -v nexus-data:/nexus-data sonatype/nexus3</code>. (Notice the volume mount? If you don't map the data outside the container, you lose all artifacts when the container restarts. Full details in Module 08!)</p>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Nexus Setup &amp; Artifact Publishing</h2>
+                        <p>You will provision a real server, install Nexus, configure its repositories, and publish artifacts to it from the command line.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+                        <div class="project-step" data-step="1">
+                            <h3>Provision Server &amp; Install Nexus</h3>
+                            <p>Provision a cloud server (or VM). Create a <code>nexus</code> user. Download Nexus, configure ownership, and write a <code>systemd</code> unit file. Start the service and verify it stays running with <code>journalctl -u nexus</code>.</p>
+                        </div>
+                        <div class="project-step" data-step="2">
+                            <h3>Secure the Installation</h3>
+                            <p>Open port 8081 using <code>ufw</code>. Log into the UI using the autogenerated admin password. Immediately disable "Anonymous Access" in the security settings.</p>
+                        </div>
+                        <div class="project-step" data-step="3">
+                            <h3>Create Roles and Users</h3>
+                            <p>Create two new Roles: <code>dev-read</code> (read access to repos) and <code>ci-deploy</code> (write access to hosted repos). Create two Users: a developer account and a <code>jenkins-svc</code> account, assigning them the respective roles.</p>
+                        </div>
+                        <div class="project-step" data-step="4">
+                            <h3>Configure Repositories</h3>
+                            <p>Create a Hosted repository named <code>maven-releases</code>. Create a Proxy repository for Maven Central. Create a Group repository bundling them together.</p>
+                        </div>
+                        <div class="project-step" data-step="5">
+                            <h3>Publish a Java Artifact</h3>
+                            <p>Take your Spring Boot app from Module 05. Add the <code>jenkins-svc</code> credentials to your <code>~/.m2/settings.xml</code> or Gradle properties. Run <code>./gradlew publish</code> and verify the JAR appears in the Nexus UI under <code>maven-releases</code>.</p>
+                        </div>
+                        <div class="project-step" data-step="6">
+                            <h3>Automate with REST API</h3>
+                            <p>Write a Bash script that uses <code>curl</code> and <code>jq</code> to query the Nexus REST API, find the exact download URL of the latest version of your JAR, and download it.</p>
+                        </div>
+                        <div class="project-step" data-step="7">
+                            <h3>Cleanup &amp; Compact</h3>
+                            <p>Create a Cleanup Policy to delete old artifacts. Run it. Then, run the "Compact Blob Store" scheduled task. Document the disk space before and after using <code>df -h</code> and <code>du -sh</code>.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>Artifact management is critical for production stability. Master these answers.</p>
+                    </div>
+
+                    <div class="interview-grid">
+                        <!-- Q1 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why use an artifact repository instead of Git or S3?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Git is awful at storing binaries (it stores every change, bloating the repo). S3 is just dumb storage. Artifact repositories enforce immutability (can't overwrite a release), understand language protocols (Maven/npm), and provide caching proxies for internet dependencies.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Explain Hosted vs. Proxy vs. Group repositories.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><strong>Hosted:</strong> Stores our own internal, proprietary artifacts built by our CI server. <strong>Proxy:</strong> Caches external dependencies from the internet (like Maven Central) so we survive outages. <strong>Group:</strong> Combines Hosted and Proxy into a single URL for developers to use.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is the difference between SNAPSHOT and Release repos?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Releases are immutable—once a version is pushed, it can never be overwritten or deleted (except manually by an admin). SNAPSHOTs are mutable—they represent in-development code and are constantly overwritten by daily builds. We use Cleanup Policies to delete old SNAPSHOTs automatically.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: "The Nexus disk is 100% full." Walk me through recovery.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>First, I find out what is consuming the space (usually SNAPSHOTs). I execute a Cleanup Policy to soft-delete artifacts older than 30 days. Crucially, I then manually run the <strong>Compact Blob Store</strong> scheduled task, which actually deletes the physical files from the Linux disk, freeing the space.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does a CI server (like Jenkins) authenticate to Nexus?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Via a dedicated Service Account (e.g., <code>jenkins-svc</code>). Following the Principle of Least Privilege, this account is assigned a role that only allows writing to specific Hosted repositories. It never uses human admin credentials.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What happens when you run `npm install` and Nexus proxies npmjs?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Nexus checks its local blob store. If the requested package is there, it serves it instantly. If it's not, Nexus reaches out to the public internet (npmjs.org), downloads the package, saves a copy to its local disk, and then serves it to you. The next developer to request it gets the cached copy.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How would you script "deploy the latest artifact"?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I would use <code>curl</code> to query the Nexus REST API (e.g., the <code>/v1/search/assets</code> endpoint), filter by the repository and artifact name, and sort descending by version. I would pipe the JSON response into <code>jq</code> to extract the <code>downloadUrl</code>, and then use <code>wget</code> to download the file.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-05.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 05 — Build Tools</span>
+                </div>
+            </a>
+            
+            <a href="module-07.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 07 — Jenkins</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+
+</body>
+</html>

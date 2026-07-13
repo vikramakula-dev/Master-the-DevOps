@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 09 — CI/CD Pipeline + Docker Integration | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 9: CI/CD + Docker — build images in Jenkins, push to ECR/Docker Hub, dynamic versioning, SSH deployment, Compose zero-downtime, pipeline security, and real incidents.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Top Bar -->
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 09 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <!-- Hero -->
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level intermediate">Intermediate</span>
+                    <span class="module-hero-duration">Phase 2 · CI/CD &amp; Containers — Finale</span>
+                </div>
+                <h1>Module 09 — CI/CD Pipeline + <span class="gradient-text">Docker Integration</span></h1>
+                <p class="module-hero-desc">
+                    The convergence module. Almost nothing here is new — instead, Git (03), build tools (05),
+                    Nexus (06), Jenkins (07) and Docker (08) get welded into one machine: push to GitHub, and
+                    your code is tested, containerized, versioned, and running on a real server — untouched by
+                    human hands.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Jenkins</span>
+                    <span class="tech-tag">Docker</span>
+                    <span class="tech-tag">ECR / Docker Hub</span>
+                    <span class="tech-tag">SSH Deploy</span>
+                    <span class="tech-tag">Compose</span>
+                    <span class="tech-tag">Shared Library</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <!-- Sidebar TOC -->
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#target-arch" class="toc-link">1. The Target Architecture</a></li>
+                    <li><a href="#docker-in-jenkins" class="toc-link">2. Building Images in Jenkins</a></li>
+                    <li><a href="#registry-push" class="toc-link">3. Pushing to Docker Hub / ECR</a></li>
+                    <li><a href="#versioning" class="toc-link">4. Dynamic Versioning</a></li>
+                    <li><a href="#ssh-deploy" class="toc-link">5. SSH Deployment</a></li>
+                    <li><a href="#compose-deploy" class="toc-link">6. Compose &amp; Zero-Downtime</a></li>
+                    <li><a href="#smoke-tests" class="toc-link">7. Post-Deploy Verification</a></li>
+                    <li><a href="#security" class="toc-link">8. Pipeline Security</a></li>
+                    <li><a href="#full-pipeline" class="toc-link">9. The Complete Jenkinsfile</a></li>
+                    <li><a href="#incidents" class="toc-link">10. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="module-main">
+
+                <!-- ============ 1. Target Architecture ============ -->
+                <section class="content-section" id="target-arch">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗺️</div>
+                        <h2>1. The Target Architecture</h2>
+                    </div>
+                    <p class="content-text">
+                        Here is the machine we're building in this module. Keep this diagram in mind —
+                        every section below implements exactly one arrow of it.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">One Push, Fully Deployed</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">git push</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Webhook</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Jenkins Agent</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Test + Build</span>
+                        </div>
+                        <div class="visual-flow">
+                            <span class="flow-item">docker build (tagged)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Push to ECR</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">SSH to Server</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">compose up -d</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Smoke Test ✔</span>
+                        </div>
+                    </div>
+                    <p class="content-text">Every arrow is a skill you already own:</p>
+                    <table class="content-table">
+                        <thead><tr><th>Pipeline Step</th><th>You Learned It In</th><th>What's New Here</th></tr></thead>
+                        <tbody>
+                            <tr><td>git push + webhook</td><td>Module 03 / 07</td><td>Nothing — reused as-is</td></tr>
+                            <tr><td>Test &amp; build (Gradle/npm)</td><td>Module 05</td><td>Nothing — same commands, in a stage</td></tr>
+                            <tr><td>docker build</td><td>Module 08</td><td>Running it on a Jenkins agent</td></tr>
+                            <tr><td>Registry push</td><td>Module 06 / 08</td><td>Credentials done safely in CI</td></tr>
+                            <tr><td>SSH to server</td><td>Module 02 / 04</td><td>Non-interactive, from a pipeline</td></tr>
+                            <tr><td>docker compose up</td><td>Module 08</td><td>Parameterized image tags</td></tr>
+                            <tr><td>Verify &amp; notify</td><td>Module 04 (curl)</td><td>The habit that separates pros</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Capstone Connection</div>
+                        <p>This is the exact application pipeline from the <a href="project1.html">Capstone Project</a>, minus two upgrades that come later: EKS instead of a single server (Modules 11–12) and ArgoCD instead of SSH-push deployment (Module 17).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Docker in Jenkins ============ -->
+                <section class="content-section" id="docker-in-jenkins">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔨</div>
+                        <h2>2. Building Docker Images in Jenkins</h2>
+                    </div>
+                    <p class="content-text">
+                        Before any pipeline code: the Jenkins <strong>agent</strong> must be able to run Docker.
+                        This is the #1 setup stumble.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — on the Jenkins agent</span></div>
+                        <pre><code><span class="comment"># Install Docker (Module 08), then let the jenkins user use it:</span>
+<span class="command">sudo</span> usermod -aG docker jenkins     <span class="comment"># -aG! (Module 02 warning applies)</span>
+<span class="command">sudo</span> systemctl restart jenkins      <span class="comment"># group changes need a fresh login/session</span>
+
+<span class="comment"># Verify AS the jenkins user:</span>
+<span class="command">sudo</span> -u jenkins docker ps           <span class="comment"># must work without sudo</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 docker group = root</div>
+                        <p>Anyone in the <code>docker</code> group can trivially become root on that machine (mount <code>/</code> into a container). This is exactly why Module 07's rule exists: <strong>agents build, the controller never does</strong>. Your controller holds all credentials — don't hand it root-equivalent Docker access too.</p>
+                    </div>
+
+                    <div class="content-subheading">The Build Stage</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — build stage</span></div>
+                        <pre><code>stage(<span class="string">'Build Image'</span>) {
+    steps {
+        sh <span class="string">'docker build -t myapp:${BUILD_NUMBER} .'</span>
+    }
+}</code></pre>
+                    </div>
+                    <p class="content-text">
+                        The Docker Pipeline plugin offers <code>docker.build("myapp")</code> as an alternative,
+                        but plain <code>sh</code> steps win in practice: what runs in CI is exactly what you can
+                        run and debug in a terminal — no plugin behavior to second-guess.
+                    </p>
+
+                    <div class="content-subheading">Why CI Builds Are Slower Than Local</div>
+                    <ul class="content-list">
+                        <li><strong>Cold layer cache</strong> — a fresh agent has no cached layers, so every <code>RUN</code> executes. Module 08's layer-ordering lesson (<code>COPY package*.json</code> first) matters <em>more</em> in CI, not less.</li>
+                        <li><strong><code>.dockerignore</code></strong> — without it, the whole workspace (including <code>.git/</code> and test reports) ships to the daemon as build context on every build.</li>
+                    </ul>
+
+                    <div class="content-subheading">Level-Up: Build Stages Inside Containers</div>
+                    <p class="content-text">
+                        Module 07's "works on controller, fails on agent" incident had a band-aid fix (install the JDK).
+                        The real fix: run the stage <strong>inside a container</strong> — the toolchain ships with the pipeline.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — containerized stage</span></div>
+                        <pre><code>stage(<span class="string">'Test'</span>) {
+    agent { docker { image <span class="string">'node:20-alpine'</span> } }   <span class="comment">// stage runs IN this image</span>
+    steps {
+        sh <span class="string">'npm ci &amp;&amp; npm test'</span>                     <span class="comment">// exact Node version, every time</span>
+    }
+}</code></pre>
+                    </div>
+                    <p class="content-text">No more toolchain drift: the agent only needs Docker itself.</p>
+                </section>
+
+                <!-- ============ 3. Registry Push ============ -->
+                <section class="content-section" id="registry-push">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📤</div>
+                        <h2>3. Pushing to Docker Hub / ECR</h2>
+                    </div>
+                    <p class="content-text">
+                        Three registry options, one rule: <strong>login happens inside the pipeline with stored
+                        credentials — never hardcoded, never with <code>-p</code> on the command line.</strong>
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — Docker Hub push, done right</span></div>
+                        <pre><code>stage(<span class="string">'Push'</span>) {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: <span class="string">'dockerhub-creds'</span>,       <span class="comment">// from Jenkins credential store (M07)</span>
+            usernameVariable: <span class="string">'DOCKER_USER'</span>,
+            passwordVariable: <span class="string">'DOCKER_PASS'</span>
+        )]) {
+            <span class="comment">// --password-stdin keeps the secret OUT of the console log &amp; process list</span>
+            sh <span class="string">'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'</span>
+            sh <span class="string">'docker push myuser/myapp:${IMAGE_TAG}'</span>
+        }
+    }
+}</code></pre>
+                    </div>
+
+                    <div class="content-subheading">ECR — The AWS Way</div>
+                    <p class="content-text">ECR logins are short-lived tokens fetched with the AWS CLI. Decode the registry URL once and it stops being scary:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ECR push flow</span></div>
+                        <pre><code><span class="comment">#  123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp:1.4.2</span>
+<span class="comment">#  └─ account ID ┘        └─ region ┘             └repo┘└tag┘</span>
+
+<span class="comment"># 1. Repo must exist first (once):</span>
+<span class="command">aws</span> ecr create-repository --repository-name myapp
+
+<span class="comment"># 2. Login (token valid 12h):</span>
+<span class="command">aws</span> ecr get-login-password --region ap-south-1 \
+  | <span class="command">docker</span> login --username AWS --password-stdin 123456789012.dkr.ecr.ap-south-1.amazonaws.com
+
+<span class="comment"># 3. Tag with the FULL registry path, then push:</span>
+<span class="command">docker</span> tag myapp:1.4.2 123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp:1.4.2
+<span class="command">docker</span> push 123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp:1.4.2</code></pre>
+                    </div>
+
+                    <table class="content-table">
+                        <thead><tr><th>Registry</th><th>Auth</th><th>Best For</th></tr></thead>
+                        <tbody>
+                            <tr><td>Docker Hub</td><td>Username + access token</td><td>Public images, learning</td></tr>
+                            <tr><td>AWS ECR</td><td>IAM + 12h token via CLI</td><td>Anything deployed on AWS (the capstone)</td></tr>
+                            <tr><td>Nexus (Module 06)</td><td>Local users/roles</td><td>Self-hosted, air-gapped, one warehouse for all artifacts</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ "no basic auth credentials" in CI (but works locally)</div>
+                        <p>Locally, <code>docker login</code> saved your token to <code>~/.docker/config.json</code> — for <em>your</em> user. The pipeline runs as <code>jenkins</code> on another machine with no such file. Every pipeline run must do its own login inside the stage. This bites everyone exactly once.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Versioning ============ -->
+                <section class="content-section" id="versioning">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏷️</div>
+                        <h2>4. Dynamic Versioning</h2>
+                    </div>
+                    <p class="content-text">
+                        Module 05 promised you'd always be able to answer <em>"which code is running in prod?"</em>
+                        This section keeps that promise. First, what NOT to do:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Tag Strategy</th><th>Example</th><th>Verdict</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>latest</code></td><td><code>myapp:latest</code></td><td>❌ Mutable — you can never prove what's deployed. Humans only.</td></tr>
+                            <tr><td>Build number</td><td><code>myapp:42</code></td><td>🟡 Unique, but meaningless outside Jenkins</td></tr>
+                            <tr><td>Git SHA</td><td><code>myapp:a1b2c3d</code></td><td>🟢 Exact traceability to a commit</td></tr>
+                            <tr><td>SemVer</td><td><code>myapp:1.4.2</code></td><td>🟢 Human-meaningful (Module 03)</td></tr>
+                            <tr><td><strong>Composite ⭐</strong></td><td><code>myapp:1.4.42-a1b2c3d</code></td><td>✅ Version + build + commit in one tag</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — computing the tag</span></div>
+                        <pre><code>environment {
+    <span class="comment">// GIT_COMMIT is provided by the checkout; take the short form</span>
+    GIT_SHORT = <span class="string">"${env.GIT_COMMIT.take(7)}"</span>
+    IMAGE_TAG = <span class="string">"1.4.${env.BUILD_NUMBER}-${GIT_SHORT}"</span>
+    IMAGE     = <span class="string">"123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp"</span>
+}
+stages {
+    stage(<span class="string">'Build Image'</span>) {
+        steps {
+            sh <span class="string">'docker build -t $IMAGE:$IMAGE_TAG .'</span>
+            <span class="comment">// same image, second tag — 'latest' for humans browsing the registry</span>
+            sh <span class="string">'docker tag $IMAGE:$IMAGE_TAG $IMAGE:latest'</span>
+        }
+    }
+}</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Tags Are Free</div>
+                        <p>A tag is just a pointer to an image digest (Module 08 layers callback) — tagging the same image five ways costs zero bytes. Push the immutable composite tag for machines <em>and</em> <code>latest</code> for humans. Deploy scripts must only ever reference the composite.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. SSH Deploy ============ -->
+                <section class="content-section" id="ssh-deploy">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>5. Deploying via SSH from the Pipeline</h2>
+                    </div>
+                    <p class="content-text">
+                        Your Module 02/04 SSH skills, now non-interactive. The pipeline gets its own
+                        <strong>deploy key</strong>: a dedicated keypair whose public half lives only on the
+                        deploy server, under a dedicated <code>deploy</code> user.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — deploy stage</span></div>
+                        <pre><code>stage(<span class="string">'Deploy'</span>) {
+    steps {
+        <span class="comment">// sshagent loads the private key from the Jenkins credential store</span>
+        sshagent([<span class="string">'deploy-server-key'</span>]) {
+            sh <span class="string">'''
+                ssh -o StrictHostKeyChecking=accept-new deploy@10.0.1.50 \
+                    "cd /opt/myapp &amp;&amp; ./deploy.sh ${IMAGE_TAG}"
+            '''</span>
+        }
+    }
+}</code></pre>
+                    </div>
+                    <div class="content-subheading">The Deploy Script Lives in the Repo</div>
+                    <p class="content-text">
+                        Notice the pipeline calls <code>./deploy.sh</code> — it does <strong>not</strong> inline
+                        ten SSH'd commands in the Jenkinsfile. The script is versioned with the app (Module 03
+                        discipline), reviewable in PRs, and testable by hand on the server.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">deploy.sh — on the server, in the repo</span></div>
+                        <pre><code><span class="comment">#!/bin/bash</span>
+set -euo pipefail                    <span class="comment"># Module 02 — always</span>
+
+TAG=<span class="string">"${1:?Usage: deploy.sh &lt;image-tag&gt;}"</span>   <span class="comment"># refuse to run without a tag</span>
+
+<span class="command">echo</span> <span class="string">"IMAGE_TAG=$TAG"</span> &gt; .env          <span class="comment"># compose reads the tag from here</span>
+<span class="command">docker</span> compose pull app              <span class="comment"># fetch only the new image</span>
+<span class="command">docker</span> compose up -d                 <span class="comment"># recreate only what changed</span>
+<span class="command">docker</span> image prune -f                <span class="comment"># keep the disk alive (Incident 2!)</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ StrictHostKeyChecking — don't just disable it</div>
+                        <p>Host-key checking is what stops a man-in-the-middle from receiving your deploy commands (and secrets). <code>accept-new</code> trusts the key on first contact and pins it after — reasonable for a server you just provisioned. <code>no</code> disables protection entirely; better: pre-provision <code>known_hosts</code> on the agent (see Incident 3).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Compose & Zero-Downtime ============ -->
+                <section class="content-section" id="compose-deploy">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚢</div>
+                        <h2>6. Compose Deployment &amp; Zero-Downtime</h2>
+                    </div>
+                    <p class="content-text">
+                        The compose file references the tag through an environment variable — the pipeline writes
+                        <code>.env</code>, compose does the rest:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">docker-compose.yml — on the server</span></div>
+                        <pre><code>services:
+  app:
+    image: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp:<span class="variable">${IMAGE_TAG}</span>
+    restart: unless-stopped
+    ports:
+      - <span class="string">"3000:3000"</span>
+    env_file: app.env                <span class="comment"># runtime secrets — NOT in the image (M08)</span>
+    healthcheck:                     <span class="comment"># Module 08 payoff — gates the restart</span>
+      test: [<span class="string">"CMD", "curl", "-f", "http://localhost:3000/health"</span>]
+      interval: 10s
+      timeout: 3s
+      retries: 3</code></pre>
+                    </div>
+                    <p class="content-text">
+                        <code>docker compose up -d</code> compares desired vs running state and recreates only
+                        services whose image or config changed — your database container isn't touched by an app deploy.
+                    </p>
+
+                    <div class="content-subheading">Honest Talk: What "Zero-Downtime" Means Here</div>
+                    <ul class="content-list">
+                        <li>Compose <code>up -d</code> = stop old container → start new one. There is a <strong>gap of a few seconds</strong>.</li>
+                        <li>You can shrink it (start-new-then-stop-old with two container names and an nginx flip — the Module 04 reverse proxy trick), but it's manual plumbing.</li>
+                        <li><strong>True rolling updates — new pods up, health-checked, old drained, automatic rollback — is exactly what Kubernetes does natively.</strong> That's Module 11, and now you know precisely why it exists.</li>
+                    </ul>
+
+                    <div class="content-subheading">Rollback: One Parameter Away</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — because every deploy is an immutable tag…</span></div>
+                        <pre><code><span class="comment"># …rollback is just deploying the previous tag:</span>
+<span class="command">./deploy.sh</span> 1.4.41-9f8e7d6          <span class="comment"># the tag that worked an hour ago</span></code></pre>
+                    </div>
+                    <p class="content-text">
+                        In Jenkins: a parameterized job (<code>IMAGE_TAG</code> as a parameter, Module 07) that runs
+                        only the deploy stage. This is the capstone's rollback strategy in miniature — rollback =
+                        redeploy a known-good version, never "fix forward under pressure."
+                    </p>
+                </section>
+
+                <!-- ============ 7. Smoke Tests ============ -->
+                <section class="content-section" id="smoke-tests">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧪</div>
+                        <h2>7. Post-Deploy Verification (Smoke Tests)</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>A pipeline isn't done when it deploys — it's done when it verifies.</strong>
+                        "Pipeline green, site down" (Incident 6) is what happens when this section is skipped.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — the stage most pipelines are missing</span></div>
+                        <pre><code>stage(<span class="string">'Smoke Test'</span>) {
+    steps {
+        <span class="comment">// -f: exit non-zero on HTTP errors → fails the stage (M02 exit codes!)</span>
+        <span class="comment">// retry+sleep: give the container a moment to become healthy</span>
+        sh <span class="string">'''
+            for i in $(seq 1 10); do
+                curl -fs http://10.0.1.50:3000/health &amp;&amp; exit 0
+                echo "Attempt $i/10 failed, retrying in 5s..."
+                sleep 5
+            done
+            echo "SMOKE TEST FAILED — app never became healthy"
+            exit 1
+        '''</span>
+    }
+}
+post {
+    failure {
+        <span class="comment">// smoke test failed? redeploy the last known-good tag automatically</span>
+        sh <span class="string">'ssh deploy@10.0.1.50 "cd /opt/myapp &amp;&amp; ./deploy.sh $(cat last-good-tag)"'</span>
+    }
+    success {
+        sh <span class="string">'ssh deploy@10.0.1.50 "echo $IMAGE_TAG &gt; /opt/myapp/last-good-tag"'</span>
+    }
+}</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Notify on State Change, Not Every Build</div>
+                        <p>A Slack ping for every green build trains everyone to ignore Slack pings (alert fatigue — a core Module 16 theme). Notify when the build <em>breaks</em> and when it's <em>fixed</em>. Silence means healthy.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Security ============ -->
+                <section class="content-section" id="security">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>8. Pipeline Security</h2>
+                    </div>
+                    <p class="content-text">
+                        This pipeline now holds keys to GitHub, a registry, and a production server.
+                        Audit every credential against least privilege (the Module 06/07 theme):
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Credential</th><th>Scope It Should Have</th><th>Scope It Should NOT Have</th></tr></thead>
+                        <tbody>
+                            <tr><td>GitHub token</td><td>Read this repo + webhooks</td><td>Org-wide, delete, admin</td></tr>
+                            <tr><td>Registry creds</td><td>Push/pull this one repository</td><td>Account-wide access token</td></tr>
+                            <tr><td>SSH deploy key</td><td><code>deploy</code> user on one server</td><td>root, your personal key, password auth</td></tr>
+                            <tr><td>AWS credentials</td><td>ECR push to one repo (IAM policy)</td><td><code>AdministratorAccess</code> "just for now"</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Secrets Never Bake Into Images</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — the leak you can see</span></div>
+                        <pre><code><span class="comment"># If a secret was passed as a build ARG, it's in the layer history FOREVER:</span>
+<span class="command">docker</span> history --no-trunc myapp:1.4.2 | <span class="command">grep</span> -i token
+<span class="output"># /bin/sh -c #(nop) ARG API_TOKEN=ghp_Xk29fPq...   ← anyone who pulls sees this</span>
+
+<span class="comment"># Rule: build args for build-time config only (never secrets).</span>
+<span class="comment"># Runtime secrets arrive via env_file / secret manager at 'docker run' time.</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 If a Secret Leaks</div>
+                        <p>Same protocol as Modules 03 and 07, now for images: the token in a pushed layer is compromised the moment the image is pullable. <strong>Revoke → rotate → then</strong> clean up. Deleting the image tag doesn't delete pulled copies.</p>
+                    </div>
+                    <p class="content-text">
+                        <strong>Image signing (awareness):</strong> Docker Content Trust / cosign let you
+                        cryptographically prove an image came from your pipeline and wasn't tampered with.
+                        We wire this up properly in Module 18 — for now, note the commented-out Trivy stage
+                        in the full pipeline below. You'll uncomment it there.
+                    </p>
+                </section>
+
+                <!-- ============ 9. Full Pipeline ============ -->
+                <section class="content-section" id="full-pipeline">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📜</div>
+                        <h2>9. The Complete Jenkinsfile</h2>
+                    </div>
+                    <p class="content-text">Everything assembled. Every line references a section above or a previous module:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — the whole machine</span></div>
+                        <pre><code>pipeline {
+    agent { label <span class="string">'linux'</span> }                          <span class="comment">// M07: never the controller</span>
+
+    options {
+        timeout(time: 20, unit: <span class="string">'MINUTES'</span>)           <span class="comment">// M07 Incident 2</span>
+        buildDiscarder(logRotator(numToKeepStr: <span class="string">'15'</span>)) <span class="comment">// M07 Incident 3</span>
+        timestamps()
+    }
+
+    environment {
+        IMAGE     = <span class="string">'123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp'</span>
+        GIT_SHORT = <span class="string">"${env.GIT_COMMIT.take(7)}"</span>
+        IMAGE_TAG = <span class="string">"1.4.${env.BUILD_NUMBER}-${GIT_SHORT}"</span>   <span class="comment">// §4</span>
+    }
+
+    stages {
+        stage(<span class="string">'Test'</span>) {
+            agent { docker { image <span class="string">'node:20-alpine'</span> } }      <span class="comment">// §2 — no toolchain drift</span>
+            steps { sh <span class="string">'npm ci &amp;&amp; npm test'</span> }                 <span class="comment">// M05: ci, not install</span>
+        }
+        stage(<span class="string">'Build &amp; Tag Image'</span>) {
+            steps {
+                sh <span class="string">'docker build -t $IMAGE:$IMAGE_TAG .'</span>       <span class="comment">// §2</span>
+                sh <span class="string">'docker tag $IMAGE:$IMAGE_TAG $IMAGE:latest'</span> <span class="comment">// §4 — humans only</span>
+            }
+        }
+        <span class="comment">// stage('Scan') {                                     // Module 18 — uncomment there</span>
+        <span class="comment">//     steps { sh 'trivy image --exit-code 1 $IMAGE:$IMAGE_TAG' }</span>
+        <span class="comment">// }</span>
+        stage(<span class="string">'Push'</span>) {
+            steps {
+                sh <span class="string">'''aws ecr get-login-password --region ap-south-1 \
+                    | docker login --username AWS --password-stdin $IMAGE'''</span>  <span class="comment">// §3</span>
+                sh <span class="string">'docker push $IMAGE:$IMAGE_TAG &amp;&amp; docker push $IMAGE:latest'</span>
+            }
+        }
+        stage(<span class="string">'Deploy'</span>) {
+            when { branch <span class="string">'main'</span> }                            <span class="comment">// M07: features build, main deploys</span>
+            steps {
+                sshagent([<span class="string">'deploy-server-key'</span>]) {             <span class="comment">// §5</span>
+                    sh <span class="string">'''ssh -o StrictHostKeyChecking=accept-new deploy@10.0.1.50 \
+                        "cd /opt/myapp &amp;&amp; ./deploy.sh ${IMAGE_TAG}"'''</span>
+                }
+            }
+        }
+        stage(<span class="string">'Smoke Test'</span>) {
+            when { branch <span class="string">'main'</span> }
+            steps { sh <span class="string">'./ci/smoke-test.sh http://10.0.1.50:3000/health'</span> }  <span class="comment">// §7</span>
+        }
+    }
+
+    post {
+        fixed   { slackSend color: <span class="string">'good'</span>,   message: <span class="string">"✅ ${env.JOB_NAME} is healthy again"</span> }
+        failure { slackSend color: <span class="string">'danger'</span>, message: <span class="string">"🔴 ${env.JOB_NAME} #${env.BUILD_NUMBER} failed: ${env.BUILD_URL}"</span> }
+        always  { sh <span class="string">'docker image prune -f'</span> }                <span class="comment">// Incident 2 prevention</span>
+    }
+}</code></pre>
+                    </div>
+
+                    <div class="content-subheading">The Same Machine in GitHub Actions</div>
+                    <p class="content-text">Module 07's promise — concepts transfer 1:1:</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">.github/workflows/deploy.yml — equivalent pipeline</span></div>
+                        <pre><code>name: ci-cd
+on: { push: { branches: [main] } }
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest            <span class="comment"># agent — but disposable, Docker pre-installed</span>
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci &amp;&amp; npm test
+      - run: |
+          TAG=1.4.${{ github.run_number }}-$(echo ${{ github.sha }} | cut -c1-7)
+          echo "TAG=$TAG" &gt;&gt; $GITHUB_ENV
+      - uses: aws-actions/amazon-ecr-login@v2   <span class="comment"># login via OIDC — no stored AWS keys!</span>
+      - run: |
+          docker build -t $ECR_REGISTRY/myapp:$TAG .
+          docker push $ECR_REGISTRY/myapp:$TAG
+      - run: |
+          ssh deploy@$SERVER "cd /opt/myapp &amp;&amp; ./deploy.sh $TAG"</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Spot the Upgrade</div>
+                        <p>That <code>amazon-ecr-login</code> step uses <strong>GitHub OIDC</strong> — no long-lived AWS keys stored anywhere (the capstone's authentication model, Module 13/18 territory). Jenkins can do this too, but Actions makes it one line. Each tool has its strengths.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 10. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>10. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+                    <p class="content-text">Six incidents you will genuinely hit. Format: symptom → investigation → root cause → fix → prevention.</p>
+
+                    <div class="content-subheading">Incident 1: "permission denied … /var/run/docker.sock"</div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">console log</span></div>
+                        <pre><code><span class="output">+ docker build -t myapp:42 .
+ERROR: permission denied while trying to connect to the Docker daemon socket
+    at unix:///var/run/docker.sock</span></code></pre>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Investigate:</strong> <code>sudo -u jenkins docker ps</code> on the agent — same error confirms it's group membership, not the pipeline.</li>
+                        <li><strong>Root cause:</strong> <code>jenkins</code> user not in the <code>docker</code> group, or the agent process started before the group change.</li>
+                        <li><strong>Fix:</strong> <code>sudo usermod -aG docker jenkins &amp;&amp; sudo systemctl restart jenkins</code> (the running session must be restarted to pick up the group).</li>
+                        <li><strong>Never:</strong> <code>chmod 777 /var/run/docker.sock</code> — that hands root to every user on the machine (§2 danger box).</li>
+                    </ul>
+
+                    <div class="content-subheading">Incident 2: "no space left on device" — the CI Disk-Full, Round 3</div>
+                    <ul class="content-list">
+                        <li><strong>Symptom:</strong> Builds fail mid-<code>docker build</code>; the M02 reflex <code>df -h</code> shows <code>/var/lib/docker</code> at 100%.</li>
+                        <li><strong>Investigate:</strong> <code>docker system df</code> — hundreds of dangling images: every build made <code>myapp:&lt;n&gt;</code> and nothing ever cleaned up.</li>
+                        <li><strong>Fix now:</strong> <code>docker system prune -af --filter "until=72h"</code>.</li>
+                        <li><strong>Prevention:</strong> <code>docker image prune -f</code> in <code>post { always }</code> + a nightly prune cron (Module 02). You've now solved disk-full on a server (M02), Jenkins (M07), and Docker (M08/09) — see the pattern? <strong>Everything that produces artifacts needs a retention policy.</strong></li>
+                    </ul>
+
+                    <div class="content-subheading">Incident 3: Deploy Stage Hangs Forever</div>
+                    <ul class="content-list">
+                        <li><strong>Symptom:</strong> Pipeline stuck at Deploy for 40 minutes, no output. (Your M07 <code>timeout</code> option eventually kills it — that's why it's there.)</li>
+                        <li><strong>Root cause:</strong> First-ever SSH to this server — <code>The authenticity of host … can't be established. Continue? (yes/no)</code> — and no human exists to type yes (Module 02's cron lesson, striking again in CI).</li>
+                        <li><strong>Fix:</strong> <code>-o StrictHostKeyChecking=accept-new</code>, or better: <code>ssh-keyscan 10.0.1.50 &gt;&gt; ~jenkins/.ssh/known_hosts</code> when provisioning the agent.</li>
+                        <li><strong>Prevention:</strong> Any prompt = a hang in CI. Audit every command for interactivity (<code>-y</code>, <code>--password-stdin</code>, <code>--no-input</code>).</li>
+                    </ul>
+
+                    <div class="content-subheading">Incident 4: Wrong Image Running in Production</div>
+                    <ul class="content-list">
+                        <li><strong>Symptom:</strong> You deployed a fix; the bug is still there. <code>docker inspect --format '{{.Image}}' app</code> shows a digest that doesn't match your new build.</li>
+                        <li><strong>Root cause:</strong> Compose file said <code>image: myapp:latest</code>; the server's cached <code>latest</code> was three weeks old, and nobody ran <code>pull</code>.</li>
+                        <li><strong>Fix &amp; prevention:</strong> Deploy scripts reference only immutable composite tags (§4) and always <code>compose pull</code> before <code>up</code>. <code>latest</code> is for humans browsing the registry — never for deploys.</li>
+                    </ul>
+
+                    <div class="content-subheading">Incident 5: Secret Leaked in an Image Layer</div>
+                    <ul class="content-list">
+                        <li><strong>Symptom:</strong> Security review runs <code>docker history --no-trunc</code> on your image — an npm token is sitting in an <code>ARG</code> layer (§8's demo, but in prod).</li>
+                        <li><strong>Fix:</strong> The M03/M07 protocol: revoke the token first, rotate, then rebuild the image without the ARG and re-push. Deleting the tag does nothing for already-pulled copies.</li>
+                        <li><strong>Prevention:</strong> Secrets only at runtime (<code>env_file</code>), never at build time; a pipeline grep-gate for <code>ARG.*(TOKEN|KEY|PASS)</code> catches it before push.</li>
+                    </ul>
+
+                    <div class="content-subheading">Incident 6: Pipeline Green, Site Down</div>
+                    <ul class="content-list">
+                        <li><strong>Symptom:</strong> Every stage passed; customers see 502 (Module 04: your upstream is dead). <code>docker ps</code> on the server: the app container is restart-looping.</li>
+                        <li><strong>Investigate:</strong> <code>docker logs app</code> → crash on a missing env var that exists in dev but not in the server's <code>app.env</code>.</li>
+                        <li><strong>Root cause (the real one):</strong> The pipeline's definition of "done" was "deploy command exited 0" — nobody asked the app if it was alive.</li>
+                        <li><strong>Fix &amp; prevention:</strong> The §7 smoke-test stage with retry + automatic rollback to <code>last-good-tag</code>. This incident is why §7 exists.</li>
+                    </ul>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="project-walkthrough-header">
+                        <h2>🛠️ Real-Time Project: Complete CI/CD — Build → Dockerize → Deploy</h2>
+                        <p>Jenkins pipeline that checks out code from GitHub → runs tests in a container → builds a Docker image with a dynamic version tag → pushes to ECR (or Docker Hub) → SSHs into a server → deploys via docker-compose → verifies with a smoke test. The Phase 2 graduation project.</p>
+                    </div>
+                    <div class="project-walkthrough-body">
+
+                        <div class="project-step" data-step="1">
+                            <h3>Prepare the Deploy Target</h3>
+                            <p>A second VM or free-tier EC2 Ubuntu instance. Run the full hardening + Docker setup — this is your Module 02/04/08 knowledge as one script:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — server-setup.sh (run once on the deploy server)</span></div>
+                                <pre><code><span class="comment">#!/bin/bash</span>
+set -euo pipefail
+
+<span class="comment"># --- 1. Docker + Compose (Module 08) ---</span>
+<span class="command">sudo</span> apt update &amp;&amp; <span class="command">sudo</span> apt install -y docker.io docker-compose-v2
+<span class="command">sudo</span> systemctl enable --now docker
+
+<span class="comment"># --- 2. Dedicated deploy user (Module 02: never deploy as root) ---</span>
+<span class="command">sudo</span> useradd -m -s /bin/bash deploy
+<span class="command">sudo</span> usermod -aG docker deploy          <span class="comment"># deploy user drives Docker</span>
+
+<span class="comment"># --- 3. Key-only SSH for the deploy user ---</span>
+<span class="command">sudo</span> mkdir -p /home/deploy/.ssh
+<span class="comment"># paste the PUBLIC half of the pipeline's deploy key:</span>
+<span class="command">echo</span> <span class="string">"ssh-ed25519 AAAA...jenkins-deploy-key"</span> | <span class="command">sudo</span> tee /home/deploy/.ssh/authorized_keys
+<span class="command">sudo</span> chmod 700 /home/deploy/.ssh &amp;&amp; <span class="command">sudo</span> chmod 600 /home/deploy/.ssh/authorized_keys
+<span class="command">sudo</span> chown -R deploy:deploy /home/deploy/.ssh
+
+<span class="comment"># --- 4. Firewall (Module 04: SSH first, then app port) ---</span>
+<span class="command">sudo</span> ufw allow 22/tcp &amp;&amp; <span class="command">sudo</span> ufw allow 3000/tcp
+<span class="command">sudo</span> ufw --force enable
+
+<span class="comment"># --- 5. App directory owned by deploy ---</span>
+<span class="command">sudo</span> mkdir -p /opt/myapp &amp;&amp; <span class="command">sudo</span> chown deploy:deploy /opt/myapp
+<span class="command">echo</span> <span class="string">"✔ Server ready. Now place docker-compose.yml, deploy.sh, app.env in /opt/myapp"</span></code></pre>
+                            </div>
+                            <p>Then place the three runtime files in <code>/opt/myapp</code> (as the <code>deploy</code> user):</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">/opt/myapp/docker-compose.yml</span></div>
+                                <pre><code>services:
+  app:
+    image: <span class="variable">${ECR_REGISTRY}</span>/myapp:<span class="variable">${IMAGE_TAG}</span>   <span class="comment"># both come from .env, written by deploy.sh</span>
+    restart: unless-stopped
+    ports:
+      - <span class="string">"3000:3000"</span>
+    env_file: app.env                          <span class="comment"># runtime secrets — never in the image</span>
+    healthcheck:
+      test: [<span class="string">"CMD", "curl", "-f", "http://localhost:3000/health"</span>]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 15s</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">/opt/myapp/deploy.sh</span></div>
+                                <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># deploy.sh &lt;image-tag&gt; — versioned in the app repo, synced here by the pipeline</span>
+set -euo pipefail
+
+TAG=<span class="string">"${1:?Usage: deploy.sh &lt;image-tag&gt;}"</span>
+REGISTRY=<span class="string">"123456789012.dkr.ecr.ap-south-1.amazonaws.com"</span>
+
+<span class="command">cd</span> /opt/myapp
+
+<span class="comment"># ECR login from the server (instance role or configured AWS CLI)</span>
+<span class="command">aws</span> ecr get-login-password --region ap-south-1 \
+    | <span class="command">docker</span> login --username AWS --password-stdin <span class="string">"$REGISTRY"</span>
+
+<span class="comment"># Point compose at the new tag</span>
+{
+    <span class="command">echo</span> <span class="string">"ECR_REGISTRY=$REGISTRY"</span>
+    <span class="command">echo</span> <span class="string">"IMAGE_TAG=$TAG"</span>
+} &gt; .env
+
+<span class="command">docker</span> compose pull app          <span class="comment"># fetch only the new image</span>
+<span class="command">docker</span> compose up -d             <span class="comment"># recreate only what changed</span>
+<span class="command">docker</span> image prune -f            <span class="comment"># Incident 2 prevention</span>
+
+<span class="command">echo</span> <span class="string">"✔ Deployed $TAG"</span></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="2">
+                            <h3>Registry &amp; Credentials, Least-Privilege</h3>
+                            <p>Create the ECR repo and a pipeline-scoped IAM policy — push to one repository, nothing else:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — one-time AWS setup</span></div>
+                                <pre><code><span class="command">aws</span> ecr create-repository --repository-name myapp --region ap-south-1</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">iam-policy.json — attached to the ci-pusher IAM user</span></div>
+                                <pre><code>{
+  <span class="string">"Version"</span>: <span class="string">"2012-10-17"</span>,
+  <span class="string">"Statement"</span>: [
+    {
+      <span class="string">"Sid"</span>: <span class="string">"EcrLogin"</span>,
+      <span class="string">"Effect"</span>: <span class="string">"Allow"</span>,
+      <span class="string">"Action"</span>: <span class="string">"ecr:GetAuthorizationToken"</span>,
+      <span class="string">"Resource"</span>: <span class="string">"*"</span>
+    },
+    {
+      <span class="string">"Sid"</span>: <span class="string">"PushPullOneRepoOnly"</span>,
+      <span class="string">"Effect"</span>: <span class="string">"Allow"</span>,
+      <span class="string">"Action"</span>: [
+        <span class="string">"ecr:BatchCheckLayerAvailability"</span>,
+        <span class="string">"ecr:GetDownloadUrlForLayer"</span>,
+        <span class="string">"ecr:BatchGetImage"</span>,
+        <span class="string">"ecr:PutImage"</span>,
+        <span class="string">"ecr:InitiateLayerUpload"</span>,
+        <span class="string">"ecr:UploadLayerPart"</span>,
+        <span class="string">"ecr:CompleteLayerUpload"</span>
+      ],
+      <span class="string">"Resource"</span>: <span class="string">"arn:aws:ecr:ap-south-1:123456789012:repository/myapp"</span>
+    }
+  ]
+}</code></pre>
+                            </div>
+                            <p>Generate the deploy keypair on the Jenkins agent and register everything in the Jenkins credential store:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — deploy key + Jenkins credentials checklist</span></div>
+                                <pre><code><span class="comment"># Dedicated pipeline key — NOT your personal key (Module 02)</span>
+<span class="command">ssh-keygen</span> -t ed25519 -f jenkins-deploy-key -C <span class="string">"jenkins-deploy"</span> -N <span class="string">""</span>
+<span class="comment"># → public half goes into step 1's authorized_keys</span>
+<span class="comment"># → private half goes into Jenkins, never onto disk anywhere else</span>
+
+<span class="comment"># Jenkins → Manage Jenkins → Credentials → Add:</span>
+<span class="comment">#  id: aws-ecr-creds        kind: Username/password  (ci-pusher access key / secret)</span>
+<span class="comment">#  id: deploy-server-key    kind: SSH private key    (jenkins-deploy-key)</span>
+<span class="comment">#  id: github-pat           kind: Secret text        (repo-scoped token)</span>
+<span class="comment">#  id: slack-webhook        kind: Secret text</span></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="3">
+                            <h3>Stages 1–2: Test &amp; Build</h3>
+                            <p>Create the multibranch pipeline on your Module 08 app repo (webhook per Module 07). Start the Jenkinsfile with test + build only, and verify before adding more:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — first iteration</span></div>
+                                <pre><code>pipeline {
+    agent { label <span class="string">'linux'</span> }
+
+    options {
+        timeout(time: 20, unit: <span class="string">'MINUTES'</span>)
+        buildDiscarder(logRotator(numToKeepStr: <span class="string">'15'</span>))
+        timestamps()
+    }
+
+    environment {
+        REGION    = <span class="string">'ap-south-1'</span>
+        IMAGE     = <span class="string">'123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp'</span>
+        GIT_SHORT = <span class="string">"${env.GIT_COMMIT.take(7)}"</span>
+        IMAGE_TAG = <span class="string">"1.0.${env.BUILD_NUMBER}-${GIT_SHORT}"</span>
+    }
+
+    stages {
+        stage(<span class="string">'Test'</span>) {
+            agent { docker { image <span class="string">'node:20-alpine'</span>; reuseNode true } }
+            steps {
+                sh <span class="string">'npm ci'</span>          <span class="comment">// ci, never install (Module 05)</span>
+                sh <span class="string">'npm test'</span>
+            }
+        }
+        stage(<span class="string">'Build Image'</span>) {
+            steps {
+                sh <span class="string">'docker build -t $IMAGE:$IMAGE_TAG .'</span>
+                sh <span class="string">'docker tag $IMAGE:$IMAGE_TAG $IMAGE:latest'</span>
+            }
+        }
+    }
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — verify on the agent after the first green run</span></div>
+                                <pre><code><span class="command">docker</span> images | <span class="command">grep</span> myapp
+<span class="output"># .../myapp   1.0.7-a1b2c3d   3f9c2e81b4a7   2 minutes ago   182MB</span>
+<span class="output"># .../myapp   latest          3f9c2e81b4a7   2 minutes ago   182MB  ← same digest, two tags</span></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="4">
+                            <h3>Stage 3: Push to ECR</h3>
+                            <p>Add the push stage with credentials injected per-stage:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — push stage</span></div>
+                                <pre><code>stage(<span class="string">'Push'</span>) {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: <span class="string">'aws-ecr-creds'</span>,
+            usernameVariable: <span class="string">'AWS_ACCESS_KEY_ID'</span>,
+            passwordVariable: <span class="string">'AWS_SECRET_ACCESS_KEY'</span>
+        )]) {
+            sh <span class="string">'''
+                aws ecr get-login-password --region $REGION \
+                    | docker login --username AWS --password-stdin $IMAGE
+                docker push $IMAGE:$IMAGE_TAG
+                docker push $IMAGE:latest
+            '''</span>
+        }
+    }
+}</code></pre>
+                            </div>
+                            <p>Prove no secrets are baked into what you shipped:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — leak check on the pushed image</span></div>
+                                <pre><code><span class="command">docker</span> pull $IMAGE:$IMAGE_TAG
+<span class="command">docker</span> history --no-trunc $IMAGE:$IMAGE_TAG | <span class="command">grep</span> -iE <span class="string">'token|key|pass|secret'</span> \
+    &amp;&amp; <span class="command">echo</span> <span class="string">"🚨 LEAK FOUND"</span> || <span class="command">echo</span> <span class="string">"✔ clean"</span></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="5">
+                            <h3>Stages 4–5: Deploy &amp; Smoke Test</h3>
+                            <p>The deploy + verify pair, gated to <code>main</code>, with automatic rollback. First the smoke-test script (lives in the repo under <code>ci/</code>):</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">ci/smoke-test.sh</span></div>
+                                <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># smoke-test.sh &lt;health-url&gt; — pipeline gate: exits 1 if app never becomes healthy</span>
+set -euo pipefail
+URL=<span class="string">"${1:?Usage: smoke-test.sh &lt;health-url&gt;}"</span>
+
+<span class="keyword">for</span> i <span class="keyword">in</span> $(seq 1 10); <span class="keyword">do</span>
+    <span class="keyword">if</span> <span class="command">curl</span> -fs --max-time 5 <span class="string">"$URL"</span> &gt; /dev/null; <span class="keyword">then</span>
+        <span class="command">echo</span> <span class="string">"✔ Healthy on attempt $i"</span>
+        <span class="keyword">exit</span> 0
+    <span class="keyword">fi</span>
+    <span class="command">echo</span> <span class="string">"Attempt $i/10 failed — retrying in 5s"</span>
+    <span class="command">sleep</span> 5
+<span class="keyword">done</span>
+
+<span class="command">echo</span> <span class="string">"✖ SMOKE TEST FAILED — $URL never became healthy"</span>
+<span class="keyword">exit</span> 1</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — deploy, verify, rollback, notify</span></div>
+                                <pre><code>stage(<span class="string">'Deploy'</span>) {
+    when { branch <span class="string">'main'</span> }
+    steps {
+        sshagent([<span class="string">'deploy-server-key'</span>]) {
+            sh <span class="string">'''
+                # sync the versioned deploy files, then run the deploy
+                scp -o StrictHostKeyChecking=accept-new \
+                    deploy.sh docker-compose.yml deploy@10.0.1.50:/opt/myapp/
+                ssh deploy@10.0.1.50 "cd /opt/myapp &amp;&amp; ./deploy.sh ${IMAGE_TAG}"
+            '''</span>
+        }
+    }
+}
+stage(<span class="string">'Smoke Test'</span>) {
+    when { branch <span class="string">'main'</span> }
+    steps {
+        sh <span class="string">'./ci/smoke-test.sh http://10.0.1.50:3000/health'</span>
+    }
+}
+
+post {
+    success {
+        <span class="comment">// only a verified deploy becomes the rollback target</span>
+        sshagent([<span class="string">'deploy-server-key'</span>]) {
+            sh <span class="string">'ssh deploy@10.0.1.50 "echo ${IMAGE_TAG} &gt; /opt/myapp/last-good-tag"'</span>
+        }
+    }
+    failure {
+        <span class="comment">// smoke test failed → put the last verified version back</span>
+        sshagent([<span class="string">'deploy-server-key'</span>]) {
+            sh <span class="string">'''ssh deploy@10.0.1.50 \
+                "cd /opt/myapp &amp;&amp; ./deploy.sh \$(cat last-good-tag)" || true'''</span>
+        }
+        withCredentials([string(credentialsId: <span class="string">'slack-webhook'</span>, variable: <span class="string">'HOOK'</span>)]) {
+            sh <span class="string">'''curl -s -X POST -H 'Content-type: application/json' \
+                --data "{\\"text\\":\\"🔴 ${JOB_NAME} #${BUILD_NUMBER} failed — rolled back. ${BUILD_URL}\\"}" $HOOK'''</span>
+        }
+    }
+    fixed {
+        withCredentials([string(credentialsId: <span class="string">'slack-webhook'</span>, variable: <span class="string">'HOOK'</span>)]) {
+            sh <span class="string">'''curl -s -X POST -H 'Content-type: application/json' \
+                --data "{\\"text\\":\\"✅ ${JOB_NAME} is healthy again\\"}" $HOOK'''</span>
+        }
+    }
+    always { sh <span class="string">'docker image prune -f'</span> }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="6">
+                            <h3>Extract to the Shared Library</h3>
+                            <p>Move the reusable logic into your Module 07 library repo so a second app gets the whole machine in three lines:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">devops-lib/vars/dockerBuildPush.groovy</span></div>
+                                <pre><code><span class="comment">// Usage: dockerBuildPush(image: '.../myapp', tag: env.IMAGE_TAG, region: 'ap-south-1')</span>
+<span class="keyword">def</span> call(Map cfg) {
+    sh <span class="string">"docker build -t ${cfg.image}:${cfg.tag} ."</span>
+    sh <span class="string">"docker tag ${cfg.image}:${cfg.tag} ${cfg.image}:latest"</span>
+    withCredentials([usernamePassword(
+        credentialsId: <span class="string">'aws-ecr-creds'</span>,
+        usernameVariable: <span class="string">'AWS_ACCESS_KEY_ID'</span>,
+        passwordVariable: <span class="string">'AWS_SECRET_ACCESS_KEY'</span>
+    )]) {
+        sh <span class="string">"""
+            aws ecr get-login-password --region ${cfg.region} \
+                | docker login --username AWS --password-stdin ${cfg.image}
+            docker push ${cfg.image}:${cfg.tag}
+            docker push ${cfg.image}:latest
+        """</span>
+    }
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">devops-lib/vars/deployCompose.groovy</span></div>
+                                <pre><code><span class="comment">// Usage: deployCompose(host: '10.0.1.50', tag: env.IMAGE_TAG, healthUrl: 'http://10.0.1.50:3000/health')</span>
+<span class="keyword">def</span> call(Map cfg) {
+    sshagent([<span class="string">'deploy-server-key'</span>]) {
+        sh <span class="string">"""
+            scp -o StrictHostKeyChecking=accept-new \
+                deploy.sh docker-compose.yml deploy@${cfg.host}:/opt/myapp/
+            ssh deploy@${cfg.host} "cd /opt/myapp &amp;&amp; ./deploy.sh ${cfg.tag}"
+        """</span>
+    }
+    sh <span class="string">"./ci/smoke-test.sh ${cfg.healthUrl}"</span>
+}</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">Jenkinsfile — any app repo, after the library</span></div>
+                                <pre><code>@Library(<span class="string">'devops-lib@v1'</span>) _        <span class="comment">// pinned version — the library is code too (M03)</span>
+
+pipeline {
+    agent { label <span class="string">'linux'</span> }
+    environment {
+        IMAGE     = <span class="string">'123456789012.dkr.ecr.ap-south-1.amazonaws.com/myapp'</span>
+        IMAGE_TAG = <span class="string">"1.0.${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"</span>
+    }
+    stages {
+        stage(<span class="string">'Test'</span>)  { agent { docker { image <span class="string">'node:20-alpine'</span>; reuseNode true } }
+                          steps { sh <span class="string">'npm ci &amp;&amp; npm test'</span> } }
+        stage(<span class="string">'Ship'</span>)  { steps { dockerBuildPush(image: env.IMAGE, tag: env.IMAGE_TAG, region: <span class="string">'ap-south-1'</span>) } }
+        stage(<span class="string">'Deploy'</span>){ when { branch <span class="string">'main'</span> }
+                          steps { deployCompose(host: <span class="string">'10.0.1.50'</span>, tag: env.IMAGE_TAG,
+                                                healthUrl: <span class="string">'http://10.0.1.50:3000/health'</span>) } }
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="7">
+                            <h3>Chaos Drill — Break It Three Ways</h3>
+                            <p>Trigger Incidents 1, 3 and 6 on purpose; diagnose with the §10 playbooks; write a post-mortem for each:</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">bash — sabotage scripts (run, then fix without peeking)</span></div>
+                                <pre><code><span class="comment"># Drill 1 → Incident 1 (docker.sock permission denied)</span>
+<span class="command">sudo</span> gpasswd -d jenkins docker &amp;&amp; <span class="command">sudo</span> systemctl restart jenkins
+<span class="comment"># Now push a commit. Expected: build fails at 'Build Image'. Diagnose. Fix. Re-run.</span>
+
+<span class="comment"># Drill 2 → Incident 3 (deploy hangs on host-key prompt)</span>
+<span class="command">sudo</span> -u jenkins rm -f /var/lib/jenkins/.ssh/known_hosts
+<span class="comment"># Remove accept-new from the ssh flags first, then push. Expected: Deploy stage hangs</span>
+<span class="comment"># until the 20-min timeout kills it. Diagnose from the console log. Fix properly.</span>
+
+<span class="comment"># Drill 3 → Incident 6 (pipeline green, site down — without a smoke test)</span>
+<span class="command">ssh</span> deploy@10.0.1.50 <span class="string">"sed -i '/^DB_HOST=/d' /opt/myapp/app.env"</span>
+<span class="comment"># Temporarily comment out the Smoke Test stage, push, watch it go "green" while the</span>
+<span class="comment"># container crash-loops (docker ps → Restarting). Re-enable the stage, push again,</span>
+<span class="comment"># and watch it catch the failure AND auto-rollback. That's the whole lesson.</span></code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">post-mortem template (one per drill)</span></div>
+                                <pre><code>## Post-Mortem: &lt;title&gt;                          Date: YYYY-MM-DD
+**Impact:** what broke, for how long, who noticed
+**Timeline:** HH:MM detected → HH:MM diagnosed → HH:MM fixed
+**Root cause:** the actual cause, not the symptom
+**Detection gap:** why didn't we know sooner?
+**Fix:** what resolved it
+**Prevention:** what now makes this impossible (config, pipeline stage, alert)</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="project-step" data-step="8">
+                            <h3>Portfolio Assembly</h3>
+                            <p>Final repo layout — this repo <em>is</em> your interview answer to "walk me through your pipeline":</p>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">repo structure</span></div>
+                                <pre><code>myapp/
+├── src/                        # the Module 08 app
+├── Dockerfile                  # multi-stage, non-root (M08)
+├── .dockerignore
+├── Jenkinsfile                 # 3 lines of stages, powered by devops-lib
+├── deploy.sh                   # synced to the server by the pipeline
+├── docker-compose.yml
+├── ci/
+│   └── smoke-test.sh
+├── docs/
+│   ├── architecture.png        # the §1 diagram, drawn in draw.io
+│   ├── postmortem-docker-sock.md
+│   ├── postmortem-ssh-hang.md
+│   └── postmortem-green-but-down.md
+└── README.md                   # includes the traceability table ↓</code></pre>
+                            </div>
+                            <div class="code-block">
+                                <div class="code-block-header"><span class="code-block-lang">README.md — the traceability table</span></div>
+                                <pre><code>| Commit  | Image Tag       | Build | Deployed | Verified |
+|---------|-----------------|-------|----------|----------|
+| a1b2c3d | 1.0.42-a1b2c3d  | #42   | ✅ prod  | ✅ smoke |
+| 9f8e7d6 | 1.0.41-9f8e7d6  | #41   | ✅ prod  | ✅ smoke |
+| 4c5d6e7 | 1.0.40-4c5d6e7  | #40   | ❌ rolled back (smoke fail) | — |</code></pre>
+                            </div>
+                            <p>That third row — a failed deploy that rolled back automatically — is worth more in an interview than fifty green builds.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview Q&A ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <h2>💬 Real DevOps Interview Questions</h2>
+                        <p>"Walk me through your CI/CD pipeline" is the single most common DevOps interview request. This module is your answer — practice saying it out loud.</p>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Walk me through your CI/CD pipeline end-to-end.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Narrate §1's diagram with tool names: push to GitHub fires a webhook to Jenkins; a multibranch pipeline runs tests inside a pinned container image; on main, we build a Docker image tagged <code>version.build-sha</code>, push to ECR with short-lived credentials, SSH to the server with a scoped deploy key, and <code>docker compose up -d</code> with the new tag. A smoke-test stage curls the health endpoint with retries — on failure it auto-rolls-back to the last known-good tag and alerts the channel. Bonus points: mention what you'd upgrade (Kubernetes rolling updates, GitOps pull-based deploys).</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you version Docker images, and why not just use latest?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>latest</code> is a mutable pointer — it can silently mean different images on different machines, so you can never prove what's deployed, and cached stale copies cause "I deployed but nothing changed" (Incident 4). We use an immutable composite tag — semantic version + build number + short git SHA (e.g. <code>1.4.42-a1b2c3d</code>) — giving exact commit traceability. <code>latest</code> is additionally tagged for humans browsing the registry, but deploy scripts never reference it.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does your pipeline authenticate to the registry safely?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Credentials live in the Jenkins credential store, injected per-stage with <code>withCredentials</code>, and login uses <code>--password-stdin</code> so the secret never appears in the process list or console log. For ECR, the AWS CLI issues a 12-hour token — no static registry password at all. The credential is scoped to push/pull on one repository, not account-wide. Best answer mentions the next level: OIDC federation (GitHub Actions → AWS) with no stored cloud keys whatsoever.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Your build fails with "permission denied on /var/run/docker.sock". Fix it.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The CI user can't reach the Docker daemon socket. Fix: add it to the docker group (<code>usermod -aG docker jenkins</code>) and restart the agent service so the session picks up the group. Crucially, say what you <em>wouldn't</em> do: <code>chmod 777</code> on the socket — docker-group access is root-equivalent, which is also why builds belong on agents, never on the controller that holds all the credentials.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you deploy with minimal downtime using Compose — and where's the ceiling?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>compose pull</code> then <code>up -d</code> recreates only changed services, and healthchecks gate readiness — but there's still a stop-old/start-new gap of seconds. You can DIY blue-green with two container names and an nginx flip, but that's plumbing. The honest answer: true rolling updates with surge, readiness gating, and automatic rollback are native Kubernetes features — Compose is fine for a single host; past that, you've outgrown it.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: The pipeline is green but production is down. What's missing?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Post-deploy verification. The pipeline's definition of done was "deploy command exited 0" — nobody asked the application if it's alive. The fix is a smoke-test stage: curl the health endpoint with a retry loop, fail the pipeline if it never becomes healthy, and auto-rollback to the last known-good tag. A pipeline isn't done when it deploys; it's done when it verifies.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you roll back a bad deployment?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Because every deploy is an immutable tag, rollback is just deploying the previous tag — a parameterized Jenkins job that runs only the deploy stage with <code>IMAGE_TAG</code> as input, taking under a minute. We track <code>last-good-tag</code> on the server (updated only after the smoke test passes) so rollback can even be automatic. The anti-pattern: "fixing forward" under pressure — debugging in production while customers wait.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why run build stages inside Docker containers?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>It eliminates toolchain drift between agents: <code>agent { docker { image 'node:20-alpine' } }</code> means the exact Node version ships with the pipeline definition, in Git, instead of being hand-installed on each agent ("works on this agent, fails on that one"). Agents then need only Docker itself, making them interchangeable and trivially replaceable — the same reasoning that later makes Kubernetes build agents attractive.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-08.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 08 — Docker</span>
+                </div>
+            </a>
+
+            <a href="index.html#roadmap" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 10 — Cloud &amp; AWS</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        // Highlight active TOC link on scroll
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>
