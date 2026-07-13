@@ -11,8 +11,12 @@
 
 <br/>
 
+<br/>
+
 <div align="center">
   <h3>🌍 <a href="https://vikramakula-dev.github.io/Master-the-DevOps/">View the Live Roadmap Platform Here</a> 🌍</h3>
+  <br/>
+  <img src="assets/roadmap.png" alt="DevOps Roadmap 2026" width="800" style="border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
 </div>
 
 <br/>
