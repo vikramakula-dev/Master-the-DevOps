@@ -58,18 +58,19 @@
                 <ul class="toc-list">
                     <li><div class="toc-subtitle">🟢 Beginner</div></li>
                     <li><a href="#intro" class="toc-link">1. Why Containers Exist</a></li>
-                    <li><a href="#arch" class="toc-link">2. Docker Architecture</a></li>
-                    <li><a href="#commands" class="toc-link">3. First Commands</a></li>
-                    <li><a href="#images" class="toc-link">4. Images (Pull/Tag/Push)</a></li>
+                    <li><a href="#what-is-docker" class="toc-link">2. What is Docker? · Docker vs K8s</a></li>
+                    <li><a href="#arch" class="toc-link">3. Docker Architecture</a></li>
+                    <li><a href="#commands" class="toc-link">4. First Commands</a></li>
+                    <li><a href="#images" class="toc-link">5. Images (Pull/Tag/Push)</a></li>
                     <li><div class="toc-subtitle">🟡 Practitioner</div></li>
-                    <li><a href="#dockerfile" class="toc-link">5. Dockerfile, Line by Line</a></li>
-                    <li><a href="#networking" class="toc-link">6. Docker Networking</a></li>
-                    <li><a href="#volumes" class="toc-link">7. Volumes &amp; Persistence</a></li>
-                    <li><a href="#compose" class="toc-link">8. Docker Compose</a></li>
+                    <li><a href="#dockerfile" class="toc-link">6. Dockerfile, Line by Line</a></li>
+                    <li><a href="#networking" class="toc-link">7. Docker Networking</a></li>
+                    <li><a href="#volumes" class="toc-link">8. Volumes &amp; Persistence</a></li>
+                    <li><a href="#compose" class="toc-link">9. Docker Compose</a></li>
                     <li><div class="toc-subtitle">🔴 Advanced</div></li>
-                    <li><a href="#best-practices" class="toc-link">9. Best Practices</a></li>
-                    <li><a href="#under-hood" class="toc-link">10. Under the Hood</a></li>
-                    <li><a href="#incidents" class="toc-link">11. Real-Time Incidents 🔥</a></li>
+                    <li><a href="#best-practices" class="toc-link">10. Best Practices</a></li>
+                    <li><a href="#under-hood" class="toc-link">11. Under the Hood</a></li>
+                    <li><a href="#incidents" class="toc-link">12. Real-Time Incidents 🔥</a></li>
                     <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
                     <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
                 </ul>
@@ -107,11 +108,95 @@
                     </div>
                 </section>
 
-                <!-- ============ 2. Docker Architecture ============ -->
+                <!-- ============ 2. What is Docker ============ -->
+                <section class="content-section" id="what-is-docker">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐳</div>
+                        <h2>2. What is Docker, Exactly? (Docker vs Container vs Kubernetes)</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>Docker is a platform for building, shipping, and running containers.</strong>
+                        That single sentence hides an important distinction people mix up constantly:
+                        the <em>container</em> is the technology, <em>Docker</em> is the tool that made it usable,
+                        and <em>Kubernetes</em> is the system that runs containers at scale. Let's untangle all three.
+                    </p>
+
+                    <div class="content-subheading">Docker Is Actually Four Things in One Box</div>
+                    <table class="content-table">
+                        <thead><tr><th>Piece</th><th>What It Is</th><th>You Use It When…</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Docker Engine</strong> (dockerd)</td><td>The daemon that creates and supervises containers on a host</td><td>Always — it does the actual work</td></tr>
+                            <tr><td><strong>Docker CLI</strong></td><td>The <code>docker</code> command — a client that talks to the daemon over a socket</td><td><code>docker run</code>, <code>docker build</code>, <code>docker ps</code>…</td></tr>
+                            <tr><td><strong>Image format</strong></td><td>The layered, portable package standard (now the open <strong>OCI</strong> standard)</td><td>Every <code>docker build</code> produces one</td></tr>
+                            <tr><td><strong>Registry ecosystem</strong></td><td>Docker Hub + private registries (Nexus, ECR) that store and distribute images</td><td><code>docker push</code> / <code>docker pull</code></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">The Lifecycle in One Line</div>
+                    <div class="visual-box">
+                        <div class="visual-flow">
+                            <span class="flow-item">Dockerfile (recipe)</span>
+                            <span class="flow-arrow">→ docker build →</span>
+                            <span class="flow-item">Image (frozen package)</span>
+                            <span class="flow-arrow">→ docker run →</span>
+                            <span class="flow-item">Container (running process)</span>
+                        </div>
+                    </div>
+
+                    <div class="content-subheading">Why Docker Won — The Shipping Container Story</div>
+                    <p class="content-text">
+                        Containers (Linux namespaces + cgroups) existed <em>before</em> Docker — LXC, Solaris Zones,
+                        FreeBSD jails. What Docker added in 2013 was <strong>standardization and ergonomics</strong>:
+                        one file format (the Dockerfile), one package format (the image), one command to run anything,
+                        anywhere. It's the same revolution as the physical shipping container: goods (apps) always
+                        existed, but a <strong>standard box</strong> meant every crane, ship, and port (every server,
+                        cloud, and CI system) could handle any cargo without knowing what's inside.
+                    </p>
+
+                    <div class="content-subheading">The Key Differences — Container vs Docker vs Kubernetes</div>
+                    <table class="content-table">
+                        <thead><tr><th></th><th>Container</th><th>Docker</th><th>Kubernetes</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>What it is</strong></td><td>A <em>technology</em> — an isolated Linux process (namespaces + cgroups)</td><td>A <em>tool</em> — builds, ships &amp; runs containers on a host</td><td>An <em>orchestrator</em> — manages thousands of containers across many hosts</td></tr>
+                            <tr><td><strong>Its job</strong></td><td>Isolate one app with its environment</td><td>Package the app + run it on one machine</td><td>Schedule, scale, heal &amp; network containers cluster-wide</td></tr>
+                            <tr><td><strong>Analogy (shipping)</strong></td><td>The standardized steel box</td><td>The crane &amp; dockyard that packs and loads boxes</td><td>The global port authority routing boxes across all ships and ports</td></tr>
+                            <tr><td><strong>Scope</strong></td><td>One process</td><td>One host</td><td>A cluster of hosts</td></tr>
+                            <tr><td><strong>You interact via</strong></td><td>(indirectly — through tools)</td><td><code>docker</code> / <code>docker compose</code></td><td><code>kubectl</code> / Helm / YAML manifests</td></tr>
+                            <tr><td><strong>Learned in</strong></td><td>This module</td><td>This module</td><td><a href="module-11.html">Module 11</a></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="content-subheading">Docker vs Kubernetes, Head to Head</div>
+                    <p class="content-text">They are <strong>not competitors</strong> — Docker builds the image; Kubernetes runs it in production. The comparison that matters is <em>Docker/Compose on one host</em> vs <em>Kubernetes on a cluster</em>:</p>
+                    <table class="content-table">
+                        <thead><tr><th>Capability</th><th>Docker + Compose</th><th>Kubernetes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Hosts</td><td>One machine</td><td>Many machines, treated as one pool</td></tr>
+                            <tr><td>Server dies</td><td>Your app is down</td><td>Containers rescheduled to healthy nodes automatically</td></tr>
+                            <tr><td>Self-healing</td><td><code>restart: unless-stopped</code> (same host only)</td><td>Reconciliation loop restarts/replaces pods anywhere</td></tr>
+                            <tr><td>Rolling updates</td><td>Stop-old / start-new gap (Module 09's ceiling)</td><td>Native rolling updates with health gating + auto-rollback</td></tr>
+                            <tr><td>Scaling</td><td>Manual (<code>--scale</code>)</td><td>Automatic (HPA) based on load</td></tr>
+                            <tr><td>Load balancing</td><td>You add nginx yourself (Module 04)</td><td>Built-in Services + Ingress</td></tr>
+                            <tr><td>Best for</td><td>Dev environments, single-server apps, learning</td><td>Production at scale, high availability</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Interview Trap: "Docker vs Kubernetes — which is better?"</div>
+                        <p>Wrong question, and interviewers ask it to see if you know that. The senior answer: <strong>they're complementary layers</strong> — Docker (build-time) produces OCI images; Kubernetes (run-time) orchestrates them. Bonus point that proves depth: Kubernetes actually <em>removed</em> Docker as its runtime (dockershim, v1.24) and uses <strong>containerd</strong> directly — yet every Docker-built image still runs unchanged, because the OCI image standard is the real contract, not Docker itself.</p>
+                    </div>
+
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Terms You'll Hear (Quick Decoder)</div>
+                        <p><strong>containerd</strong> — the lower-level runtime Docker itself uses internally (and K8s uses directly). <strong>OCI</strong> — the open standard for images &amp; runtimes; why images run anywhere. <strong>Podman</strong> — a daemonless Docker alternative, CLI-compatible. <strong>Docker Desktop</strong> — the Mac/Windows GUI app (runs a Linux VM under the hood — containers are always Linux processes). <strong>Docker Swarm</strong> — Docker's own orchestrator; simpler than K8s but the industry chose Kubernetes.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Docker Architecture ============ -->
                 <section class="content-section" id="arch">
                     <div class="content-section-header">
                         <div class="content-section-icon">🏗️</div>
-                        <h2>2. Docker Architecture</h2>
+                        <h2>3. Docker Architecture</h2>
                     </div>
                     <div class="visual-box">
                         <div class="visual-flow" style="font-size: 0.9rem;">
@@ -128,11 +213,11 @@
                     <p class="content-text">When you install Docker on Ubuntu, it creates a <code>docker</code> user group. Adding your user to this group allows you to run docker commands without <code>sudo</code>. <strong>WARNING:</strong> Anyone in the <code>docker</code> group effectively has <code>root</code> access to the host server, because they can mount the host's root filesystem into a container.</p>
                 </section>
 
-                <!-- ============ 3. First Commands ============ -->
+                <!-- ============ 4. First Commands ============ -->
                 <section class="content-section" id="commands">
                     <div class="content-section-header">
                         <div class="content-section-icon">💻</div>
-                        <h2>3. First Commands, Step-by-Step</h2>
+                        <h2>4. First Commands, Step-by-Step</h2>
                     </div>
                     <p class="content-text">Let's start an Nginx web server. Notice how we map port 8080 on the host to port 80 inside the container (Module 04 payoff).</p>
                     <div class="code-block">
@@ -155,11 +240,11 @@
                     </div>
                 </section>
 
-                <!-- ============ 4. Images ============ -->
+                <!-- ============ 5. Images ============ -->
                 <section class="content-section" id="images">
                     <div class="content-section-header">
                         <div class="content-section-icon">🖼️</div>
-                        <h2>4. Images — Pull, Tag, Push</h2>
+                        <h2>5. Images — Pull, Tag, Push</h2>
                     </div>
                     <p class="content-text">
                         How do images travel from your laptop to production? Through a Registry (like Docker Hub, AWS ECR, or our Nexus server from Module 06).
@@ -186,7 +271,7 @@
                 <section class="content-section" id="dockerfile">
                     <div class="content-section-header">
                         <div class="content-section-icon">📜</div>
-                        <h2>5. Dockerfile, Line by Line</h2>
+                        <h2>6. Dockerfile, Line by Line</h2>
                     </div>
                     <p class="content-text">
                         A Dockerfile is the script used to build an image. It executes from top to bottom. Each line creates a new "Layer", which is cached.
@@ -267,7 +352,7 @@ CMD ["java", "-jar", "app.jar"]</code></pre>
                 <section class="content-section" id="networking">
                     <div class="content-section-header">
                         <div class="content-section-icon">🌐</div>
-                        <h2>6. Docker Networking</h2>
+                        <h2>7. Docker Networking</h2>
                     </div>
                     <p class="content-text">
                         The biggest beginner trap: inside a container, <code>localhost</code> means the container itself, NOT your Mac/Windows host. To let containers talk to each other, we put them on a <strong>Custom Bridge Network</strong>.
@@ -284,11 +369,11 @@ CMD ["java", "-jar", "app.jar"]</code></pre>
                     </p>
                 </section>
 
-                <!-- ============ 7. Volumes ============ -->
+                <!-- ============ 8. Volumes ============ -->
                 <section class="content-section" id="volumes">
                     <div class="content-section-header">
                         <div class="content-section-icon">💾</div>
-                        <h2>7. Volumes &amp; Persistence</h2>
+                        <h2>8. Volumes &amp; Persistence</h2>
                     </div>
                     <p class="content-text">
                         Containers are ephemeral (cattle, not pets). If you run a PostgreSQL container, write 10 rows of data, and then <code>docker rm</code> the container... <strong>your data is gone forever.</strong>
@@ -309,7 +394,7 @@ CMD ["java", "-jar", "app.jar"]</code></pre>
                 <section class="content-section" id="compose">
                     <div class="content-section-header">
                         <div class="content-section-icon">🐙</div>
-                        <h2>8. Docker Compose</h2>
+                        <h2>9. Docker Compose</h2>
                     </div>
                     <p class="content-text">
                         Typing <code>docker run</code> with 15 flags for the web app, and another 15 flags for the database, is tedious. Docker Compose allows you to define the entire stack in a single YAML file.
@@ -362,11 +447,11 @@ networks:
                     </ul>
                 </section>
 
-                <!-- ============ 9. Best Practices ============ -->
+                <!-- ============ 10. Best Practices ============ -->
                 <section class="content-section" id="best-practices">
                     <div class="content-section-header">
                         <div class="content-section-icon">✅</div>
-                        <h2>9. Best Practices &amp; Optimization</h2>
+                        <h2>10. Best Practices &amp; Optimization</h2>
                     </div>
                     <p class="content-text">
                         A poorly built container is a security risk and costs money in cloud bandwidth. The production checklist:
@@ -380,11 +465,11 @@ networks:
                     </ul>
                 </section>
 
-                <!-- ============ 10. Under the Hood ============ -->
+                <!-- ============ 11. Under the Hood ============ -->
                 <section class="content-section" id="under-hood">
                     <div class="content-section-header">
                         <div class="content-section-icon">⚙️</div>
-                        <h2>10. Under the Hood (How it actually works)</h2>
+                        <h2>11. Under the Hood (How it actually works)</h2>
                     </div>
                     <p class="content-text">
                         If you want to pass a Senior DevOps interview, you need to know how Docker fakes a computer.
@@ -407,7 +492,7 @@ networks:
                 <section class="content-section" id="incidents">
                     <div class="content-section-header">
                         <div class="content-section-icon">🔥</div>
-                        <h2>11. Real-Time Incidents &amp; Troubleshooting</h2>
+                        <h2>12. Real-Time Incidents &amp; Troubleshooting</h2>
                     </div>
                     
                     <div class="tip-box tip-danger" style="margin-top: 20px;">
