@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 16 — Monitoring &amp; Observability | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 16: Prometheus, Grafana, AlertManager, Loki, custom metrics. Build the capstone observability stack — dashboards, alert rules, and alert fatigue doctrine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 16 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 4 · Automation &amp; IaC</span>
+                </div>
+                <h1>Module 16 — Monitoring &amp; <span class="gradient-text">Observability</span></h1>
+                <p class="module-hero-desc">
+                    Every incident in Modules 02–15 was found by looking. Monitoring is how systems tell you first.
+                    This module builds the capstone's entire observability stack — Prometheus, Grafana, AlertManager,
+                    and Loki — and closes the Module 09 "notify on state change" thread properly.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Prometheus</span>
+                    <span class="tech-tag">PromQL</span>
+                    <span class="tech-tag">Grafana</span>
+                    <span class="tech-tag">AlertManager</span>
+                    <span class="tech-tag">Loki</span>
+                    <span class="tech-tag">node-exporter</span>
+                    <span class="tech-tag">prom-client</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#pillars" class="toc-link">1. Observability Pillars</a></li>
+                    <li><a href="#prometheus-arch" class="toc-link">2. Prometheus Architecture</a></li>
+                    <li><a href="#install-k8s" class="toc-link">3. Install on Kubernetes</a></li>
+                    <li><a href="#promql" class="toc-link">4. PromQL</a></li>
+                    <li><a href="#node-exporter" class="toc-link">5. Node Exporter</a></li>
+                    <li><a href="#k8s-monitoring" class="toc-link">6. Monitoring Kubernetes</a></li>
+                    <li><a href="#grafana" class="toc-link">7. Grafana</a></li>
+                    <li><a href="#dashboards" class="toc-link">8. Custom Dashboards</a></li>
+                    <li><a href="#alertmanager" class="toc-link">9. AlertManager</a></li>
+                    <li><a href="#app-metrics" class="toc-link">10. App Metrics</a></li>
+                    <li><a href="#logging" class="toc-link">11. Centralized Logging — Loki</a></li>
+                    <li><a href="#incidents" class="toc-link">12. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Pillars ============ -->
+                <section class="content-section" id="pillars">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔭</div>
+                        <h2>1. The Three Observability Pillars</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Pillar</th><th>What it answers</th><th>Tool</th><th>When to reach for it</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Metrics</strong></td><td>"What is the system doing right now?" — numbers over time</td><td>Prometheus + Grafana</td><td>Alerting, trending, capacity planning</td></tr>
+                            <tr><td><strong>Logs</strong></td><td>"What happened, and exactly when?"</td><td>Loki + Promtail</td><td>Post-incident forensics, debugging</td></tr>
+                            <tr><td><strong>Traces</strong></td><td>"Where did this request spend its time?"</td><td>Jaeger, Tempo</td><td>Latency attribution in microservices</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        <strong>Monitoring vs Observability</strong>: monitoring is "did the known thing break?"
+                        (alert fires). Observability is "can I answer arbitrary questions about the system's
+                        internal state from its outputs?" — the three pillars together make that possible.
+                    </p>
+                </section>
+
+                <!-- ============ 2. Prometheus Architecture ============ -->
+                <section class="content-section" id="prometheus-arch">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📊</div>
+                        <h2>2. Prometheus Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Pull-based scraping model</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">App/Exporter<br/>(/metrics endpoint)</span>
+                            <span class="flow-arrow">← scrape (pull) ←</span>
+                            <span class="flow-item">Prometheus Server<br/>(TSDB, rules engine)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">AlertManager<br/>(routing, grouping)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Slack / PagerDuty</span>
+                        </div>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why pull vs push?</div>
+                        <p>Prometheus pulls metrics from targets on a schedule. Push-based systems (StatsD, Graphite) require apps to know the monitoring server's address. Pull has two advantages: (1) if a target goes down, Prometheus knows — a push-based system would just see silence and might not alert. (2) The targets list is in Prometheus config (or service discovery) — not distributed across every app. The pull model is why Prometheus can alert on "target down" as a first-class concept.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Install on K8s ============ -->
+                <section class="content-section" id="install-k8s">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☸️</div>
+                        <h2>3. Install on Kubernetes — kube-prometheus-stack</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install via Helm (Module 11 Helm payoff)</span></div>
+                        <pre><code><span class="comment"># Add the Prometheus community Helm chart repo</span>
+<span class="command">helm</span> repo add prometheus-community https://prometheus-community.github.io/helm-charts
+<span class="command">helm</span> repo update
+
+<span class="comment"># Install kube-prometheus-stack (Prometheus + Grafana + AlertManager + exporters)</span>
+<span class="command">helm</span> install monitoring prometheus-community/kube-prometheus-stack \
+    --namespace monitoring --create-namespace \
+    -f monitoring-values.yaml
+
+<span class="comment"># What you get automatically:</span>
+<span class="comment"># - Prometheus server with 15-day retention</span>
+<span class="comment"># - Grafana with pre-built dashboards</span>
+<span class="comment"># - AlertManager</span>
+<span class="comment"># - kube-state-metrics (cluster state)</span>
+<span class="comment"># - node-exporter on every node (DaemonSet)</span>
+<span class="comment"># - ServiceMonitors for all K8s components</span>
+
+<span class="comment"># Access Grafana locally</span>
+<span class="command">kubectl</span> port-forward -n monitoring svc/monitoring-grafana 3000:80
+<span class="comment"># Default credentials: admin / prom-operator</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. PromQL ============ -->
+                <section class="content-section" id="promql">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔢</div>
+                        <h2>4. PromQL — Prometheus Query Language</h2>
+                    </div>
+                    <p class="content-text">
+                        PromQL has four metric types. Understanding them determines which functions to use:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>What it is</th><th>Example</th><th>Query pattern</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Counter</strong></td><td>Monotonically increasing number, resets on restart</td><td>HTTP requests total</td><td><code>rate()</code> or <code>increase()</code></td></tr>
+                            <tr><td><strong>Gauge</strong></td><td>Can go up or down</td><td>Memory usage, pod count</td><td>Direct, or <code>avg_over_time()</code></td></tr>
+                            <tr><td><strong>Histogram</strong></td><td>Bucketed observations + count + sum</td><td>Request latency</td><td><code>histogram_quantile()</code></td></tr>
+                            <tr><td><strong>Summary</strong></td><td>Pre-computed quantiles (client-side)</td><td>Go GC pause duration</td><td>Direct quantile labels</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">promql — ⭐ the 5 queries every engineer needs</span></div>
+                        <pre><code><span class="comment"># ⭐ 1. CPU utilization per node</span>
+1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+<span class="comment"># ⭐ 2. Memory usage (used / total)</span>
+(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes
+
+<span class="comment"># ⭐ 3. HTTP request rate by status code</span>
+sum by (status_code) (rate(http_requests_total[5m]))
+<span class="comment">#   rate() = per-second average over [5m] window</span>
+<span class="comment">#   5m is the window — should be ≥ 4× the scrape interval (15s → use [1m] minimum)</span>
+
+<span class="comment"># ⭐ 4. p95 request latency</span>
+histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))
+<span class="comment">#   le = "less than or equal" — the bucket label</span>
+<span class="comment">#   0.95 = 95th percentile</span>
+
+<span class="comment"># ⭐ 5. Pod restart count (detect crash loops)</span>
+increase(kube_pod_container_status_restarts_total[1h])
+<span class="comment">#   increase() = total increase over window (use for counters over fixed window)</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Node Exporter ============ -->
+                <section class="content-section" id="node-exporter">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🖥️</div>
+                        <h2>5. Node Exporter — Server Metrics</h2>
+                    </div>
+                    <p class="content-text">
+                        Node exporter exposes Linux system metrics (<code>node_cpu_*</code>,
+                        <code>node_memory_*</code>, <code>node_disk_*</code>, <code>node_filesystem_*</code>)
+                        — this is the Module 02 <code>health-report.sh</code> script, industrialized.
+                        The Ansible role from Module 15 installs it on bare-metal EC2s.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — node exporter disk alert PromQL</span></div>
+                        <pre><code><span class="comment"># Alert when any filesystem is more than 85% full (the disk-full series finale)</span>
+(node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes &gt; 0.85</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Monitoring K8s ============ -->
+                <section class="content-section" id="k8s-monitoring">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☸️</div>
+                        <h2>6. Monitoring Kubernetes</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Component</th><th>What it measures</th><th>Installed by</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>kube-state-metrics</strong></td><td>K8s object state — pod phases, deployment replicas, job completions</td><td>kube-prometheus-stack</td></tr>
+                            <tr><td><strong>cAdvisor</strong></td><td>Container resource usage — CPU, memory, network (per container)</td><td>Built into kubelet</td></tr>
+                            <tr><td><strong>metrics-server</strong></td><td>Real-time CPU/memory for kubectl top and HPA</td><td>Separate install (M11)</td></tr>
+                            <tr><td><strong>node-exporter</strong></td><td>Node-level OS metrics</td><td>kube-prometheus-stack DaemonSet</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — OOMKilled alert rule (Module 11 Incident 3, now auto-detected)</span></div>
+                        <pre><code><span class="keyword">groups</span>:
+- <span class="keyword">name</span>: kubernetes.rules
+  <span class="keyword">rules</span>:
+  - <span class="keyword">alert</span>: PodOOMKilled
+    <span class="keyword">expr</span>: |
+      increase(kube_pod_container_status_restarts_total[1h]) &gt; 0
+      and on(pod, namespace)
+      kube_pod_container_status_last_terminated_reason{reason="OOMKilled"} == 1
+    <span class="keyword">for</span>: 0m                              <span class="comment"># fire immediately (OOMKill = urgent)</span>
+    <span class="keyword">labels</span>:
+      severity: warning
+    <span class="keyword">annotations</span>:
+      summary: <span class="string">"Pod {{ $labels.pod }} in {{ $labels.namespace }} was OOMKilled"</span>
+      description: <span class="string">"Container {{ $labels.container }} exceeded memory limit. Increase limit or investigate leak."</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Grafana ============ -->
+                <section class="content-section" id="grafana">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📈</div>
+                        <h2>7. Grafana — Dashboards</h2>
+                    </div>
+                    <p class="content-text">
+                        Grafana turns PromQL queries into charts. Key workflow: add Prometheus as a data source
+                        (URL: <code>http://prometheus-operated:9090</code> inside the cluster), create dashboards,
+                        use template variables for namespace/pod dropdowns.
+                    </p>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Import community dashboards first</div>
+                        <p>Don't build from scratch. Import: Node Exporter Full (#1860), Kubernetes Cluster Monitoring (#3119), NGINX Ingress (#9614). Customize from there. Each dashboard ID works via Grafana → Dashboards → Import → paste ID. Version-control your final dashboard JSONs in Git — Grafana exports them via API.</p>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — export a dashboard as JSON (dashboard-as-code)</span></div>
+                        <pre><code><span class="comment"># Export via Grafana HTTP API (Module 03 Git discipline — dashboards in code)</span>
+<span class="command">curl</span> -s -H "Authorization: Bearer $GRAFANA_TOKEN" \
+    http://grafana:3000/api/dashboards/uid/cluster-overview \
+    | jq '.dashboard' &gt; dashboards/cluster-overview.json
+
+<span class="comment"># Import on a new cluster:</span>
+<span class="command">curl</span> -s -X POST -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $GRAFANA_TOKEN" \
+    -d "{\"dashboard\": $(cat dashboards/cluster-overview.json), \"overwrite\": true}" \
+    http://grafana:3000/api/dashboards/db</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Dashboards ============ -->
+                <section class="content-section" id="dashboards">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎛️</div>
+                        <h2>8. Custom Dashboards — RED Method</h2>
+                    </div>
+                    <p class="content-text">
+                        The capstone has three dashboards. The application dashboard uses the RED method —
+                        the right framework for any request-serving service:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>RED Metric</th><th>PromQL</th><th>Alert threshold</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Rate</strong> (req/sec)</td><td><code>rate(http_requests_total[5m])</code></td><td>Drops below baseline (traffic loss)</td></tr>
+                            <tr><td><strong>Errors</strong> (error %)</td><td><code>rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])</code></td><td>&gt; 1% error ratio</td></tr>
+                            <tr><td><strong>Duration</strong> (p95 latency)</td><td><code>histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))</code></td><td>&gt; 500ms p95</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 9. AlertManager ============ -->
+                <section class="content-section" id="alertmanager">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔔</div>
+                        <h2>9. AlertManager — Routing, Grouping, Silence</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — AlertManager config (severity-split routing)</span></div>
+                        <pre><code><span class="keyword">global</span>:
+  <span class="keyword">slack_api_url</span>: <span class="string">"https://hooks.slack.com/services/..."</span>
+
+<span class="keyword">route</span>:
+  <span class="keyword">group_by</span>: [alertname, namespace]    <span class="comment"># group related alerts together (prevents storm)</span>
+  <span class="keyword">group_wait</span>: 30s                    <span class="comment"># wait for more alerts before sending the first notification</span>
+  <span class="keyword">group_interval</span>: 5m                 <span class="comment"># wait before sending updates to an existing group</span>
+  <span class="keyword">repeat_interval</span>: 4h                <span class="comment"># re-notify if alert is still firing after 4h</span>
+  <span class="keyword">receiver</span>: slack-warning            <span class="comment"># default receiver</span>
+  <span class="keyword">routes</span>:
+  - <span class="keyword">match</span>: { severity: critical }
+    <span class="keyword">receiver</span>: pagerduty-critical       <span class="comment"># critical → page the on-call</span>
+  - <span class="keyword">match</span>: { severity: warning }
+    <span class="keyword">receiver</span>: slack-warning            <span class="comment"># warning → Slack ticket channel (M09 notify thread done)</span>
+
+<span class="keyword">receivers</span>:
+- <span class="keyword">name</span>: slack-warning
+  <span class="keyword">slack_configs</span>:
+  - <span class="keyword">channel</span>: <span class="string">"#alerts-warning"</span>
+    <span class="keyword">text</span>: <span class="string">"{{ .CommonAnnotations.summary }}"</span>
+
+- <span class="keyword">name</span>: pagerduty-critical
+  <span class="keyword">pagerduty_configs</span>:
+  - <span class="keyword">routing_key</span>: <span class="string">"YOUR_PD_INTEGRATION_KEY"</span>
+    <span class="keyword">severity</span>: critical</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">⭐ Alert fatigue doctrine</div>
+                        <p>Every alert must be actionable — if you can't tell an engineer what to do when the alert fires, it shouldn't page. Severity split: <strong>critical</strong> = wake someone up at 3am (service is down / SLO breach imminent); <strong>warning</strong> = create a ticket, investigate during business hours. Review your alert history monthly — any alert that fires and is silenced without action is noise and should be deleted or downgraded.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 10. App Metrics ============ -->
+                <section class="content-section" id="app-metrics">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📱</div>
+                        <h2>10. Application Metrics — prom-client</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">javascript — instrument a Node.js app (Module 08 app)</span></div>
+                        <pre><code><span class="keyword">const</span> client = require(<span class="string">'prom-client'</span>);
+<span class="keyword">const</span> express = require(<span class="string">'express'</span>);
+<span class="keyword">const</span> app = express();
+
+<span class="comment">// Default metrics: Node.js process metrics (event loop lag, memory, GC)</span>
+client.collectDefaultMetrics();
+
+<span class="comment">// Custom counter: HTTP requests by method + status</span>
+<span class="keyword">const</span> httpRequests = new client.Counter({
+  name: <span class="string">'http_requests_total'</span>,
+  help: <span class="string">'Total HTTP requests'</span>,
+  labelNames: [<span class="string">'method'</span>, <span class="string">'status_code'</span>, <span class="string">'route'</span>]
+});
+
+<span class="comment">// Custom histogram: request duration (needed for p95 calculation)</span>
+<span class="keyword">const</span> httpDuration = new client.Histogram({
+  name: <span class="string">'http_request_duration_seconds'</span>,
+  help: <span class="string">'HTTP request duration in seconds'</span>,
+  labelNames: [<span class="string">'method'</span>, <span class="string">'route'</span>],
+  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]  <span class="comment">// latency SLO thresholds</span>
+});
+
+<span class="comment">// Middleware: record every request</span>
+app.use((req, res, next) =&gt; {
+  <span class="keyword">const</span> end = httpDuration.startTimer({ method: req.method, route: req.path });
+  res.on(<span class="string">'finish'</span>, () =&gt; {
+    httpRequests.inc({ method: req.method, status_code: res.statusCode, route: req.path });
+    end();
+  });
+  next();
+});
+
+<span class="comment">// /metrics endpoint — Prometheus scrapes this</span>
+app.get(<span class="string">'/metrics'</span>, <span class="keyword">async</span> (req, res) =&gt; {
+  res.set(<span class="string">'Content-Type'</span>, client.register.contentType);
+  res.end(<span class="keyword">await</span> client.register.metrics());
+});</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — ServiceMonitor to scrape the app</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: monitoring.coreos.com/v1
+<span class="keyword">kind</span>: ServiceMonitor
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: api-monitor
+  <span class="keyword">namespace</span>: production
+<span class="keyword">spec</span>:
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>: { app: api }         <span class="comment"># selects the api Service</span>
+  <span class="keyword">endpoints</span>:
+  - <span class="keyword">port</span>: http
+    <span class="keyword">path</span>: /metrics
+    <span class="keyword">interval</span>: 15s</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 11. Logging ============ -->
+                <section class="content-section" id="logging">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📝</div>
+                        <h2>11. Centralized Logging — Loki + Promtail</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Stack</th><th>Components</th><th>Pros</th><th>Capstone choice?</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>EFK</strong></td><td>Elasticsearch + Fluentd + Kibana</td><td>Powerful full-text search</td><td>❌ — expensive, heavy</td></tr>
+                            <tr><td><strong>Loki + Promtail</strong></td><td>Loki (log store) + Promtail (shipper) + Grafana (UI)</td><td>Cheap (indexes labels, not content), Grafana-native</td><td>✅ — capstone uses this</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">logql — Loki queries (like PromQL but for logs)</span></div>
+                        <pre><code><span class="comment"># Show all ERROR logs from the api pod in the last 5 minutes</span>
+{namespace="production", pod=~"api-.*"} |= "ERROR"
+
+<span class="comment"># Count errors per minute (Module 02 grep | wc -l, now queryable)</span>
+sum(rate({namespace="production"} |= "ERROR" [1m]))
+
+<span class="comment"># Filter by structured log field (JSON logs)</span>
+{app="api"} | json | level="error" | http_status >= 500
+
+<span class="comment"># These LogQL patterns map to the Module 02 grep/awk pipelines you already know</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 12. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>12. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — Prometheus Disk Full (Cardinality Explosion)</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>Prometheus pod restarts; <code>kubectl top pod</code> shows it at memory limit. Grafana dashboards show gaps.</td></tr>
+                            <tr><td><strong>Investigation</strong></td><td><code>topk(10, count by (__name__)({__name__=~".+"}))</code> in PromQL — this query finds the metrics with the most series. If <code>http_requests_total{user_id="..."}</code> has 10M series (one per user), you found it.</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>A developer added a <code>user_id</code> label to HTTP metrics. High-cardinality labels (unbounded values like user IDs, UUIDs, IP addresses) create one time series per unique value — Prometheus TSDB can't handle millions of series.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Remove the label (relabeling rules in the scrape config) or drop the metric entirely. Set TSDB retention time and storage limits. Bump Prometheus memory limit.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Only use labels with bounded, low-cardinality values (method, status_code, route — not user_id, session_id). Code-review any new prom-client instrumentation.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Alert Storm at 3am (200 Alerts from One Node Down)</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>On-call engineer gets 200 Slack/PagerDuty notifications in 5 minutes. All from different pods on the same node.</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>AlertManager grouping not configured. Each pod fires a separate alert.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>AlertManager <code>group_by: [alertname, node]</code> — group all alerts from the same node into one notification. Add <code>inhibit_rules</code>: if NodeDown fires, suppress all child pod alerts from that node.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — "Dashboard Says Fine, Users Say Down"</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Root Cause</strong></td><td>You monitored infrastructure (CPU, memory, pod count) but not the user-visible path. A misconfigured ALB was returning 502 to users while pods were healthy by all internal metrics.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Add a blackbox exporter: it makes real HTTP requests from outside the cluster and records success/failure. Now Prometheus scrapes the user-visible endpoint the same way a user does. RED method dashboard on the app metrics (Section 8) catches this too.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — Full Observability Stack on EKS</h2>
+                    </div>
+                    <p class="content-text">
+                        Deploy kube-prometheus-stack → instrument the app → build three Grafana dashboards →
+                        configure alert rules → validate with chaos. See <a href="project1.html">Capstone Project</a> §18.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Install kube-prometheus-stack on EKS</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">helm</span> install monitoring prometheus-community/kube-prometheus-stack \
+    -n monitoring --create-namespace \
+    --set prometheus.prometheusSpec.retention=30d \
+    --set grafana.adminPassword=changeme123 \
+    -f monitoring-values.yaml
+<span class="command">kubectl</span> get pods -n monitoring    <span class="comment"># all pods should be Running within 2 min</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Instrument the App + Create ServiceMonitor</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Add prom-client to the app (Section 10 code), rebuild, push to ECR, helm upgrade</span>
+<span class="command">kubectl</span> apply -f servicemonitor.yaml -n production
+<span class="command">kubectl</span> port-forward -n monitoring svc/monitoring-prometheus 9090
+<span class="comment"># Go to localhost:9090/targets — verify api appears as a scrape target</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Build Three Grafana Dashboards</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># 1. Cluster overview: import #3119 (Kubernetes Cluster Monitoring)</span>
+<span class="comment"># 2. Node dashboard: import #1860 (Node Exporter Full)</span>
+<span class="comment"># 3. Application (RED): build from scratch using Section 8 queries</span>
+<span class="comment"># Export all three as JSON and commit to Git:</span>
+<span class="command">curl</span> -s -H "Authorization: Bearer $TOKEN" \
+    http://localhost:3000/api/dashboards/uid/red-dashboard | jq '.dashboard' \
+    &gt; dashboards/application-red.json</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Alert Rules + Slack Routing</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Apply alert rules from Section 6 + RED threshold alerts</span>
+<span class="command">kubectl</span> apply -f prometheus-rules.yaml -n monitoring
+<span class="comment"># Apply AlertManager config from Section 9 via Helm values</span>
+<span class="command">helm</span> upgrade monitoring prometheus-community/kube-prometheus-stack \
+    -n monitoring --reuse-values \
+    --set alertmanager.config.receivers[0].slack_configs[0].channel="#alerts"</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Chaos Validation — Kill a Pod, Watch the Alert</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Delete all api pods to trigger CrashLoopBackOff → restart count alert</span>
+<span class="command">kubectl</span> delete pods -l app=api -n production
+<span class="comment"># In Grafana: watch pod restart counter spike</span>
+<span class="comment"># In Slack: PodOOMKilled/CrashLoop alert should arrive within 2 minutes</span>
+<span class="comment"># Mark the post-mortem: what did the alert say, what was the root cause, what would prevent it?</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why does Prometheus use a pull model instead of push?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Pull means Prometheus knows which targets exist and actively scrapes them. If a target goes down, Prometheus detects the failed scrape immediately and can fire an "instance down" alert. In a push model, a dead target just stops pushing — you'd see silence and might not know if it's dead or just very quiet. Pull also centralizes the target list in Prometheus config or service discovery, rather than distributing the monitoring server address to every application. The tradeoff: targets must be reachable from Prometheus, which requires network planning in multi-AZ or multi-cluster setups.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between a counter and a gauge?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A counter only goes up (and resets to zero on restart). Use <code>rate()</code> to get the per-second rate of change — never query raw counter values, they're cumulative totals. A gauge can go up or down — current memory usage, number of concurrent connections, replica count. You can query gauges directly. The most common mistake: treating request counts as a gauge and forgetting that the raw number is meaningless without a time window. Always apply <code>rate()</code> to counters.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Explain rate() and what the time window means.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>rate(metric[5m])</code> computes the average per-second rate of increase over the last 5 minutes, accounting for counter resets. The window <code>[5m]</code> is the look-back window for the calculation — it should be at least 4× the scrape interval (default 15s → minimum [1m]). A longer window smooths spikes; a shorter window is more responsive but noisier. For alerting, I use [5m] for stability. For SLO burn-rate alerts, I use two windows ([5m] and [1h]) together to catch both fast burns and slow burns.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you avoid alert fatigue?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Three rules: (1) Every alert must be actionable — there must be a runbook entry for what to do. If the response is "watch it for a while," it's noise. (2) Severity split: critical = page at 3am, warning = ticket for business hours. Most alerts should be warnings. (3) Regular alert review — anything silenced more than once in a month is either misconfigured or should be a lower severity. Also: group with AlertManager (one node failure → one alert, not 50), and use inhibition rules (NodeDown inhibits all pod alerts on that node).</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is cardinality, and why can high cardinality kill Prometheus?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Cardinality is the number of unique label value combinations for a metric. <code>http_requests_total{method, status_code, route}</code> might have 100 series (3 methods × 5 status codes × 7 routes). Add a <code>user_id</code> label and it jumps to 100 × millions of users. Prometheus stores each time series separately in TSDB — millions of series consumes gigabytes of memory and disk. The scraper slows to a crawl, memory OOM kills the Prometheus pod, and you lose monitoring. Rule: only use labels with low, bounded cardinality. User IDs, request IDs, IP addresses — never as labels.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How would you monitor a new microservice from scratch?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Start with the RED method: instrument the app with a counter for requests (labelled by method, route, status code) and a histogram for request duration. Export a /metrics endpoint, create a ServiceMonitor. Build a Grafana dashboard: Rate (req/sec), Error ratio (5xx/total), Duration (p50/p95/p99). Add three alerts: error ratio &gt; 1% (warning), p95 latency &gt; SLO threshold (warning), target down (critical). Then add the USE method for the underlying resources: CPU utilization, memory saturation, disk/network saturation. That gives you the full picture within a day of launch.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-15.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 15 — Ansible</span>
+                </div>
+            </a>
+            <a href="module-17.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 17 — GitOps/ArgoCD</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

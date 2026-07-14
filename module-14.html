@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 14 — Programming &amp; Automation with Python | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 14: Python for DevOps — boto3, subprocess, REST APIs, YAML parsing, automation patterns. Three production-grade scripts: aws_inventory.py, app_monitor.py, log_report.py.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 14 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 4 · Automation &amp; IaC</span>
+                </div>
+                <h1>Module 14 — Programming &amp; Automation with <span class="gradient-text">Python</span></h1>
+                <p class="module-hero-desc">
+                    Bash (Module 02) is the glue; Python is the tool you reach for when glue isn't enough —
+                    APIs, JSON, boto3, anything over ~50 lines. Taught DevOps-first: every example manipulates
+                    infrastructure or automates an ops task, not toy math.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Python 3</span>
+                    <span class="tech-tag">boto3</span>
+                    <span class="tech-tag">requests</span>
+                    <span class="tech-tag">PyYAML</span>
+                    <span class="tech-tag">subprocess</span>
+                    <span class="tech-tag">logging</span>
+                    <span class="tech-tag">cron</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#python-basics" class="toc-link">1. Python Basics for Bash Speakers</a></li>
+                    <li><a href="#control-flow" class="toc-link">2. Control Flow</a></li>
+                    <li><a href="#functions-errors" class="toc-link">3. Functions, Modules &amp; Errors</a></li>
+                    <li><a href="#files-yaml" class="toc-link">4. Files: JSON / YAML / CSV</a></li>
+                    <li><a href="#key-libs" class="toc-link">5. Key Libraries</a></li>
+                    <li><a href="#rest-apis" class="toc-link">6. REST APIs with requests</a></li>
+                    <li><a href="#boto3" class="toc-link">7. boto3 — AWS SDK</a></li>
+                    <li><a href="#patterns" class="toc-link">8. Automation Patterns</a></li>
+                    <li><a href="#scheduling" class="toc-link">9. Scheduling</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Python Basics ============ -->
+                <section class="content-section" id="python-basics">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🐍</div>
+                        <h2>1. Python Basics for Bash Speakers</h2>
+                    </div>
+                    <p class="content-text">
+                        If you know Module 02's Bash, Python's syntax is one translation table away:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Bash</th><th>Python equivalent</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>$1, $2</code></td><td><code>sys.argv[1], sys.argv[2]</code></td><td>Import sys first</td></tr>
+                            <tr><td><code>$(cmd)</code></td><td><code>subprocess.run(cmd, capture_output=True)</code></td><td>Returns CompletedProcess</td></tr>
+                            <tr><td><code>[ -f /path ]</code></td><td><code>os.path.exists('/path')</code></td><td>Also: Path('/path').exists()</td></tr>
+                            <tr><td><code>echo $var</code></td><td><code>print(f"{var}")</code></td><td>f-strings are idiomatic</td></tr>
+                            <tr><td><code>VAR=value</code></td><td><code>var = "value"</code></td><td>No $ for assignment</td></tr>
+                            <tr><td><code>for x in $(cat list)</code></td><td><code>for x in items:</code></td><td>Indent (no braces)</td></tr>
+                            <tr><td><code>if [ $? -ne 0 ]</code></td><td><code>if proc.returncode != 0:</code></td><td>Check after subprocess.run</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — setup a venv (Module 05 payoff)</span></div>
+                        <pre><code><span class="comment"># Create a virtual environment (isolate dependencies per project)</span>
+<span class="command">python3</span> -m venv venv
+<span class="command">source</span> venv/bin/activate        <span class="comment"># Windows: venv\Scripts\activate</span>
+<span class="command">pip</span> install boto3 requests pyyaml   <span class="comment"># install into the venv, not system Python</span>
+<span class="command">pip</span> freeze &gt; requirements.txt   <span class="comment"># pin exact versions (Module 05 lockfile discipline)</span>
+<span class="comment"># Add venv/ to .gitignore (Module 03)</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Control Flow ============ -->
+                <section class="content-section" id="control-flow">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔀</div>
+                        <h2>2. Control Flow — Infra Examples</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — retry loop (Module 09 smoke-test rewritten)</span></div>
+                        <pre><code><span class="keyword">import</span> time, requests, sys
+
+<span class="keyword">def</span> <span class="function">wait_for_healthy</span>(url: str, max_retries: int = 10, delay: int = 5) -&gt; bool:
+    <span class="string">"""Poll URL until 200 OK or timeout — replaces the bash retry loop from M09."""</span>
+    <span class="keyword">for</span> attempt <span class="keyword">in</span> range(1, max_retries + 1):
+        <span class="keyword">try</span>:
+            resp = requests.get(url, timeout=5)
+            <span class="keyword">if</span> resp.status_code == 200:
+                print(f<span class="string">"✓ Healthy after {attempt} attempt(s)"</span>)
+                <span class="keyword">return</span> True
+        <span class="keyword">except</span> requests.ConnectionError:
+            pass                        <span class="comment"># service not yet up</span>
+        print(f<span class="string">"Attempt {attempt}/{max_retries}: not ready — retrying in {delay}s"</span>)
+        time.sleep(delay)
+    <span class="keyword">return</span> False
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    url = sys.argv[1]
+    <span class="keyword">if</span> <span class="keyword">not</span> wait_for_healthy(url):
+        print(<span class="string">"ERROR: service never became healthy"</span>, file=sys.stderr)
+        sys.exit(1)                     <span class="comment"># non-zero exit = failure in CI (M02 discipline)</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Functions, Modules, Errors ============ -->
+                <section class="content-section" id="functions-errors">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧩</div>
+                        <h2>3. Functions, Modules &amp; Error Handling</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — error handling done right</span></div>
+                        <pre><code><span class="keyword">import</span> boto3
+<span class="keyword">from</span> botocore.exceptions <span class="keyword">import</span> ClientError, NoCredentialsError
+
+<span class="keyword">def</span> <span class="function">get_instance_ids</span>(tag_name: str) -&gt; list[str]:
+    <span class="string">"""Return EC2 instance IDs matching a Name tag."""</span>
+    ec2 = boto3.client(<span class="string">"ec2"</span>)
+    <span class="keyword">try</span>:
+        resp = ec2.describe_instances(
+            Filters=[{<span class="string">"Name"</span>: <span class="string">"tag:Name"</span>, <span class="string">"Values"</span>: [tag_name]}]
+        )
+        <span class="keyword">return</span> [
+            i[<span class="string">"InstanceId"</span>]
+            <span class="keyword">for</span> r <span class="keyword">in</span> resp[<span class="string">"Reservations"</span>]
+            <span class="keyword">for</span> i <span class="keyword">in</span> r[<span class="string">"Instances"</span>]
+        ]
+    <span class="keyword">except</span> NoCredentialsError:
+        <span class="comment"># catch specific — never bare `except:`</span>
+        print(<span class="string">"ERROR: No AWS credentials found. Check ~/.aws/credentials or instance role."</span>)
+        sys.exit(1)
+    <span class="keyword">except</span> ClientError <span class="keyword">as</span> e:
+        <span class="comment"># e.response['Error']['Code'] gives the AWS error code</span>
+        print(f<span class="string">"AWS error: {e.response['Error']['Message']}"</span>)
+        <span class="keyword">raise</span>               <span class="comment"># re-raise for the caller to handle or propagate</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Never use bare except:</div>
+                        <p>A bare <code>except:</code> catches everything including <code>KeyboardInterrupt</code> and <code>SystemExit</code>, masking bugs and making the script impossible to cancel. Always catch the most specific exception type. In automation code this matters more than in app code — a swallowed error that deletes the wrong S3 bucket is a very bad day.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Files: JSON/YAML/CSV ============ -->
+                <section class="content-section" id="files-yaml">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📄</div>
+                        <h2>4. Files: JSON, YAML, CSV</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — parse and patch a K8s manifest (CI image-tag bump)</span></div>
+                        <pre><code><span class="keyword">import</span> yaml, sys
+
+<span class="keyword">def</span> <span class="function">bump_image_tag</span>(manifest_path: str, new_tag: str):
+    <span class="string">"""
+    Read a K8s Deployment YAML, update the image tag, write it back.
+    This is what CI tag-bumping really is — the yq shorthand does this under the hood.
+    Module 17 (ArgoCD) teaser: this commit triggers a GitOps sync.
+    """</span>
+    <span class="keyword">with</span> open(manifest_path) <span class="keyword">as</span> f:
+        manifest = yaml.safe_load(f)    <span class="comment"># safe_load: no arbitrary code execution</span>
+
+    containers = manifest[<span class="string">"spec"</span>][<span class="string">"template"</span>][<span class="string">"spec"</span>][<span class="string">"containers"</span>]
+    <span class="keyword">for</span> c <span class="keyword">in</span> containers:
+        repo = c[<span class="string">"image"</span>].split(<span class="string">":"</span>)[0]    <span class="comment"># strip old tag</span>
+        c[<span class="string">"image"</span>] = f<span class="string">"{repo}:{new_tag}"</span>
+
+    <span class="keyword">with</span> open(manifest_path, <span class="string">"w"</span>) <span class="keyword">as</span> f:
+        yaml.dump(manifest, f, default_flow_style=False)
+    print(f<span class="string">"Updated {manifest_path} → image tag: {new_tag}"</span>)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    bump_image_tag(sys.argv[1], sys.argv[2])</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — jq equivalent in Python (Module 02 callback)</span></div>
+                        <pre><code><span class="keyword">import</span> json, subprocess
+
+<span class="comment"># Bash: aws ec2 describe-instances | jq '...'</span>
+<span class="comment"># Python equivalent — more readable for complex transforms:</span>
+<span class="keyword">import</span> boto3
+
+ec2 = boto3.client(<span class="string">"ec2"</span>)
+instances = ec2.describe_instances()
+
+<span class="keyword">for</span> r <span class="keyword">in</span> instances[<span class="string">"Reservations"</span>]:
+    <span class="keyword">for</span> i <span class="keyword">in</span> r[<span class="string">"Instances"</span>]:
+        name = next((t[<span class="string">"Value"</span>] <span class="keyword">for</span> t <span class="keyword">in</span> i.get(<span class="string">"Tags"</span>, []) <span class="keyword">if</span> t[<span class="string">"Key"</span>] == <span class="string">"Name"</span>), <span class="string">"unnamed"</span>)
+        print(f<span class="string">"{i['InstanceId']}\t{i['State']['Name']}\t{name}"</span>)</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Key Libraries ============ -->
+                <section class="content-section" id="key-libs">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📚</div>
+                        <h2>5. Key Libraries</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — subprocess (run kubectl/terraform from Python)</span></div>
+                        <pre><code><span class="keyword">import</span> subprocess
+
+<span class="keyword">def</span> <span class="function">run</span>(cmd: list[str], check: bool = True) -&gt; str:
+    <span class="string">"""
+    Run a shell command. Pass a list — NEVER a string with shell=True
+    if any part comes from user input (shell injection risk).
+    """</span>
+    result = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        check=check    <span class="comment"># raises CalledProcessError if returncode != 0</span>
+    )
+    <span class="keyword">return</span> result.stdout.strip()
+
+<span class="comment"># Good: list form — no shell injection possible</span>
+output = run([<span class="string">"kubectl"</span>, <span class="string">"get"</span>, <span class="string">"pods"</span>, <span class="string">"-n"</span>, <span class="string">"production"</span>])
+
+<span class="comment"># Never do this with user-provided input:</span>
+<span class="comment"># subprocess.run(f"kubectl get pods -n {namespace}", shell=True)  # ← injection risk</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. REST APIs ============ -->
+                <section class="content-section" id="rest-apis">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>6. REST APIs with requests</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — GitHub API: list stale PRs + Slack notification</span></div>
+                        <pre><code><span class="keyword">import</span> requests, os
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, timezone, timedelta
+
+GH_TOKEN = os.environ[<span class="string">"GITHUB_TOKEN"</span>]       <span class="comment"># never hardcode credentials (M03 rule)</span>
+SLACK_WEBHOOK = os.environ[<span class="string">"SLACK_WEBHOOK_URL"</span>]
+REPO = <span class="string">"techitfactory/api"</span>
+STALE_DAYS = 7
+
+<span class="keyword">def</span> <span class="function">get_stale_prs</span>() -&gt; list[dict]:
+    headers = {<span class="string">"Authorization"</span>: f<span class="string">"Bearer {GH_TOKEN}"</span>, <span class="string">"Accept"</span>: <span class="string">"application/vnd.github+json"</span>}
+    prs, page = [], 1
+    cutoff = datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)
+
+    <span class="keyword">while</span> True:                             <span class="comment"># pagination — always handle it</span>
+        resp = requests.get(
+            f<span class="string">"https://api.github.com/repos/{REPO}/pulls"</span>,
+            headers=headers,
+            params={<span class="string">"state"</span>: <span class="string">"open"</span>, <span class="string">"per_page"</span>: 100, <span class="string">"page"</span>: page},
+            timeout=10
+        )
+        resp.raise_for_status()           <span class="comment"># raises on 4xx/5xx</span>
+        batch = resp.json()
+        <span class="keyword">if</span> <span class="keyword">not</span> batch:
+            <span class="keyword">break</span>
+        prs.extend(pr <span class="keyword">for</span> pr <span class="keyword">in</span> batch
+                   <span class="keyword">if</span> datetime.fromisoformat(pr[<span class="string">"updated_at"</span>].replace(<span class="string">"Z"</span>,<span class="string">"+00:00"</span>)) &lt; cutoff)
+        page += 1
+    <span class="keyword">return</span> prs
+
+<span class="keyword">def</span> <span class="function">notify_slack</span>(prs: list[dict]):
+    <span class="keyword">if</span> <span class="keyword">not</span> prs:
+        <span class="keyword">return</span>
+    text = f<span class="string">"*{len(prs)} stale PRs (no activity &gt; {STALE_DAYS}d):*\n"</span>
+    text += <span class="string">"\n"</span>.join(f<span class="string">"• &lt;{pr['html_url']}|{pr['title']}&gt; by @{pr['user']['login']}"</span> <span class="keyword">for</span> pr <span class="keyword">in</span> prs[:10])
+    requests.post(SLACK_WEBHOOK, json={<span class="string">"text"</span>: text}, timeout=5)
+
+notify_slack(get_stale_prs())</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 7. boto3 ============ -->
+                <section class="content-section" id="boto3">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☁️</div>
+                        <h2>7. boto3 — AWS SDK for Python</h2>
+                    </div>
+                    <p class="content-text">
+                        boto3 uses the same credential chain as the AWS CLI (Module 10): environment variables
+                        → shared credentials file → instance role → container role. Never call
+                        <code>boto3.client('ec2', aws_access_key_id=...)</code> — let the chain work.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — boto3 EC2 inventory + start/stop scheduler</span></div>
+                        <pre><code><span class="keyword">import</span> boto3, csv
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+<span class="keyword">def</span> <span class="function">ec2_inventory</span>(region: str = <span class="string">"us-east-1"</span>) -&gt; list[dict]:
+    <span class="string">"""Return EC2 inventory with name, state, type, and cost tags."""</span>
+    ec2 = boto3.client(<span class="string">"ec2"</span>, region_name=region)
+    paginator = ec2.get_paginator(<span class="string">"describe_instances"</span>)  <span class="comment"># paginators handle &gt;1000 results</span>
+    rows = []
+    <span class="keyword">for</span> page <span class="keyword">in</span> paginator.paginate():
+        <span class="keyword">for</span> r <span class="keyword">in</span> page[<span class="string">"Reservations"</span>]:
+            <span class="keyword">for</span> i <span class="keyword">in</span> r[<span class="string">"Instances"</span>]:
+                tags = {t[<span class="string">"Key"</span>]: t[<span class="string">"Value"</span>] <span class="keyword">for</span> t <span class="keyword">in</span> i.get(<span class="string">"Tags"</span>, [])}
+                rows.append({
+                    <span class="string">"id"</span>: i[<span class="string">"InstanceId"</span>],
+                    <span class="string">"name"</span>: tags.get(<span class="string">"Name"</span>, <span class="string">"—"</span>),
+                    <span class="string">"state"</span>: i[<span class="string">"State"</span>][<span class="string">"Name"</span>],
+                    <span class="string">"type"</span>: i[<span class="string">"InstanceType"</span>],
+                    <span class="string">"project"</span>: tags.get(<span class="string">"Project"</span>, <span class="string">"untagged"</span>),  <span class="comment"># cost audit</span>
+                })
+    <span class="keyword">return</span> rows
+
+<span class="keyword">def</span> <span class="function">save_csv</span>(rows: list[dict], path: str):
+    <span class="keyword">with</span> open(path, <span class="string">"w"</span>, newline=<span class="string">""</span>) <span class="keyword">as</span> f:
+        w = csv.DictWriter(f, fieldnames=rows[0].keys())
+        w.writeheader()
+        w.writerows(rows)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    rows = ec2_inventory()
+    out = f<span class="string">"inventory_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"</span>
+    save_csv(rows, out)
+    untagged = [r <span class="keyword">for</span> r <span class="keyword">in</span> rows <span class="keyword">if</span> r[<span class="string">"project"</span>] == <span class="string">"untagged"</span>]
+    print(f<span class="string">"Saved {len(rows)} instances to {out}. Untagged: {len(untagged)}"</span>)</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Automation Patterns ============ -->
+                <section class="content-section" id="patterns">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>8. Automation Patterns — Health Check with Auto-Recovery</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — app_monitor.py (health check + restart + Slack alert)</span></div>
+                        <pre><code><span class="keyword">import</span> requests, subprocess, time, os, logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=<span class="string">"%(asctime)s %(levelname)s %(message)s"</span>,
+    handlers=[
+        logging.FileHandler(<span class="string">"/var/log/app_monitor.log"</span>),
+        logging.StreamHandler()
+    ]
+)
+log = logging.getLogger(__name__)
+
+APP_URL     = os.environ[<span class="string">"APP_URL"</span>]
+SLACK_URL   = os.environ[<span class="string">"SLACK_WEBHOOK_URL"</span>]
+CONTAINER   = os.environ.get(<span class="string">"CONTAINER_NAME"</span>, <span class="string">"api"</span>)
+COOLDOWN    = 300           <span class="comment"># seconds between auto-restarts (prevent flapping)</span>
+_last_restart = 0
+
+<span class="keyword">def</span> <span class="function">is_healthy</span>() -&gt; bool:
+    <span class="keyword">try</span>:
+        r = requests.get(APP_URL, timeout=5)
+        <span class="keyword">return</span> r.status_code == 200
+    <span class="keyword">except</span> Exception:
+        <span class="keyword">return</span> False
+
+<span class="keyword">def</span> <span class="function">alert_slack</span>(msg: str):
+    <span class="keyword">try</span>:
+        requests.post(SLACK_URL, json={<span class="string">"text"</span>: msg}, timeout=5)
+    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+        log.warning(f<span class="string">"Slack notify failed: {e}"</span>)   <span class="comment"># don't crash if Slack is down</span>
+
+<span class="keyword">def</span> <span class="function">restart_container</span>():
+    global _last_restart
+    <span class="keyword">if</span> time.time() - _last_restart &lt; COOLDOWN:
+        log.warning(<span class="string">"Skipping restart — cooldown period active (prevents flapping)"</span>)
+        <span class="keyword">return</span>
+    log.info(f<span class="string">"Restarting container {CONTAINER}"</span>)
+    subprocess.run([<span class="string">"docker"</span>, <span class="string">"restart"</span>, CONTAINER], check=True)
+    _last_restart = time.time()
+    alert_slack(f<span class="string">"⚠️ Auto-restarted {CONTAINER} at {APP_URL}"</span>)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    log.info(<span class="string">"Monitor started"</span>)
+    <span class="keyword">while</span> True:
+        <span class="keyword">if</span> <span class="keyword">not</span> is_healthy():
+            log.error(f<span class="string">"Health check FAILED: {APP_URL}"</span>)
+            alert_slack(f<span class="string">"🚨 {CONTAINER} is DOWN at {APP_URL}"</span>)
+            restart_container()
+        time.sleep(30)</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Scheduling ============ -->
+                <section class="content-section" id="scheduling">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⏰</div>
+                        <h2>9. Scheduling — Cron + Lock Files</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — cron + Python venv</span></div>
+                        <pre><code><span class="comment"># Module 02 cron payoff — schedule the inventory script nightly</span>
+<span class="command">crontab</span> -e
+
+<span class="comment"># Add this line: run at 2am daily, log to file</span>
+<span class="comment"># 0 2 * * * /opt/scripts/venv/bin/python /opt/scripts/aws_inventory.py &gt;&gt; /var/log/inventory.log 2&gt;&amp;1</span>
+
+<span class="comment"># Lock file pattern: prevent overlap if the script takes longer than the interval</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — lock file pattern</span></div>
+                        <pre><code><span class="keyword">import</span> fcntl, sys
+
+LOCK_FILE = <span class="string">"/tmp/aws_inventory.lock"</span>
+
+<span class="keyword">try</span>:
+    lock_fd = open(LOCK_FILE, <span class="string">"w"</span>)
+    fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)  <span class="comment"># non-blocking exclusive lock</span>
+<span class="keyword">except</span> BlockingIOError:
+    print(<span class="string">"Another instance is running. Exiting."</span>)
+    sys.exit(0)
+
+<span class="keyword">try</span>:
+    <span class="comment"># ... main script work ...</span>
+    pass
+<span class="keyword">finally</span>:
+    fcntl.flock(lock_fd, fcntl.LOCK_UN)
+    lock_fd.close()</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — 3-Script Automation Suite</h2>
+                    </div>
+                    <p class="content-text">
+                        Three production-grade Python scripts, cron-scheduled, running in a venv, with a portfolio
+                        README. Each script is a real tool you'd use in a DevOps role on day one.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>aws_inventory.py — EC2 + S3 Inventory to CSV</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">python — full script (key functions)</span></div>
+                            <pre><code><span class="comment">"""
+aws_inventory.py — EC2 + S3 asset inventory with cost-tag audit.
+Usage: python aws_inventory.py [--region us-east-1] [--output inventory.csv]
+"""</span>
+<span class="keyword">import</span> boto3, csv, argparse, sys
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(<span class="string">"--region"</span>, default=<span class="string">"us-east-1"</span>)
+    parser.add_argument(<span class="string">"--output"</span>, default=<span class="string">"inventory.csv"</span>)
+    args = parser.parse_args()
+
+    rows = ec2_inventory(args.region) + s3_inventory(args.region)
+    save_csv(rows, args.output)
+    untagged = [r <span class="keyword">for</span> r <span class="keyword">in</span> rows <span class="keyword">if</span> r.get(<span class="string">"project"</span>) == <span class="string">"untagged"</span>]
+    print(f<span class="string">"Saved {len(rows)} resources. Untagged: {len(untagged)}"</span>)
+    <span class="keyword">if</span> untagged:
+        sys.exit(1)   <span class="comment"># fail CI if untagged resources found (cost audit gate)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>app_monitor.py — Health Check, Alert, Auto-Recovery</div>
+                        <p>Full script from Section 8. Add cooldown logic to prevent flapping. Schedule with cron every 30 seconds using a wrapper script.</p>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>log_report.py — Nginx Log Parser → HTML Report</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">python — Nginx log parser (Module 02's awk pipeline in Python)</span></div>
+                            <pre><code><span class="keyword">import</span> re, sys
+<span class="keyword">from</span> collections <span class="keyword">import</span> Counter
+
+LOG_PATTERN = re.compile(
+    r<span class="string">'(?P&lt;ip&gt;\S+) .+ \[.+\] "(?P&lt;method&gt;\S+) (?P&lt;url&gt;\S+) \S+" (?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'</span>
+)
+
+ips, statuses, urls = Counter(), Counter(), Counter()
+
+<span class="keyword">with</span> open(sys.argv[1]) <span class="keyword">as</span> f:
+    <span class="keyword">for</span> line <span class="keyword">in</span> f:
+        m = LOG_PATTERN.match(line)
+        <span class="keyword">if</span> m:
+            ips[m.group(<span class="string">"ip"</span>)] += 1
+            statuses[m.group(<span class="string">"status"</span>)] += 1
+            urls[m.group(<span class="string">"url"</span>)] += 1
+
+print(f<span class="string">"Top 5 IPs:     {ips.most_common(5)}"</span>)
+print(f<span class="string">"Status codes:  {dict(statuses.most_common())}"</span>)
+print(f<span class="string">"Top 5 URLs:    {urls.most_common(5)}"</span>)
+<span class="comment"># Then generate an HTML report from these Counters (write to index.html)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Cron Schedule All Three</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash — crontab</span></div>
+                            <pre><code><span class="comment"># Inventory: nightly at 2am</span>
+0 2 * * * /opt/scripts/venv/bin/python /opt/scripts/aws_inventory.py &gt;&gt; /var/log/inventory.log 2&gt;&amp;1
+<span class="comment"># Monitor: every 2 minutes</span>
+*/2 * * * * /opt/scripts/venv/bin/python /opt/scripts/app_monitor.py &gt;&gt; /var/log/monitor.log 2&gt;&amp;1
+<span class="comment"># Log report: daily at 6am</span>
+0 6 * * * /opt/scripts/venv/bin/python /opt/scripts/log_report.py /var/log/nginx/access.log &gt;&gt; /var/log/logreport.log 2&gt;&amp;1</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: When do you choose Python over Bash for automation?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Bash is ideal for: chaining CLI commands, simple file manipulation, short one-off scripts. I switch to Python when: the script is over ~50 lines (readability matters), I need to handle complex data structures (JSON, YAML parsing), I'm calling APIs or AWS SDK (boto3 is far better than CLI + jq for complex queries), I need real error handling, retry logic, or unit tests. Python is also the better choice when other engineers will maintain the script — it's more universally readable than advanced Bash.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you safely use subprocess when user input is involved?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Always pass a list, never a string with <code>shell=True</code>. With <code>shell=True</code>, if a variable contains <code>; rm -rf /</code> the shell will execute it. With a list, each argument is passed directly to the OS — no shell interpolation occurs. Also: validate inputs before building the command list (check allowed characters, use allow-lists not block-lists). If you need to redirect, use <code>stdout=subprocess.PIPE</code> rather than shell redirection characters in a string.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you handle API pagination and rate limiting?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Pagination: always loop until the response returns an empty page or null next-page token. Never assume one call returns all results — GitHub, AWS, and most APIs cap at 100 items per call. Rate limiting: check the <code>X-RateLimit-Remaining</code> header (or equivalent), back off when it's near zero, implement exponential backoff with jitter on 429 responses. For boto3, use paginators (<code>client.get_paginator(...)</code>) — they handle AWS pagination automatically and are much cleaner than manual page-looping.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does the boto3 credential chain work?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>boto3 looks for credentials in this order: (1) explicit kwargs to the client (<code>aws_access_key_id=</code> — avoid), (2) environment variables (<code>AWS_ACCESS_KEY_ID</code>), (3) shared credentials file (<code>~/.aws/credentials</code>), (4) AWS config file, (5) instance metadata service (EC2 instance role / ECS task role / Lambda execution role), (6) ECS container credentials. In practice: on a developer machine, use the config file or environment variables. On EC2/ECS/Lambda/EKS with IRSA, use the instance or task role — no credentials file needed or wanted.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Walk me through writing an auto-remediation script and its risks.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The app_monitor.py pattern: (1) health check on a well-defined endpoint, (2) on failure, alert Slack immediately, (3) attempt restart only after a cooldown period to prevent flapping. The risks: flapping — if the root cause isn't fixed, the script restarts in a loop, potentially masking the real issue; cascade — auto-restarting a service that's down due to a database failure can make the database situation worse; alert fatigue — too many noise alerts and teams stop reading them. My rule: auto-remediate only for narrow, well-understood failure modes. Log everything, page a human for anything outside that envelope.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-13.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 13 — Terraform</span>
+                </div>
+            </a>
+            <a href="module-15.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 15 — Ansible</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 18 — DevSecOps | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 18: DevSecOps — Shift Left security, SAST/DAST, container scanning, secret detection, SBOM, OPA/Gatekeeper, and runtime security with Falco.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 18 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level pro">Pro</span>
+                    <span class="module-hero-duration">Phase 5 · Advanced DevOps</span>
+                </div>
+                <h1>Module 18 — <span class="gradient-text">DevSecOps</span></h1>
+                <p class="module-hero-desc">
+                    Security is no longer a final gate before release — it's woven into every stage of the
+                    pipeline you built in Modules 09 and 17. Shift Left means finding vulnerabilities in
+                    a 30-second CI scan, not a 2-week pen-test after the code is already in production.
+                    This module adds security teeth to every earlier module.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Trivy</span>
+                    <span class="tech-tag">Semgrep</span>
+                    <span class="tech-tag">Gitleaks</span>
+                    <span class="tech-tag">OPA/Gatekeeper</span>
+                    <span class="tech-tag">Falco</span>
+                    <span class="tech-tag">SBOM</span>
+                    <span class="tech-tag">Sealed Secrets</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#shift-left" class="toc-link">1. Shift Left &amp; DevSecOps</a></li>
+                    <li><a href="#secret-detection" class="toc-link">2. Secret Detection</a></li>
+                    <li><a href="#sast" class="toc-link">3. SAST — Semgrep</a></li>
+                    <li><a href="#container-scanning" class="toc-link">4. Container Scanning — Trivy</a></li>
+                    <li><a href="#sbom" class="toc-link">5. SBOM</a></li>
+                    <li><a href="#opa" class="toc-link">6. Policy as Code — OPA/Gatekeeper</a></li>
+                    <li><a href="#secrets-mgmt" class="toc-link">7. Secrets Management in K8s</a></li>
+                    <li><a href="#runtime" class="toc-link">8. Runtime Security — Falco</a></li>
+                    <li><a href="#pipeline" class="toc-link">9. Secure Pipeline Integration</a></li>
+                    <li><a href="#incidents" class="toc-link">10. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Shift Left ============ -->
+                <section class="content-section" id="shift-left">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>1. Shift Left &amp; the DevSecOps Mindset</h2>
+                    </div>
+                    <p class="content-text">
+                        "Shift Left" means moving security checks earlier in the SDLC — from a quarterly
+                        pen-test to a sub-minute CI stage. The cost to fix a vulnerability multiplies at each
+                        stage: $1 in dev code → $10 in CI → $100 in staging → $10,000 in production (breach).
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Security at Every Pipeline Stage</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Pre-commit<br/>Gitleaks / hooks<br/>(secrets)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">CI Build<br/>Semgrep (SAST)<br/>Trivy (image)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">CI Deploy<br/>OPA/Gatekeeper<br/>(policy gate)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Runtime<br/>Falco<br/>(anomaly)</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>DevSecOps pillar</th><th>What it does</th><th>Tool</th></tr></thead>
+                        <tbody>
+                            <tr><td>Secret detection</td><td>Block secrets committed to Git</td><td>Gitleaks, git-secrets, pre-commit</td></tr>
+                            <tr><td>SAST</td><td>Static analysis of source code for security bugs</td><td>Semgrep, Bandit (Python), Checkmarx</td></tr>
+                            <tr><td>Container scanning</td><td>CVE scan of image layers and OS packages</td><td>Trivy, Grype, AWS Inspector</td></tr>
+                            <tr><td>SBOM</td><td>Bill of materials: every dependency in the image</td><td>Syft, Trivy SBOM</td></tr>
+                            <tr><td>Policy as Code</td><td>Admission control: block non-compliant K8s workloads</td><td>OPA Gatekeeper, Kyverno</td></tr>
+                            <tr><td>Secrets management</td><td>No plaintext secrets in repos or manifests</td><td>Sealed Secrets, External Secrets + AWS SM</td></tr>
+                            <tr><td>Runtime security</td><td>Detect anomalous process/syscall behavior</td><td>Falco</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 2. Secret Detection ============ -->
+                <section class="content-section" id="secret-detection">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>2. Secret Detection — Stop Secrets Before They Hit Git</h2>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">⚠️ The Golden Rule</div>
+                        <p>Once a secret is pushed to a remote Git repo, assume it is compromised — even if you immediately delete it. GitHub's secret scanning, third-party bots, and forks may have already seen it. Rotate immediately; don't just remove the commit.</p>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — Gitleaks: install and scan</span></div>
+                        <pre><code><span class="comment"># Install Gitleaks</span>
+<span class="command">brew</span> install gitleaks          <span class="comment"># macOS</span>
+<span class="comment"># or download binary from GitHub releases for Linux</span>
+
+<span class="comment"># Scan entire repo history for secrets</span>
+<span class="command">gitleaks</span> detect --source . --verbose
+
+<span class="comment"># Scan specific commit range (use in CI)</span>
+<span class="command">gitleaks</span> detect --source . --log-opts "origin/main..HEAD"
+
+<span class="comment"># As a pre-commit hook (module-03 Git payoff)</span>
+<span class="comment"># .pre-commit-config.yaml:</span>
+<span class="comment"># repos:</span>
+<span class="comment">#   - repo: https://github.com/gitleaks/gitleaks</span>
+<span class="comment">#     hooks: [{ id: gitleaks }]</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">groovy — Jenkins: Gitleaks stage</span></div>
+                        <pre><code><span class="comment">// Add to the Jenkins pipeline from Module 09:</span>
+<span class="keyword">stage</span>(<span class="string">'Secret Scan'</span>) {
+    <span class="keyword">steps</span> {
+        <span class="function">sh</span> <span class="string">'''
+            docker run --rm -v $(pwd):/path \
+                zricethezav/gitleaks:latest detect \
+                --source /path \
+                --log-opts "origin/main..HEAD" \
+                --exit-code 1
+        '''</span>
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 3. SAST ============ -->
+                <section class="content-section" id="sast">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔍</div>
+                        <h2>3. SAST — Semgrep Static Analysis</h2>
+                    </div>
+                    <p class="content-text">
+                        SAST (Static Application Security Testing) analyzes source code without executing it,
+                        looking for patterns that indicate security bugs — SQL injection, hardcoded creds,
+                        insecure deserialization. Semgrep is the OSS leader: fast, rules-as-code (YAML),
+                        and language-agnostic.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — Semgrep scan</span></div>
+                        <pre><code><span class="comment"># Install</span>
+<span class="command">pip</span> install semgrep --break-system-packages
+
+<span class="comment"># Run OWASP Top 10 rules against a Node.js app</span>
+<span class="command">semgrep</span> --config p/owasp-top-ten .
+
+<span class="comment"># Python-specific security rules</span>
+<span class="command">semgrep</span> --config p/python-security .
+
+<span class="comment"># Output results as SARIF (for GitHub Code Scanning upload)</span>
+<span class="command">semgrep</span> --config p/owasp-top-ten --sarif > semgrep.sarif
+
+<span class="comment"># Custom rule example (catch subprocess with shell=True)</span>
+<span class="comment"># rules:</span>
+<span class="comment">#   - id: subprocess-shell-true</span>
+<span class="comment">#     pattern: subprocess.run(..., shell=True, ...)</span>
+<span class="comment">#     message: "shell=True with subprocess can allow command injection"</span>
+<span class="comment">#     severity: ERROR</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Container Scanning ============ -->
+                <section class="content-section" id="container-scanning">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>4. Container Scanning — Trivy</h2>
+                    </div>
+                    <p class="content-text">
+                        A Docker image is a filesystem containing OS packages, runtime, and your app. Every
+                        installed package is a potential CVE. Trivy scans the image layers and reports
+                        vulnerabilities with severity (CRITICAL/HIGH/MEDIUM/LOW) and the fix version.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — Trivy: scan image + fail on CRITICAL ⭐</span></div>
+                        <pre><code><span class="comment"># Install Trivy</span>
+<span class="command">brew</span> install aquasecurity/trivy/trivy     <span class="comment"># macOS</span>
+<span class="command">apt-get</span> install -y trivy                  <span class="comment"># Debian/Ubuntu</span>
+
+<span class="comment"># Scan an image — full report</span>
+<span class="command">trivy</span> image techitfactory/api:latest       <span class="comment"># ⭐ daily use</span>
+
+<span class="comment"># CI mode: fail build on CRITICAL CVEs only (avoid alert fatigue)</span>
+<span class="command">trivy</span> image \
+    --exit-code 1 \
+    --severity CRITICAL \
+    --no-progress \
+    techitfactory/api:${IMAGE_TAG}
+
+<span class="comment"># Scan a Dockerfile before building</span>
+<span class="command">trivy</span> config Dockerfile
+
+<span class="comment"># Scan Terraform/K8s manifests for misconfigurations</span>
+<span class="command">trivy</span> config ./terraform
+<span class="command">trivy</span> config ./k8s-manifests/</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Reduce image attack surface</div>
+                        <p>Use <code>FROM node:20-alpine</code> instead of <code>FROM node:20</code>. Alpine-based images have ~50% fewer CVEs (smaller OS footprint). Go and Rust can use <code>FROM scratch</code> — a completely empty base, zero OS CVEs. Multi-stage builds (Module 09) help further: the final image contains only the compiled binary, not the build toolchain.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. SBOM ============ -->
+                <section class="content-section" id="sbom">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📋</div>
+                        <h2>5. SBOM — Software Bill of Materials</h2>
+                    </div>
+                    <p class="content-text">
+                        An SBOM is a machine-readable list of every component in a software artifact — OS
+                        packages, runtime libraries, direct and transitive dependencies. US Executive Order
+                        14028 (2021) mandated SBOMs for software sold to the federal government. Even for
+                        private companies, SBOMs enable rapid CVE triage: when Log4Shell dropped, teams
+                        with SBOMs found affected services in minutes; others took days.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — generate and attach SBOM</span></div>
+                        <pre><code><span class="comment"># Generate SBOM with Trivy (SPDX format)</span>
+<span class="command">trivy</span> image \
+    --format spdx-json \
+    --output sbom.spdx.json \
+    techitfactory/api:${IMAGE_TAG}
+
+<span class="comment"># Or with Syft (CycloneDX format)</span>
+<span class="command">syft</span> techitfactory/api:${IMAGE_TAG} -o cyclonedx-json > sbom.cyclonedx.json
+
+<span class="comment"># Attach SBOM to image as OCI attestation (cosign)</span>
+<span class="command">cosign</span> attach sbom --sbom sbom.spdx.json techitfactory/api:${IMAGE_TAG}
+
+<span class="comment"># In CI: archive as artifact so auditors can access it</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. OPA/Gatekeeper ============ -->
+                <section class="content-section" id="opa">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛡️</div>
+                        <h2>6. Policy as Code — OPA Gatekeeper</h2>
+                    </div>
+                    <p class="content-text">
+                        OPA (Open Policy Agent) Gatekeeper is a Kubernetes admission webhook: it intercepts
+                        every <code>kubectl apply</code> and evaluates your Rego policies. Non-compliant
+                        resources are rejected before they're persisted — cluster-level enforcement that no
+                        amount of CI discipline can replace.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install Gatekeeper</span></div>
+                        <pre><code><span class="command">kubectl</span> apply -f \
+    https://raw.githubusercontent.com/open-policy-agent/gatekeeper/release-3.15/deploy/gatekeeper.yaml</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — ConstraintTemplate: require resource limits</span></div>
+                        <pre><code><span class="comment"># ConstraintTemplate defines the Rego logic</span>
+<span class="keyword">apiVersion</span>: templates.gatekeeper.sh/v1
+<span class="keyword">kind</span>: ConstraintTemplate
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: k8srequiredlimits
+<span class="keyword">spec</span>:
+  <span class="keyword">crd</span>:
+    <span class="keyword">spec</span>:
+      <span class="keyword">names</span>:
+        <span class="keyword">kind</span>: K8sRequiredLimits
+  <span class="keyword">targets</span>:
+  - <span class="keyword">target</span>: admission.k8s.gatekeeper.sh
+    <span class="keyword">rego</span>: |
+      package k8srequiredlimits
+      violation[{"msg": msg}] {
+        container := input.review.object.spec.containers[_]
+        not container.resources.limits.memory
+        msg := sprintf("Container %v must set memory limit", [container.name])
+      }
+---
+<span class="comment"># Constraint applies the template to specific resources</span>
+<span class="keyword">apiVersion</span>: constraints.gatekeeper.sh/v1beta1
+<span class="keyword">kind</span>: K8sRequiredLimits
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: must-have-limits
+<span class="keyword">spec</span>:
+  <span class="keyword">match</span>:
+    <span class="keyword">kinds</span>: [{ <span class="keyword">apiGroups</span>: [""], <span class="keyword">kinds</span>: ["Pod"] }]
+    <span class="keyword">namespaces</span>: ["production", "staging"]</code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Common policies</th><th>What they enforce</th></tr></thead>
+                        <tbody>
+                            <tr><td>Require resource limits</td><td>No pod can skip memory/CPU limits (prevents OOMKilled cascades — M11 incident payoff)</td></tr>
+                            <tr><td>No privileged containers</td><td>Blocks <code>securityContext.privileged: true</code></td></tr>
+                            <tr><td>Require specific image registry</td><td>Only images from your ECR allowed (prevents supply-chain attacks)</td></tr>
+                            <tr><td>Read-only root filesystem</td><td>Container filesystem immutable at runtime</td></tr>
+                            <tr><td>No latest tag</td><td>Blocks <code>image: nginx:latest</code> (non-reproducible)</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 7. Secrets Management ============ -->
+                <section class="content-section" id="secrets-mgmt">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔏</div>
+                        <h2>7. Secrets Management in Kubernetes</h2>
+                    </div>
+                    <p class="content-text">
+                        Module 11 created K8s Secrets — but native K8s Secrets are base64-encoded, not
+                        encrypted, and cannot be safely committed to Git. Two solutions for GitOps (M17) + secrets:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Approach</th><th>How it works</th><th>Best for</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Sealed Secrets</strong></td><td>bitnami/sealed-secrets controller in the cluster holds a private key. <code>kubeseal</code> encrypts your secret → SealedSecret CRD safe to commit to Git. Controller decrypts at apply time.</td><td>Simple self-contained clusters</td></tr>
+                            <tr><td><strong>External Secrets Operator</strong></td><td>Watches ExternalSecret CRDs. Fetches real secrets from AWS Secrets Manager / Parameter Store at sync time. Secret never lives in Git at all.</td><td>AWS-native, team already using Secrets Manager</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — Sealed Secrets workflow</span></div>
+                        <pre><code><span class="comment"># Install Sealed Secrets controller</span>
+<span class="command">helm</span> install sealed-secrets \
+    sealed-secrets/sealed-secrets \
+    -n kube-system
+
+<span class="comment"># Install kubeseal CLI</span>
+<span class="command">brew</span> install kubeseal
+
+<span class="comment"># Encrypt a secret (outputs SealedSecret — safe to commit)</span>
+<span class="command">kubectl</span> create secret generic db-pass \
+    --from-literal=password=s3cr3t \
+    --dry-run=client -o yaml | \
+<span class="command">kubeseal</span> --format yaml > sealed-db-pass.yaml
+
+<span class="comment"># Commit sealed-db-pass.yaml to the gitops config repo (Module 17)</span>
+<span class="comment"># ArgoCD applies it; the controller decrypts it into a real K8s Secret</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — External Secrets Operator with AWS Secrets Manager</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: external-secrets.io/v1beta1
+<span class="keyword">kind</span>: ExternalSecret
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: db-credentials
+  <span class="keyword">namespace</span>: production
+<span class="keyword">spec</span>:
+  <span class="keyword">refreshInterval</span>: 1h
+  <span class="keyword">secretStoreRef</span>:
+    <span class="keyword">kind</span>: ClusterSecretStore   <span class="comment"># uses IRSA from Module 12</span>
+    <span class="keyword">name</span>: aws-secretsmanager
+  <span class="keyword">target</span>:
+    <span class="keyword">name</span>: db-credentials       <span class="comment"># K8s Secret created in-cluster</span>
+  <span class="keyword">data</span>:
+  - <span class="keyword">secretKey</span>: password
+    <span class="keyword">remoteRef</span>:
+      <span class="keyword">key</span>: techitfactory/prod/db  <span class="comment"># AWS Secrets Manager key name</span>
+      <span class="keyword">property</span>: password</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Runtime Security ============ -->
+                <section class="content-section" id="runtime">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">👁️</div>
+                        <h2>8. Runtime Security — Falco</h2>
+                    </div>
+                    <p class="content-text">
+                        Container scanning finds known CVEs in images at build time. Falco detects
+                        <em>anomalous behavior at runtime</em> — a container executing a shell, reading
+                        <code>/etc/shadow</code>, making unexpected network connections. It uses Linux
+                        eBPF/kprobes to hook kernel syscalls with near-zero overhead.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install Falco with Helm</span></div>
+                        <pre><code><span class="command">helm</span> repo add falcosecurity https://falcosecurity.github.io/charts
+<span class="command">helm</span> install falco falcosecurity/falco \
+    --namespace falco --create-namespace \
+    --set falco.json_output=true \
+    --set falco.log_stderr=true
+
+<span class="comment"># Watch Falco alerts in real time</span>
+<span class="command">kubectl</span> logs -n falco -l app.kubernetes.io/name=falco -f</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — custom Falco rule: shell spawned in container</span></div>
+                        <pre><code><span class="keyword">- rule</span>: Shell Spawned in Container
+  <span class="keyword">desc</span>: Detect any shell executed in a running container
+  <span class="keyword">condition</span>: >
+    container
+    and proc.name in (bash, sh, zsh, dash)
+    and not proc.pname in (runc, containerd-shim)
+  <span class="keyword">output</span>: >
+    Shell spawned in container
+    (user=%user.name container=%container.name
+     image=%container.image.repository:%container.image.tag
+     cmd=%proc.cmdline)
+  <span class="keyword">priority</span>: WARNING
+  <span class="keyword">tags</span>: [container, shell, mitre_execution]</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Falco is detection, not prevention</div>
+                        <p>Falco alerts after the syscall happens — it's an IDS (Intrusion Detection System), not IPS. For prevention, combine it with: OPA Gatekeeper (block privileged containers before they start) + K8s NetworkPolicies (restrict lateral movement). Falco's alerts can trigger a Prometheus alert → AlertManager → PagerDuty chain (Module 16 integration).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Secure Pipeline ============ -->
+                <section class="content-section" id="pipeline">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔗</div>
+                        <h2>9. Secure Pipeline Integration — Full Jenkinsfile</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">groovy — Jenkinsfile with full DevSecOps stages</span></div>
+                        <pre><code><span class="comment">// Module 09 pipeline + DevSecOps layers</span>
+<span class="keyword">pipeline</span> {
+    <span class="keyword">agent</span> any
+    <span class="keyword">environment</span> {
+        <span class="variable">IMAGE</span> = <span class="string">"123456789.dkr.ecr.us-east-1.amazonaws.com/techitfactory-api"</span>
+        <span class="variable">TAG</span>   = <span class="string">"${BUILD_NUMBER}-${GIT_COMMIT[0..6]}"</span>
+    }
+    <span class="keyword">stages</span> {
+        <span class="keyword">stage</span>(<span class="string">'Secret Scan'</span>) {         <span class="comment">// NEW: catch secrets before anything else</span>
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'gitleaks detect --source . --log-opts "origin/main..HEAD" --exit-code 1'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'SAST'</span>) {                 <span class="comment">// NEW: static analysis</span>
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'semgrep --config p/owasp-top-ten --error .'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'Build'</span>) {
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'docker build -t $IMAGE:$TAG .'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'Container Scan'</span>) {       <span class="comment">// NEW: CVE scan before push</span>
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'trivy image --exit-code 1 --severity CRITICAL --no-progress $IMAGE:$TAG'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'Generate SBOM'</span>) {        <span class="comment">// NEW: compliance artifact</span>
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'trivy image --format spdx-json --output sbom-${TAG}.json $IMAGE:$TAG'</span>
+                <span class="function">archiveArtifacts</span> <span class="string">'sbom-*.json'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'Push to ECR'</span>) {
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'docker push $IMAGE:$TAG'</span>
+            }
+        }
+        <span class="keyword">stage</span>(<span class="string">'Update Config Repo'</span>) {    <span class="comment">// Module 17 GitOps handoff</span>
+            <span class="keyword">steps</span> {
+                <span class="function">sh</span> <span class="string">'''
+                    cd /tmp/gitops
+                    yq eval ".image.tag = env(TAG)" -i environments/dev/values-dev.yaml
+                    git commit -am "ci: bump to ${TAG} [skip ci]" && git push
+                '''</span>
+            }
+        }
+    }
+    <span class="keyword">post</span> {
+        <span class="keyword">always</span> { <span class="function">cleanWs</span>() }
+        <span class="keyword">failure</span> {
+            <span class="function">slackSend</span>(channel: <span class="string">'#alerts'</span>, message: <span class="string">"Security gate FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}"</span>)
+        }
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>10. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — AWS Key Committed to GitHub</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Timeline</strong></td><td>Developer commits hardcoded <code>aws_secret_access_key</code> in a config file. GitHub's secret scanning triggers within minutes. But third-party bots also scan GitHub continuously — compromise can happen in &lt;5 minutes.</td></tr>
+                            <tr><td><strong>Immediate</strong></td><td>(1) Deactivate the key in IAM console — NOW, before anything else. (2) Check CloudTrail for usage of that key. (3) <code>git filter-repo</code> to rewrite history. (4) Force push with <code>git push --force</code>.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Gitleaks pre-commit hook + CI secret scan. Never use long-lived access keys — use IAM roles (EC2/EKS IRSA — Modules 10/12). No access keys in developer machines for production; use AWS SSO.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Trivy Blocks CI: CRITICAL CVE in Base Image</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — handle base image CVEs</span></div>
+                        <pre><code><span class="comment"># Trivy fails: CRITICAL CVE in node:18-alpine base image</span>
+<span class="comment"># Option 1: Update base image to latest patch</span>
+<span class="comment"># FROM node:18-alpine → FROM node:20-alpine (or latest 18 patch)</span>
+<span class="command">docker</span> pull node:20-alpine
+<span class="command">trivy</span> image node:20-alpine      <span class="comment"># verify fewer CVEs</span>
+
+<span class="comment"># Option 2: Suppress known-acceptable CVE with .trivyignore</span>
+<span class="comment"># .trivyignore (commit to repo, document why each one is acceptable):</span>
+<span class="comment"># CVE-2024-XXXX  # Not exploitable: we don't use this code path</span>
+
+<span class="comment"># Option 3: Scope the severity threshold (avoid blocking on MEDIUM if noise is high)</span>
+<span class="command">trivy</span> image --exit-code 1 --severity CRITICAL,HIGH $IMAGE:$TAG</code></pre>
+                    </div>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — OPA Blocks a Legitimate Deploy</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td><code>kubectl apply</code> fails with: <em>"Container api must set memory limit"</em></td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Add resource limits to the Deployment manifest. This is actually correct behavior — Gatekeeper doing its job. If the policy is wrong, fix the policy (not by bypassing Gatekeeper).</td></tr>
+                            <tr><td><strong>Development workflow</strong></td><td>Run <code>trivy config ./k8s-manifests/</code> locally before pushing (Section 4). This catches policy violations before hitting the admission webhook.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 4 — Falco Alert: Shell in Production Container</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Alert</strong></td><td>Falco: <em>"Shell spawned in container — user=root container=api cmd=bash"</em> at 2:17 AM</td></tr>
+                            <tr><td><strong>Triage</strong></td><td>Was this an authorized operator doing emergency debugging, or an attacker who exploited RCE? Check: who exec'd into the pod? Was there an on-call incident at that time? Check CloudTrail and kubectl audit logs.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Distroless images have no shell — attackers can't exec into them even if they gain code execution. Module 18 best practice: production images use <code>FROM gcr.io/distroless/nodejs20</code>. Debugging via ephemeral debug containers (<code>kubectl debug</code>), not exec.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — DevSecOps Pipeline Hardening</h2>
+                    </div>
+                    <p class="content-text">
+                        Harden the Module 09/17 pipeline by adding all security stages, deploy Gatekeeper
+                        with three constraints, and set up Falco with a custom alert.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Add Security Stages to Jenkins Pipeline</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Install tools on the Jenkins agent</span>
+<span class="command">pip</span> install semgrep --break-system-packages
+<span class="comment"># Install Gitleaks and Trivy binaries (see Sections 2 and 4)</span>
+<span class="comment"># Update Jenkinsfile with Secret Scan, SAST, Container Scan, SBOM stages</span>
+<span class="comment"># (Section 9 Jenkinsfile)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Deploy Gatekeeper with 3 Constraints</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/release-3.15/deploy/gatekeeper.yaml
+<span class="comment"># Apply constraints: required-limits, no-privileged, require-ecr-registry</span>
+<span class="comment"># Test: try to apply a pod without limits → should be rejected</span>
+<span class="command">kubectl</span> run test --image=nginx --restart=Never  <span class="comment"># should fail (no limits)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Implement Sealed Secrets for DB Credentials</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">helm</span> install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
+<span class="comment"># Seal the database password secret (Section 7)</span>
+<span class="comment"># Add sealed-db-pass.yaml to the gitops config repo</span>
+<span class="comment"># ArgoCD syncs it → controller decrypts → K8s Secret created</span>
+<span class="comment"># Verify: kubectl get secret db-pass -n production</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Deploy Falco and Wire Alerts to Slack</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">helm</span> install falco falcosecurity/falco -n falco --create-namespace \
+    --set falco.json_output=true
+<span class="comment"># Add custom rule from Section 8 (shell in container)</span>
+<span class="comment"># Wire Falco sidekick → Slack webhook for alerts</span>
+<span class="command">helm</span> install falco-sidekick falcosecurity/falcosidekick \
+    -n falco \
+    --set config.slack.webhookurl=https://hooks.slack.com/...</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Drift Drill — Inject and Detect a Threat</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Exec a shell into a running pod — Falco should alert within seconds</span>
+<span class="command">kubectl</span> exec -it deploy/api -n production -- bash
+
+<span class="comment"># Verify: Falco log shows "Shell Spawned in Container" at WARNING</span>
+<span class="comment"># Verify: Slack receives the alert</span>
+
+<span class="comment"># Also: attempt to push an image with a CRITICAL CVE — CI should fail at Trivy stage</span>
+<span class="comment"># And: attempt kubectl run without limits — Gatekeeper should reject it</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What does "Shift Left" mean in DevSecOps?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Moving security checks earlier (leftward on the timeline) in the SDLC — from production pen-tests to pre-commit hooks and CI stages. The economics: a vulnerability costs ~$1 to fix in development, ~$10 in CI, ~$100 in staging, and can cost $10K+ in a production breach. Shift Left tools include: pre-commit hooks (Gitleaks), SAST in CI (Semgrep), container scanning before push (Trivy), policy admission control at deploy time (OPA Gatekeeper). The developer gets fast feedback on security issues without waiting for a security team review — security becomes self-service.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you handle secrets in a GitOps setup?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Native K8s Secrets are base64 — not encrypted — and can't be safely committed to Git. Two main approaches: (1) Sealed Secrets: kubeseal encrypts with the cluster's public key → SealedSecret CRD is safe to commit → controller decrypts in-cluster. Simple but tied to one cluster. (2) External Secrets Operator: commits ExternalSecret manifests to Git (not the secret itself), ESO fetches live values from AWS Secrets Manager using IRSA. Rotation is automatic. For a GitOps + AWS setup, External Secrets is preferred because secrets never touch Git at all and rotation is just a Secrets Manager update — no re-sealing required.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: A developer pushed an AWS key to GitHub. What do you do?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Immediate actions (in order): (1) Deactivate the IAM key NOW in the console — before doing anything else. Bots scan GitHub continuously; assume compromise already happened. (2) Check CloudTrail for any API calls using that key after the commit timestamp. (3) Notify the security team and begin an incident. (4) Clean the Git history with git filter-repo and force-push. (5) Root cause and prevent: add Gitleaks as a pre-commit hook and CI stage, adopt IAM roles (IRSA, EC2 instance profiles) to eliminate long-lived access keys for developers. Key insight: deleting the commit doesn't help if the repo is public or was cloned — rotation is the only reliable fix.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is OPA Gatekeeper and how does it work?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>OPA Gatekeeper is a Kubernetes admission webhook that enforces policies on every API server request. When you run <code>kubectl apply</code>, the API server sends the manifest to Gatekeeper before persisting it. Gatekeeper evaluates Rego policies (ConstraintTemplates) and returns ALLOW or DENY with a message. Examples: require all containers to have memory limits, block privileged containers, allow images only from your ECR. Unlike RBAC (which controls who can do what), Gatekeeper controls what can be created/updated. It's cluster-level enforcement that no amount of CI policy can replace — even if CI is bypassed, Gatekeeper still blocks non-compliant workloads from running.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between SAST and container scanning?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>SAST (Static Application Security Testing) analyzes your source code for security bugs — patterns like SQL injection, hardcoded credentials, insecure deserialization, prototype pollution. It runs against your code before it's compiled or containerized. Container scanning (Trivy, Grype) analyzes the built Docker image — it inventories every OS package, runtime, and library in the image layers and checks them against CVE databases. SAST finds bugs you wrote; container scanning finds vulnerabilities in your dependencies. Both are needed: a perfectly written Node.js app can still have a CRITICAL CVE in <code>node:18</code> that container scanning catches, while SAST catches a SQL injection that container scanning would miss entirely.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does Falco complement static security tools?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Static tools (Trivy, Semgrep, Gatekeeper) catch known issues at build time and deploy time. Falco addresses a different threat model: zero-day exploits, supply-chain attacks where a compromised npm package later phones home, or legitimate credentials stolen and used to exec into running containers. Falco monitors Linux kernel syscalls at runtime via eBPF — if a container suddenly spawns a shell, reads <code>/etc/shadow</code>, or opens a connection to an unexpected IP, Falco alerts in real time. The combination is: prevent known issues at build/deploy (static), detect anomalous behavior at runtime (Falco). Neither alone is sufficient.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-17.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 17 — GitOps with ArgoCD</span>
+                </div>
+            </a>
+            <a href="module-19.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 19 — SRE &amp; Platform Engineering</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

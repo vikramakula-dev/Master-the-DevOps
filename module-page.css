@@ -983,3 +983,47 @@
     color: var(--text-secondary);
     line-height: 1.7;
 }
+
+/* ---------- Variant styles used by Modules 10-20 ---------- */
+.interview-header-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.interview-header:has(.interview-header-icon) {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.subsection-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 28px 0 10px;
+    color: var(--text-primary);
+}
+
+.project-step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.project-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}

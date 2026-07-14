@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 19 — SRE &amp; Platform Engineering | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 19: SRE and Platform Engineering — SLOs, Error Budgets, Toil elimination, Internal Developer Platforms, and the on-call mindset.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 19 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level pro">Pro</span>
+                    <span class="module-hero-duration">Phase 5 · Advanced DevOps</span>
+                </div>
+                <h1>Module 19 — SRE &amp; <span class="gradient-text">Platform Engineering</span></h1>
+                <p class="module-hero-desc">
+                    You've built the system — now you run it at scale. SRE turns "keep the lights on"
+                    into an engineering discipline with math (SLOs, error budgets, toil ratios). Platform
+                    Engineering takes everything you automated in Modules 09-18 and packages it into a
+                    self-service product for other engineering teams. This is the operating model beneath
+                    the tools.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">SLO/SLA/SLI</span>
+                    <span class="tech-tag">Error Budget</span>
+                    <span class="tech-tag">Toil</span>
+                    <span class="tech-tag">IDP</span>
+                    <span class="tech-tag">Backstage</span>
+                    <span class="tech-tag">Incident Command</span>
+                    <span class="tech-tag">Blameless Post-Mortem</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#sre-intro" class="toc-link">1. SRE vs DevOps vs Ops</a></li>
+                    <li><a href="#slis-slos" class="toc-link">2. SLIs, SLOs, SLAs</a></li>
+                    <li><a href="#error-budget" class="toc-link">3. Error Budgets</a></li>
+                    <li><a href="#toil" class="toc-link">4. Toil Elimination</a></li>
+                    <li><a href="#incident" class="toc-link">5. Incident Response</a></li>
+                    <li><a href="#postmortem" class="toc-link">6. Blameless Post-Mortems</a></li>
+                    <li><a href="#platform-eng" class="toc-link">7. Platform Engineering &amp; IDPs</a></li>
+                    <li><a href="#backstage" class="toc-link">8. Backstage — The IDP Framework</a></li>
+                    <li><a href="#oncall" class="toc-link">9. On-Call Engineering</a></li>
+                    <li><a href="#incidents" class="toc-link">10. 🔥 Real-Time Scenarios</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. SRE vs DevOps ============ -->
+                <section class="content-section" id="sre-intro">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📐</div>
+                        <h2>1. SRE vs DevOps vs Traditional Ops</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Dimension</th><th>Traditional Ops</th><th>DevOps</th><th>SRE</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Goal</strong></td><td>Keep things stable ("no changes")</td><td>Ship fast and reliably</td><td>Engineer reliability at scale</td></tr>
+                            <tr><td><strong>Changes</strong></td><td>Change = risk, slow change boards</td><td>CI/CD, frequent deploys</td><td>Change managed by error budget math</td></tr>
+                            <tr><td><strong>Incidents</strong></td><td>Firefighting, blame</td><td>Post-mortems, automation</td><td>Blameless RCAs, toil metrics, elimination</td></tr>
+                            <tr><td><strong>Success metric</strong></td><td>Uptime % (5 9s religion)</td><td>Deploy frequency, MTTR</td><td>SLO compliance, toil ratio, error budget burn</td></tr>
+                            <tr><td><strong>Tooling</strong></td><td>Runbooks, tickets</td><td>Pipelines, IaC</td><td>All of DevOps + SLO dashboards + IDP</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 SRE is DevOps with a job title and more math</div>
+                        <p>Google coined SRE in 2003. The core insight: treat operations as a software problem. SRE teams have coding standards for runbooks (they call them playbooks), measure their own toil like a bug backlog, and use error budgets to have objective, data-driven conversations with product teams about release velocity vs reliability.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. SLIs SLOs SLAs ============ -->
+                <section class="content-section" id="slis-slos">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📊</div>
+                        <h2>2. SLIs, SLOs, SLAs — The Reliability Vocabulary</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Term</th><th>Definition</th><th>Example</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>SLI</strong> (Service Level Indicator)</td><td>A quantitative measure of service behavior. A ratio: good events / total events</td><td>% of API requests returning 2xx in &lt;200ms</td></tr>
+                            <tr><td><strong>SLO</strong> (Service Level Objective)</td><td>An internal reliability target on an SLI. Binding within engineering.</td><td>99.9% of requests succeed within 200ms over 30 days</td></tr>
+                            <tr><td><strong>SLA</strong> (Service Level Agreement)</td><td>External contractual commitment. Penalty if breached (credits, lawsuits).</td><td>AWS EC2 SLA: 99.99% monthly uptime; credits if below</td></tr>
+                            <tr><td><strong>Error Budget</strong></td><td>1 - SLO. The amount of unreliability you're allowed in the SLO window.</td><td>99.9% SLO → 0.1% budget → 43 min/month</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — SLO definition (OpenSLO format)</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: openslo/v1
+<span class="keyword">kind</span>: SLO
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory-api-availability
+<span class="keyword">spec</span>:
+  <span class="keyword">service</span>: techitfactory-api
+  <span class="keyword">description</span>: API request success rate SLO
+  <span class="keyword">sli</span>:
+    <span class="keyword">metricSource</span>:
+      <span class="keyword">spec</span>:
+        <span class="comment"># Module 16 PromQL payoff — SLI expressed as a PromQL query</span>
+        <span class="keyword">query</span>: >
+          sum(rate(http_requests_total{status=~"2.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m]))
+  <span class="keyword">objectives</span>:
+  - <span class="keyword">value</span>: 0.999          <span class="comment"># 99.9% SLO</span>
+    <span class="keyword">op</span>: gte
+    <span class="keyword">displayName</span>: Monthly availability</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Why 100% SLO is wrong</div>
+                        <p>A 100% availability SLO means any change risks breaching it — so you'd never deploy. SLOs should be "good enough that users are happy, but realistic enough to allow innovation." Google's rule: the SLO should be slightly better than users notice, but never 100%. Typical targets: user-facing APIs: 99.9%, critical payment flows: 99.99%, batch jobs: 99%.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Error Budgets ============ -->
+                <section class="content-section" id="error-budget">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏦</div>
+                        <h2>3. Error Budgets — The Policy that Changes Conversations</h2>
+                    </div>
+                    <p class="content-text">
+                        The error budget converts a reliability debate ("we need 100% uptime!") into a
+                        business trade-off conversation. Error budget math:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — error budget calculations</span></div>
+                        <pre><code><span class="comment"># SLO = 99.9% over 30 days</span>
+<span class="comment"># Error budget = (1 - 0.999) × 30 days × 24 hr × 60 min = 43.2 minutes</span>
+
+<span class="comment"># SLO = 99.95% over 30 days → 21.6 minutes</span>
+<span class="comment"># SLO = 99.99% over 30 days → 4.3 minutes</span>
+
+<span class="comment"># Error budget burn rate: how fast are we consuming the budget?</span>
+<span class="comment"># Burn rate 1 = consuming budget at exactly the SLO rate (will exhaust at end of window)</span>
+<span class="comment"># Burn rate 14 (fast burn) = exhausting 30-day budget in 2 days — PAGE IMMEDIATELY</span>
+
+<span class="comment"># PromQL: 1-hour burn rate alert (Module 16 AlertManager payoff)</span>
+<span class="comment"># 1 - (sum(rate(http_requests_total{status=~"2.."}[1h])) / sum(rate(http_requests_total[1h]))) > 0.001 * 14</span></code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Budget state</th><th>Meaning</th><th>Engineering response</th></tr></thead>
+                        <tbody>
+                            <tr><td>Budget healthy</td><td>On track — consuming &lt;1× burn rate</td><td>Deploy freely, run experiments</td></tr>
+                            <tr><td>Budget below 50%</td><td>Burning faster than expected</td><td>Slow risky deploys, focus on reliability improvements</td></tr>
+                            <tr><td>Budget exhausted</td><td>SLO breached for the window</td><td>Feature freeze; only reliability fixes ship until budget resets</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 4. Toil ============ -->
+                <section class="content-section" id="toil">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>4. Toil — Engineering's Technical Debt Equivalent</h2>
+                    </div>
+                    <p class="content-text">
+                        Toil is manual, repetitive, automatable operational work that scales with service
+                        growth. SRE practice: cap toil at &lt;50% of team time (the rest must be engineering).
+                        Every runbook task is a toil item; every automation eliminates it.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Toil example</th><th>Automation</th><th>Module link</th></tr></thead>
+                        <tbody>
+                            <tr><td>Manually scaling deployments during high traffic</td><td>HPA (Horizontal Pod Autoscaler)</td><td>Module 11</td></tr>
+                            <tr><td>Manually rotating IAM credentials</td><td>IRSA — no long-lived keys</td><td>Module 12</td></tr>
+                            <tr><td>Manually provisioning servers for new services</td><td>Terraform modules + CI apply</td><td>Module 13</td></tr>
+                            <tr><td>Manually deploying new image versions</td><td>GitOps — commit triggers deploy</td><td>Module 17</td></tr>
+                            <tr><td>Manually running the same <code>kubectl describe</code> triage flow</td><td>Python runbook automation (boto3/subprocess)</td><td>Module 14</td></tr>
+                            <tr><td>Manually checking all 20 services for new CVEs</td><td>Trivy in CI + ECR scanning</td><td>Module 18</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-success">
+                        <div class="tip-box-title">✅ Toil elimination is the SRE pitch in interviews</div>
+                        <p>"In my current role, I noticed we were spending 4 hours a week manually checking CloudWatch alarms and creating tickets. I automated the correlation logic in Python (Module 14 boto3), which eliminated ~180 hours of toil per year and let the team focus on the alerting architecture instead of reading emails." This kind of answer wins SRE roles.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Incident Response ============ -->
+                <section class="content-section" id="incident">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚨</div>
+                        <h2>5. Incident Response — Command Structure</h2>
+                    </div>
+                    <p class="content-text">
+                        Incidents are chaotic without structure. The SRE Incident Command model assigns clear
+                        roles so responders aren't tripping over each other:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Role</th><th>Responsibility</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Incident Commander (IC)</strong></td><td>Owns the incident. Coordinates response, decides escalations, controls the communication channel. Does NOT debug — delegates.</td></tr>
+                            <tr><td><strong>Tech Lead</strong></td><td>Leads technical diagnosis and mitigation. Focuses on the system, not communication.</td></tr>
+                            <tr><td><strong>Communications Lead</strong></td><td>Writes status page updates, stakeholder comms. Shields Tech Lead from interruptions.</td></tr>
+                            <tr><td><strong>Scribe</strong></td><td>Documents timeline in real time: what was tried, what failed, what fixed it. The post-mortem raw material.</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">text — incident timeline template (scribe output)</span></div>
+                        <pre><code>INCIDENT: API 5xx rate above 50%          Severity: P1
+IC: Vikram                                Started: 2026-07-14 14:32 UTC
+
+14:32 - PagerDuty alert: http_error_rate > 10% for 5 minutes
+14:33 - IC declared P1, opened war room
+14:35 - No recent deploys in last 2 hours (checked ArgoCD)
+14:38 - kubectl describe pods: 3/5 pods OOMKilled (Module 11 incident type)
+14:40 - Memory limit: 256Mi — recent traffic spike doubled memory usage
+14:41 - MITIGATION: kubectl patch deploy api -p '{"spec":{"template":{"spec":{"containers":[{"name":"api","resources":{"limits":{"memory":"512Mi"}}}]}}}}'
+14:43 - All pods running. Error rate back to 0.1%.
+14:44 - Post-mortem scheduled. Terraform/GitOps PR to update base limits.</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Post-Mortems ============ -->
+                <section class="content-section" id="postmortem">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📝</div>
+                        <h2>6. Blameless Post-Mortems</h2>
+                    </div>
+                    <p class="content-text">
+                        The blameless post-mortem assumes that engineers are smart people working in a complex
+                        system — the system (process, tooling, alerting) failed, not the person. Blame produces
+                        cover-ups. Blameless culture produces learning and systemic improvement.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Section</th><th>Content</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Impact</strong></td><td>What users experienced, how many, how long, revenue/SLO impact</td></tr>
+                            <tr><td><strong>Timeline</strong></td><td>Chronological from first signal to resolution (scribe log)</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>5-Whys analysis. Not "the engineer ran the wrong command" — what system allowed that?</td></tr>
+                            <tr><td><strong>Contributing Factors</strong></td><td>Alerting gaps, runbook gaps, deploy process gaps, on-call fatigue</td></tr>
+                            <tr><td><strong>Action Items</strong></td><td>Specific, assigned, time-bounded. Not "be more careful" — "add memory limit review to deploy checklist by 2026-07-21 (owner: Vikram)"</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The 5-Whys for the OOMKilled incident</div>
+                        <p>Why did the API fail? → Pods were OOMKilled. Why? → Memory limit was 256Mi. Why? → Default from the Helm chart wasn't updated for traffic growth. Why? → No process to review resource limits as traffic grows. Why? → We don't have an SLO-driven capacity review cadence. Fix: schedule quarterly resource review + add HPA (Module 11).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Platform Engineering ============ -->
+                <section class="content-section" id="platform-eng">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>7. Platform Engineering &amp; Internal Developer Platforms</h2>
+                    </div>
+                    <p class="content-text">
+                        Platform Engineering is the practice of building and maintaining an Internal Developer
+                        Platform (IDP) — the "paved road" that lets product engineers deploy services without
+                        becoming Kubernetes/Terraform/ArgoCD experts. Your entire Modules 09-18 stack is the
+                        platform; the IDP is the interface over it.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">IDP Layers</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Developer<br/>self-service<br/>(Backstage/portal)</span>
+                            <span class="flow-arrow">↓</span>
+                            <span class="flow-item">Automation<br/>(pipelines, scripts,<br/>GitOps, ArgoCD)</span>
+                            <span class="flow-arrow">↓</span>
+                            <span class="flow-item">Infrastructure<br/>(EKS, Terraform,<br/>Helm charts)</span>
+                            <span class="flow-arrow">↓</span>
+                            <span class="flow-item">Cloud<br/>(AWS services<br/>from Module 10)</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>IDP capability</th><th>What it replaces</th><th>Module built on</th></tr></thead>
+                        <tbody>
+                            <tr><td>New service scaffold</td><td>"Can you set up a new repo and pipeline for me?"</td><td>Module 09 (Jenkins), Module 17 (GitOps)</td></tr>
+                            <tr><td>Self-service deploy</td><td>Ticket to ops team to deploy version X</td><td>Module 17 (ArgoCD)</td></tr>
+                            <tr><td>Environment provisioning</td><td>"Can you spin me a test environment?"</td><td>Module 13 (Terraform), Module 12 (EKS)</td></tr>
+                            <tr><td>Service observability</td><td>Individual teams hand-rolling dashboards</td><td>Module 16 (Prometheus/Grafana)</td></tr>
+                            <tr><td>Security compliance</td><td>Security team manually reviewing each service</td><td>Module 18 (OPA, Trivy, Gitleaks)</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 8. Backstage ============ -->
+                <section class="content-section" id="backstage">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎭</div>
+                        <h2>8. Backstage — The IDP Framework</h2>
+                    </div>
+                    <p class="content-text">
+                        Backstage (Spotify OSS, adopted by CNCF) is the most common IDP framework.
+                        It provides a service catalog (every microservice, its owner, runbook, SLO),
+                        Software Templates (scaffold new services with your golden-path CI/CD baked in),
+                        and plugin integrations (PagerDuty, ArgoCD, Grafana, GitHub).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — bootstrap Backstage</span></div>
+                        <pre><code><span class="comment"># Requires Node 18+</span>
+<span class="command">npx</span> @backstage/create-app@latest
+
+<span class="comment"># Run locally</span>
+<span class="command">cd</span> my-backstage
+<span class="command">yarn</span> dev    <span class="comment"># http://localhost:3000</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — catalog-info.yaml (add to every service repo)</span></div>
+                        <pre><code><span class="comment"># Add catalog-info.yaml to the root of each microservice repo</span>
+<span class="keyword">apiVersion</span>: backstage.io/v1alpha1
+<span class="keyword">kind</span>: Component
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory-api
+  <span class="keyword">description</span>: Core API for the TechitFactory platform
+  <span class="keyword">annotations</span>:
+    <span class="keyword">github.com/project-slug</span>: techitfactory/api
+    <span class="keyword">pagerduty.com/service-id</span>: P12345
+    <span class="keyword">argocd/app-name</span>: techitfactory-prod
+    <span class="keyword">grafana/dashboard-selector</span>: techitfactory-api
+<span class="keyword">spec</span>:
+  <span class="keyword">type</span>: service
+  <span class="keyword">lifecycle</span>: production
+  <span class="keyword">owner</span>: team-backend
+  <span class="keyword">system</span>: techitfactory-platform</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. On-Call ============ -->
+                <section class="content-section" id="oncall">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📟</div>
+                        <h2>9. On-Call Engineering — The Sustainable Model</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>On-call principle</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Alert only on SLO threats</strong></td><td>If an alert doesn't require action within 30 minutes, it's not a page — it's a ticket. PagerDuty fatigue kills teams. Only page when the error budget is burning fast (Module 3 concept from Section 3).</td></tr>
+                            <tr><td><strong>Runbooks for every alert</strong></td><td>Every AlertManager rule links to a runbook. The responder shouldn't debug from scratch at 2 AM — the runbook walks through triage. Module 16 AlertManager annotations: <code>runbook_url</code>.</td></tr>
+                            <tr><td><strong>Fix the alert or fix the system</strong></td><td>If you're paged for the same thing three times, that's a toil item — automate the mitigation or fix the root cause. Never just silence the alert.</td></tr>
+                            <tr><td><strong>Rotation and compensation</strong></td><td>On-call rotations should be 5–7 days per person, with minimum 2-person teams (primary + secondary). Compensate for on-call load.</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — AlertManager rule with runbook (Module 16 extension)</span></div>
+                        <pre><code><span class="keyword">- alert</span>: ErrorBudgetFastBurn
+  <span class="keyword">expr</span>: >
+    (1 - sum(rate(http_requests_total{status=~"2.."}[1h]))
+    / sum(rate(http_requests_total[1h]))) > 0.001 * 14
+  <span class="keyword">for</span>: 5m
+  <span class="keyword">labels</span>:
+    <span class="keyword">severity</span>: critical
+    <span class="keyword">team</span>: platform
+  <span class="keyword">annotations</span>:
+    <span class="keyword">summary</span>: <span class="string">"Error budget burning 14x too fast"</span>
+    <span class="keyword">description</span>: <span class="string">"30-day budget will be exhausted in 2 days at current rate"</span>
+    <span class="keyword">runbook_url</span>: <span class="string">"https://wiki.techitfactory.com/runbooks/error-budget-burn"</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>10. Real-Time Scenarios &amp; War Room Practice</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Scenario 1 — Error Budget Burned in 3 Days</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Situation</strong></td><td>Monday: 30-day SLO budget exhausted by Wednesday after a bad deploy on Friday.</td></tr>
+                            <tr><td><strong>Response</strong></td><td>(1) Freeze new feature deploys per the error budget policy. (2) Roll back the Friday deploy via git revert (Module 17). (3) Schedule post-mortem for Thursday. (4) Only reliability improvements deploy until next month's budget resets.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Fast-burn AlertManager rule (Section 9) would have paged at 14× burn rate — catching it 2 hours after the deploy instead of 3 days later. SLO monitoring dashboard (Module 16) visible to the on-call team.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Scenario 2 — Toil Explosion: 40% of Sprint on Manual Work</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Situation</strong></td><td>New services onboarding doubles. Team spends 40% of time provisioning namespaces, creating ArgoCD apps, and setting up Grafana dashboards manually for each new service.</td></tr>
+                            <tr><td><strong>SRE response</strong></td><td>Identify the toil. Build a Backstage Software Template: developer fills a form, template runs Terraform to create the namespace, applies the ArgoCD Application, scaffolds the Grafana dashboard. New service onboarding: 2 weeks → 15 minutes.</td></tr>
+                            <tr><td><strong>Measurement</strong></td><td>Track toil ratio before and after: 40% → 10%. Present at the next sprint review with numbers. This is the SRE career proof point.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Scenario 3 — Major Incident: Post-Mortem Culture Test</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Situation</strong></td><td>A database migration caused 45 minutes of downtime. A manager wants to "find out who's responsible."</td></tr>
+                            <tr><td><strong>SRE response</strong></td><td>Blameless post-mortem: the system allowed the migration to run without a canary or rollback plan. The action item is a process change (all database migrations require a rollback script and staging validation), not a reprimand. Blame prevents learning and causes engineers to hide incidents in the future.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — SLO Dashboard + Backstage Service Catalog</h2>
+                    </div>
+                    <p class="content-text">
+                        Define SLOs for the capstone app, build a Grafana SLO dashboard using Module 16
+                        Prometheus, wire an error-budget-burn alert, and add the service to a Backstage catalog.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Define SLIs and SLOs for the TechitFactory API</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">text</span></div>
+                            <pre><code>SLI 1: Availability
+  = sum(rate(http_requests_total{status=~"2.."}[5m]))
+    / sum(rate(http_requests_total[5m]))
+  SLO: 99.9% over 30 days
+
+SLI 2: Latency
+  = histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) &lt; 0.5
+  SLO: 95% of requests &lt; 500ms over 30 days
+
+Error budget (Availability): 43.2 minutes / 30 days
+Error budget (Latency): auto-compute similarly</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Build Grafana SLO Dashboard</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">promql — panels for the SLO dashboard</span></div>
+                            <pre><code><span class="comment"># Panel 1: Current availability SLI (last 30 days)</span>
+sum(rate(http_requests_total{status=~"2.."}[30d]))
+/ sum(rate(http_requests_total[30d]))
+
+<span class="comment"># Panel 2: Error budget remaining (minutes)</span>
+(0.001 - (1 - sum(rate(http_requests_total{status=~"2.."}[30d])) / sum(rate(http_requests_total[30d])))) * 30 * 24 * 60
+
+<span class="comment"># Panel 3: Current burn rate</span>
+(1 - sum(rate(http_requests_total{status=~"2.."}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Add Fast-Burn AlertManager Rule</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">yaml</span></div>
+                            <pre><code><span class="comment"># Add to the Module 16 alert rules (Section 9 YAML above)</span>
+<span class="comment"># Test: artificially fail requests → verify PagerDuty/Slack fires within 5 minutes</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Bootstrap Backstage and Add the API to the Catalog</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">npx</span> @backstage/create-app@latest --name techitfactory-platform
+<span class="command">cd</span> techitfactory-platform &amp;&amp; <span class="command">yarn</span> dev
+<span class="comment"># Add catalog-info.yaml to the app repo root (Section 8 YAML)</span>
+<span class="comment"># In Backstage: Settings → Catalog → Register component → point to GitHub URL</span>
+<span class="comment"># Verify: service appears in Backstage catalog with owner, links, SLO annotations</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Write a Post-Mortem for a Simulated Incident</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Simulate: kubectl scale deploy api --replicas=0 -n production</span>
+<span class="comment"># Record the timeline from first alert to recovery</span>
+<span class="comment"># Write the blameless post-mortem (Section 6 template)</span>
+<span class="comment"># Include 5-Whys and 2-3 action items with owners and due dates</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is an SLO and how does it differ from an SLA?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>An SLO (Service Level Objective) is an internal reliability target expressed as a threshold on an SLI — for example, "99.9% of API requests succeed within 200ms over any 30-day window." It's a binding engineering commitment. An SLA (Service Level Agreement) is an external contract with customers or stakeholders — it typically has penalties if breached (credits, termination rights). SLOs should be set tighter than SLAs to give you a buffer. The SLO is owned by engineering; the SLA is owned by the business/legal team. Breaking your SLO is an engineering problem to fix; breaking the SLA is a customer/legal problem.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is an error budget and how does it change team behavior?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Error budget = 1 - SLO. For a 99.9% SLO over 30 days, you have 43.2 minutes of allowed unreliability. When the budget is healthy, teams can move fast — deploy features, run experiments. When the budget is low or exhausted, it's a forcing function: freeze new features, focus on reliability improvements. This transforms the conversation between product and engineering from subjective ("we need to ship faster") to objective ("we've burned 80% of our error budget this month — we can't take on more risk without violating our SLO"). Error budgets make reliability a shared team responsibility, not just an ops team problem.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is toil? Give an example of how you'd eliminate it.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Toil is manual, repetitive, automatable work that scales with service growth — it has no lasting engineering value. Examples: manually approving deploys, rotating credentials, scaling pods during traffic spikes. SRE practice is to cap toil at &lt;50% of team time. Example elimination: we were manually creating Kubernetes namespaces, ArgoCD Applications, and Grafana dashboards for every new microservice (about 2 weeks of work per onboarding). I built a Backstage Software Template that runs Terraform and applies K8s manifests automatically when a developer submits a form. Onboarding time dropped to 15 minutes. That freed 3 weeks per quarter for reliability engineering work.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is a blameless post-mortem and why does it matter?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A blameless post-mortem analyzes an incident assuming that the people involved made reasonable decisions given the information they had at the time — the system (tooling, process, alerting, runbooks) is what failed, not the individual. Why it matters: blame produces cover-ups, silence, and fear of taking action during incidents. Blameless culture produces learning: engineers share the full timeline honestly because they won't be punished, which surfaces real root causes and systemic improvements. The key structure: timeline → root cause (5-Whys analysis of system failures, not people failures) → action items (specific, assigned, time-bounded). "Be more careful" is never an action item.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is an Internal Developer Platform?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>An IDP (Internal Developer Platform) is a self-service product that lets application developers deploy and operate services without deep infrastructure expertise. It abstracts the underlying platform (Kubernetes, Terraform, ArgoCD, monitoring) behind a simpler interface — typically a service catalog, template wizard, and observability dashboards. Teams build IDPs on frameworks like Backstage. The goal is to encode the "golden path" — your organization's approved, secure, observable way to run a service — into a template developers can use in minutes. IDPs reduce toil for both the platform team and developers, improve consistency (every service gets monitoring, security policies, GitOps by default), and accelerate onboarding.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you prevent on-call burnout?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>SRE approach to sustainable on-call: (1) Alert only on SLO threats — if an alert doesn't require action within 30 minutes it should be a ticket, not a page. Most alert noise comes from alerts that fire but don't need immediate action. (2) Every alert links to a runbook — responders shouldn't debug from scratch at 2 AM. (3) Fix the alert or fix the system: if the same page fires 3 times, that's a toil item — automate the mitigation or fix root cause. (4) Measure pages per shift — target &lt;2 actionable pages per on-call week, escalate if exceeded. (5) Rotation covers minimum 2 people (primary/secondary), and compensate for on-call load. Burnout is a system design problem, not a personal resilience problem.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-18.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 18 — DevSecOps</span>
+                </div>
+            </a>
+            <a href="module-20.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 20 — AI in DevOps &amp; Career</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

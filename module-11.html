@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 11 — Container Orchestration with Kubernetes | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 11: Kubernetes — architecture, Pods, Deployments, Services, Ingress, ConfigMaps, Helm, HPA. Move from Docker Compose to production-grade orchestration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 11 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 3 · Cloud &amp; Infrastructure</span>
+                </div>
+                <h1>Module 11 — Container Orchestration with <span class="gradient-text">Kubernetes</span></h1>
+                <p class="module-hero-desc">
+                    Module 09 ended at Compose's ceiling — one host, downtime-gap deploys, manual rollback.
+                    Kubernetes answers "what if the server dies?" with desired-state reconciliation instead of
+                    imperative scripts. By the end you'll have a microservices app running on Minikube with
+                    self-healing, rolling updates, and a packaged Helm chart.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Kubernetes</span>
+                    <span class="tech-tag">kubectl</span>
+                    <span class="tech-tag">Minikube</span>
+                    <span class="tech-tag">Helm</span>
+                    <span class="tech-tag">Ingress</span>
+                    <span class="tech-tag">StatefulSet</span>
+                    <span class="tech-tag">HPA</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#why-orchestration" class="toc-link">1. Why Orchestration</a></li>
+                    <li><a href="#architecture" class="toc-link">2. K8s Architecture</a></li>
+                    <li><a href="#local-setup" class="toc-link">3. Local Setup — Minikube</a></li>
+                    <li><a href="#pods" class="toc-link">4. Pods</a></li>
+                    <li><a href="#deployments" class="toc-link">5. Deployments &amp; Rollouts</a></li>
+                    <li><a href="#services" class="toc-link">6. Services</a></li>
+                    <li><a href="#ingress" class="toc-link">7. Ingress</a></li>
+                    <li><a href="#config-secrets" class="toc-link">8. ConfigMaps &amp; Secrets</a></li>
+                    <li><a href="#stateful" class="toc-link">9. Namespaces, Volumes &amp; StatefulSets</a></li>
+                    <li><a href="#helm" class="toc-link">10. Helm</a></li>
+                    <li><a href="#hpa" class="toc-link">11. Requests, Limits &amp; HPA</a></li>
+                    <li><a href="#incidents" class="toc-link">12. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Why Orchestration ============ -->
+                <section class="content-section" id="why-orchestration">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤔</div>
+                        <h2>1. Why Orchestration?</h2>
+                    </div>
+                    <p class="content-text">
+                        Docker Compose is excellent up to one host. Four problems break it at scale:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Problem</th><th>Compose reality</th><th>Kubernetes answer</th></tr></thead>
+                        <tbody>
+                            <tr><td>Multi-host scheduling</td><td>Runs only on the machine you SSH'd into</td><td>Scheduler places pods across a cluster of nodes</td></tr>
+                            <tr><td>Self-healing</td><td>Container crashes → stays dead until you restart it</td><td>Controller detects drift, replaces failed pods automatically</td></tr>
+                            <tr><td>Rolling updates</td><td>Down-gap between <code>docker compose down</code> and <code>up</code></td><td>Deployments replace pods one-at-a-time, zero downtime</td></tr>
+                            <tr><td>Service discovery at scale</td><td>Hardcoded container names in the same Compose file</td><td>kube-dns resolves every Service by name across the cluster</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The Key Insight</div>
+                        <p>Kubernetes is <em>declarative</em> — you describe the desired state (<em>"3 replicas of this image"</em>), and controllers continuously converge reality toward it. This reconciliation loop is the core pattern, and you'll see it again in Terraform (M13) and ArgoCD (M17).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Architecture ============ -->
+                <section class="content-section" id="architecture">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. Kubernetes Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Control Plane vs Worker Nodes</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">You: kubectl apply</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">API Server</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">etcd (state store)</span>
+                        </div>
+                        <div class="visual-flow" style="margin-top:8px;">
+                            <span class="flow-item">Scheduler</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">picks Node</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">kubelet (on node)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">containerd → Pod</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Component</th><th>Role</th><th>Analogy</th></tr></thead>
+                        <tbody>
+                            <tr><td>API Server</td><td>REST gateway — all cluster operations go through it</td><td>The front-door to all cluster state</td></tr>
+                            <tr><td>etcd</td><td>Distributed key-value store; the source of truth</td><td>Git for cluster state</td></tr>
+                            <tr><td>Scheduler</td><td>Watches unscheduled pods; assigns them to nodes</td><td>Job dispatcher</td></tr>
+                            <tr><td>Controller Manager</td><td>Runs controllers (Deployment, ReplicaSet, etc.) that converge state</td><td>The reconciliation engine</td></tr>
+                            <tr><td>kubelet</td><td>Agent on each node; receives pod specs, starts containers via containerd</td><td>Node's local manager</td></tr>
+                            <tr><td>kube-proxy</td><td>Manages iptables/IPVS rules for Service networking</td><td>In-kernel load balancer</td></tr>
+                            <tr><td>containerd</td><td>OCI-compliant container runtime (Module 08 callback)</td><td>Replaces docker daemon</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 3. Local Setup ============ -->
+                <section class="content-section" id="local-setup">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💻</div>
+                        <h2>3. Local Setup — Minikube &amp; kubectl</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install and start</span></div>
+                        <pre><code><span class="comment"># Install minikube (single-node K8s cluster on your machine)</span>
+<span class="command">curl</span> -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+<span class="command">sudo</span> install minikube-linux-amd64 /usr/local/bin/minikube
+
+<span class="comment"># Install kubectl (the CLI for every K8s cluster, local or cloud)</span>
+<span class="command">curl</span> -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+<span class="command">sudo</span> install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+<span class="comment"># Start a local cluster (uses Docker as the driver)</span>
+<span class="command">minikube</span> start --driver=docker --cpus=2 --memory=4096
+
+<span class="comment"># Verify — both should show "Running" / "Ready"</span>
+<span class="command">minikube</span> status
+<span class="command">kubectl</span> get nodes</code></pre>
+                    </div>
+                    <p class="content-text">
+                        <code>kubectl</code> maps directly to Docker commands you already know:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Docker</th><th>kubectl equivalent</th><th>What it does</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>docker ps</code></td><td><code>kubectl get pods</code> ⭐</td><td>List running pods</td></tr>
+                            <tr><td><code>docker logs &lt;id&gt;</code></td><td><code>kubectl logs &lt;pod&gt;</code> ⭐</td><td>Stream container logs</td></tr>
+                            <tr><td><code>docker exec -it</code></td><td><code>kubectl exec -it &lt;pod&gt; -- bash</code> ⭐</td><td>Shell into a running pod</td></tr>
+                            <tr><td><code>docker inspect</code></td><td><code>kubectl describe pod &lt;pod&gt;</code> ⭐</td><td>Events + full state (the debug command)</td></tr>
+                            <tr><td><code>docker rm</code></td><td><code>kubectl delete pod &lt;pod&gt;</code></td><td>Delete a pod (Deployment recreates it)</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 4. Pods ============ -->
+                <section class="content-section" id="pods">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>4. Pods — The Smallest Deployable Unit</h2>
+                    </div>
+                    <p class="content-text">
+                        A pod wraps one or more containers that share a network namespace (same IP) and optional
+                        volumes. You rarely create pods directly — Deployments manage them. But understanding the
+                        pod YAML is the "decode <code>ls -l</code>" moment of Kubernetes:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — annotated Pod manifest</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: v1                    <span class="comment"># K8s API group/version — always check docs</span>
+<span class="keyword">kind</span>: Pod                         <span class="comment"># resource type</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: api-pod                   <span class="comment"># unique name in the namespace</span>
+  <span class="keyword">labels</span>:
+    <span class="keyword">app</span>: api                      <span class="comment"># labels = the glue (Services use selectors to find pods)</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">containers</span>:
+  - <span class="keyword">name</span>: api                     <span class="comment"># container name</span>
+    <span class="keyword">image</span>: <span class="string">techitfactory/api:1.4.2</span> <span class="comment"># always pin a tag — never :latest in prod</span>
+    <span class="keyword">ports</span>:
+    - <span class="keyword">containerPort</span>: 3000          <span class="comment"># documentation only — doesn't open firewall rules</span>
+    <span class="keyword">env</span>:                           <span class="comment"># env vars (or use envFrom + ConfigMap/Secret)</span>
+    - <span class="keyword">name</span>: NODE_ENV
+      <span class="keyword">value</span>: <span class="string">production</span>
+    <span class="keyword">resources</span>:                     <span class="comment"># Section 11 — always set these</span>
+      <span class="keyword">requests</span>: { cpu: <span class="string">"100m"</span>, memory: <span class="string">"128Mi"</span> }
+      <span class="keyword">limits</span>:   { cpu: <span class="string">"500m"</span>, memory: <span class="string">"256Mi"</span> }</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Deployments ============ -->
+                <section class="content-section" id="deployments">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚀</div>
+                        <h2>5. Deployments &amp; Rolling Updates</h2>
+                    </div>
+                    <p class="content-text">
+                        A Deployment manages a ReplicaSet, which manages pods. You almost never touch ReplicaSets
+                        directly — just set <code>replicas</code> and <code>strategy</code> in the Deployment.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — Deployment with rolling update strategy</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: apps/v1
+<span class="keyword">kind</span>: Deployment
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: api-deployment
+<span class="keyword">spec</span>:
+  <span class="keyword">replicas</span>: 3                      <span class="comment"># desired state — controller converges to this</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>:
+      <span class="keyword">app</span>: api                    <span class="comment"># must match pod template labels below</span>
+  <span class="keyword">strategy</span>:
+    <span class="keyword">type</span>: RollingUpdate
+    <span class="keyword">rollingUpdate</span>:
+      <span class="keyword">maxSurge</span>: 1                 <span class="comment"># 1 extra pod during update (4 total briefly)</span>
+      <span class="keyword">maxUnavailable</span>: 0           <span class="comment"># never take a pod down before new one is ready</span>
+  <span class="keyword">template</span>:                        <span class="comment"># pod template — same spec as a Pod manifest</span>
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>:
+        <span class="keyword">app</span>: api
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: api
+        <span class="keyword">image</span>: <span class="string">techitfactory/api:1.4.2</span>
+        <span class="keyword">readinessProbe</span>:             <span class="comment"># must pass before pod receives traffic</span>
+          <span class="keyword">httpGet</span>: { path: /health, port: 3000 }
+          <span class="keyword">initialDelaySeconds</span>: 5</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — rolling update lifecycle (⭐ daily use)</span></div>
+                        <pre><code><span class="comment"># Apply (create or update)</span>
+<span class="command">kubectl</span> apply -f deployment.yaml
+
+<span class="comment"># ⭐ Watch the rollout in real time</span>
+<span class="command">kubectl</span> rollout status deployment/api-deployment
+
+<span class="comment"># ⭐ View rollout history</span>
+<span class="command">kubectl</span> rollout history deployment/api-deployment
+
+<span class="comment"># ⭐ Rollback to previous version (the Module 09 zero-downtime promise, delivered)</span>
+<span class="command">kubectl</span> rollout undo deployment/api-deployment
+
+<span class="comment"># Rollback to a specific revision</span>
+<span class="command">kubectl</span> rollout undo deployment/api-deployment --to-revision=2
+
+<span class="comment"># Scale manually</span>
+<span class="command">kubectl</span> scale deployment api-deployment --replicas=5</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Services ============ -->
+                <section class="content-section" id="services">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔗</div>
+                        <h2>6. Services — Stable Networking for Pods</h2>
+                    </div>
+                    <p class="content-text">
+                        Pods are ephemeral — they die and get new IPs. A Service gives you a stable virtual IP
+                        and DNS name that routes to matching pods via label selectors. kube-dns resolves
+                        <code>api-service.default.svc.cluster.local</code> to the Service's ClusterIP —
+                        the Module 08 container-name networking concept, cluster-wide.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>Reachable from</th><th>Use case</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>ClusterIP</strong></td><td>Inside cluster only</td><td>Internal service-to-service (default)</td></tr>
+                            <tr><td><strong>NodePort</strong></td><td>Any node IP + port (30000-32767)</td><td>Dev/testing, not production</td></tr>
+                            <tr><td><strong>LoadBalancer</strong></td><td>External (cloud provisions an LB)</td><td>Prod external access, replaced by Ingress in practice</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — ClusterIP Service</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: v1
+<span class="keyword">kind</span>: Service
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: api-service          <span class="comment"># DNS name: api-service.&lt;namespace&gt;.svc.cluster.local</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">selector</span>:
+    <span class="keyword">app</span>: api                 <span class="comment"># routes to all pods with label app=api</span>
+  <span class="keyword">ports</span>:
+  - <span class="keyword">port</span>: 80                 <span class="comment"># port clients connect to</span>
+    <span class="keyword">targetPort</span>: 3000         <span class="comment"># port the pod actually listens on</span>
+  <span class="keyword">type</span>: ClusterIP</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Ingress ============ -->
+                <section class="content-section" id="ingress">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🚪</div>
+                        <h2>7. Ingress — One Load Balancer, Many Services</h2>
+                    </div>
+                    <p class="content-text">
+                        Instead of one LoadBalancer Service per microservice (expensive and unmanageable),
+                        Ingress provides L7 routing: one LB → nginx-ingress controller → routes by host/path
+                        to the right Service. This is the Module 04 reverse-proxy concept at cluster scale.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — enable ingress on minikube</span></div>
+                        <pre><code><span class="command">minikube</span> addons enable ingress     <span class="comment"># installs nginx-ingress controller</span>
+<span class="command">kubectl</span> get pods -n ingress-nginx   <span class="comment"># verify controller is Running</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — Ingress with host routing + TLS</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: networking.k8s.io/v1
+<span class="keyword">kind</span>: Ingress
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory-ingress
+  <span class="keyword">annotations</span>:
+    nginx.ingress.kubernetes.io/rewrite-target: /  <span class="comment"># strip path prefix</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">ingressClassName</span>: nginx
+  <span class="keyword">tls</span>:
+  - <span class="keyword">hosts</span>: [app.techitfactory.com]
+    <span class="keyword">secretName</span>: tls-secret        <span class="comment"># TLS cert in a K8s Secret</span>
+  <span class="keyword">rules</span>:
+  - <span class="keyword">host</span>: app.techitfactory.com
+    <span class="keyword">http</span>:
+      <span class="keyword">paths</span>:
+      - <span class="keyword">path</span>: /api
+        <span class="keyword">pathType</span>: Prefix
+        <span class="keyword">backend</span>:
+          <span class="keyword">service</span>: { name: api-service, port: { number: 80 } }
+      - <span class="keyword">path</span>: /
+        <span class="keyword">pathType</span>: Prefix
+        <span class="keyword">backend</span>:
+          <span class="keyword">service</span>: { name: frontend-service, port: { number: 80 } }</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. ConfigMaps & Secrets ============ -->
+                <section class="content-section" id="config-secrets">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>8. ConfigMaps &amp; Secrets</h2>
+                    </div>
+                    <p class="content-text">
+                        ConfigMaps and Secrets externalize configuration from the container image — the Module 08
+                        and 09 <code>env_file</code> pattern, but cluster-native. ConfigMaps hold non-sensitive
+                        config; Secrets hold credentials.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — create and consume</span></div>
+                        <pre><code><span class="comment"># Create ConfigMap from literals</span>
+<span class="command">kubectl</span> create configmap api-config \
+    --from-literal=NODE_ENV=production \
+    --from-literal=PORT=3000
+
+<span class="comment"># Create Secret (values get base64-encoded automatically)</span>
+<span class="command">kubectl</span> create secret generic api-secrets \
+    --from-literal=DB_PASSWORD=supersecret \
+    --from-literal=JWT_SECRET=mykey123</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — consume via envFrom in a Deployment</span></div>
+                        <pre><code><span class="keyword">spec</span>:
+  <span class="keyword">containers</span>:
+  - <span class="keyword">name</span>: api
+    <span class="keyword">image</span>: <span class="string">techitfactory/api:1.4.2</span>
+    <span class="keyword">envFrom</span>:
+    - <span class="keyword">configMapRef</span>:
+        <span class="keyword">name</span>: api-config       <span class="comment"># all keys become env vars</span>
+    - <span class="keyword">secretRef</span>:
+        <span class="keyword">name</span>: api-secrets      <span class="comment"># secret keys also become env vars</span></code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 base64 ≠ encryption</div>
+                        <p>K8s Secrets are base64-encoded, not encrypted. Anyone with cluster access who can <code>kubectl get secret</code> can decode them. For production, store secrets in HashiCorp Vault or AWS Secrets Manager and inject them at runtime — covered in Module 18. Never commit Secret YAMLs with real values to Git (Module 03 warning applies).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Namespaces, Volumes, StatefulSets ============ -->
+                <section class="content-section" id="stateful">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗄️</div>
+                        <h2>9. Namespaces, Volumes &amp; StatefulSets</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>Namespaces</strong> are virtual clusters within a cluster — the capstone uses
+                        three: <code>development</code>, <code>staging</code>, <code>production</code>.
+                        Resources in different namespaces are isolated by default; cross-namespace communication
+                        uses the full DNS name.
+                    </p>
+                    <p class="content-text">
+                        <strong>Volumes and StatefulSets</strong> — Deployments are for stateless workloads;
+                        StatefulSets are for databases. Key differences:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Feature</th><th>Deployment</th><th>StatefulSet</th></tr></thead>
+                        <tbody>
+                            <tr><td>Pod names</td><td>Random (<code>api-7d4f9b-xkzpl</code>)</td><td>Stable ordinals (<code>mongo-0</code>, <code>mongo-1</code>)</td></tr>
+                            <tr><td>Persistent storage</td><td>Shared PVC or none</td><td>Each pod gets its own PVC, retained on delete</td></tr>
+                            <tr><td>Scaling order</td><td>Parallel, random</td><td>Sequential (0 → 1 → 2), ordered rollout</td></tr>
+                            <tr><td>Use case</td><td>API servers, web frontends</td><td>Databases, message queues, any stateful app</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — StatefulSet for MongoDB with PVC template</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: apps/v1
+<span class="keyword">kind</span>: StatefulSet
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: mongo
+<span class="keyword">spec</span>:
+  <span class="keyword">serviceName</span>: mongo-svc     <span class="comment"># headless Service for stable DNS (mongo-0.mongo-svc)</span>
+  <span class="keyword">replicas</span>: 1
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>: { app: mongo }
+  <span class="keyword">template</span>:
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>: { app: mongo }
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: mongo
+        <span class="keyword">image</span>: <span class="string">mongo:6.0</span>
+        <span class="keyword">volumeMounts</span>:
+        - <span class="keyword">name</span>: data
+          <span class="keyword">mountPath</span>: /data/db
+  <span class="keyword">volumeClaimTemplates</span>:       <span class="comment"># each pod gets its own PVC — persists on pod restart</span>
+  - <span class="keyword">metadata</span>: { name: data }
+    <span class="keyword">spec</span>:
+      <span class="keyword">accessModes</span>: [ReadWriteOnce]
+      <span class="keyword">resources</span>:
+        <span class="keyword">requests</span>: { storage: 10Gi }</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 10. Helm ============ -->
+                <section class="content-section" id="helm">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⛵</div>
+                        <h2>10. Helm — Kubernetes Package Manager</h2>
+                    </div>
+                    <p class="content-text">
+                        Helm is the package manager for Kubernetes. A <em>chart</em> is a directory of templated
+                        YAML files + a <code>values.yaml</code> file. Instead of maintaining separate manifests
+                        for dev/staging/prod, you maintain one chart + per-environment values.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ Helm daily commands</span></div>
+                        <pre><code><span class="comment"># Install Helm</span>
+<span class="command">curl</span> https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+<span class="comment"># Create a chart skeleton</span>
+<span class="command">helm</span> create techitfactory-api
+<span class="comment"># Creates: Chart.yaml, values.yaml, templates/ (Deployment, Service, Ingress, etc.)</span>
+
+<span class="comment"># ⭐ Install a release</span>
+<span class="command">helm</span> install techitfactory-dev ./techitfactory-api \
+    --namespace development --create-namespace \
+    -f values-dev.yaml
+
+<span class="comment"># ⭐ Upgrade (update image tag, config, etc.)</span>
+<span class="command">helm</span> upgrade techitfactory-dev ./techitfactory-api \
+    -f values-dev.yaml \
+    --set image.tag=1.5.0          <span class="comment"># override a single value</span>
+
+<span class="comment"># ⭐ Rollback to previous release</span>
+<span class="command">helm</span> rollback techitfactory-dev 1  <span class="comment"># revision 1</span>
+
+<span class="comment"># List, status, uninstall</span>
+<span class="command">helm</span> list -A                       <span class="comment"># all namespaces</span>
+<span class="command">helm</span> status techitfactory-dev
+<span class="command">helm</span> uninstall techitfactory-dev</code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Docker Compose concept</th><th>Helm equivalent</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>docker-compose.yml</code></td><td><code>templates/*.yaml</code> (rendered manifests)</td></tr>
+                            <tr><td><code>.env</code> file</td><td><code>values.yaml</code></td></tr>
+                            <tr><td><code>docker compose up -d</code></td><td><code>helm install</code></td></tr>
+                            <tr><td><code>docker compose down</code></td><td><code>helm uninstall</code></td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 11. HPA ============ -->
+                <section class="content-section" id="hpa">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📈</div>
+                        <h2>11. Resource Requests, Limits &amp; HPA</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>Requests</strong> = what the scheduler uses to place the pod (guaranteed minimum).
+                        <strong>Limits</strong> = the hard ceiling. Exceeding the CPU limit → throttled;
+                        exceeding the memory limit → OOMKilled (exit code 137 — the Module 08 callback).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — HorizontalPodAutoscaler</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: autoscaling/v2
+<span class="keyword">kind</span>: HorizontalPodAutoscaler
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: api-hpa
+<span class="keyword">spec</span>:
+  <span class="keyword">scaleTargetRef</span>:
+    <span class="keyword">apiVersion</span>: apps/v1
+    <span class="keyword">kind</span>: Deployment
+    <span class="keyword">name</span>: api-deployment
+  <span class="keyword">minReplicas</span>: 2
+  <span class="keyword">maxReplicas</span>: 10
+  <span class="keyword">metrics</span>:
+  - <span class="keyword">type</span>: Resource
+    <span class="keyword">resource</span>:
+      <span class="keyword">name</span>: cpu
+      <span class="keyword">target</span>:
+        <span class="keyword">type</span>: Utilization
+        <span class="keyword">averageUtilization</span>: 70   <span class="comment"># scale out when avg CPU &gt; 70% of request</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ resource monitoring</span></div>
+                        <pre><code><span class="comment"># ⭐ Top nodes and pods (like htop for K8s — requires metrics-server)</span>
+<span class="command">kubectl</span> top nodes
+<span class="command">kubectl</span> top pods --sort-by=memory
+
+<span class="comment"># Watch HPA in action during a load test</span>
+<span class="command">kubectl</span> get hpa api-hpa --watch</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 12. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>12. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — CrashLoopBackOff</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td><code>kubectl get pods</code> shows <code>CrashLoopBackOff</code>. This is Module 09 Incident 6 reborn at the cluster level.</td></tr>
+                            <tr><td><strong>Investigation</strong></td><td><code>kubectl logs api-pod</code> → logs from current (crashed) container. <code>kubectl logs api-pod -p</code> → logs from the <em>previous</em> crash (often the real error). <code>kubectl describe pod api-pod</code> → Events section shows exit codes and restart count.</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>Missing environment variable — the app starts, immediately errors on <code>process.env.DB_URL</code> undefined, exits with code 1. K8s restarts with exponential backoff (5s→10s→20s…→5min), hence the "back-off" in the name.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Add the missing key to the ConfigMap or Secret, then <code>kubectl rollout restart deployment/api-deployment</code>.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — ImagePullBackOff</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — debug ImagePullBackOff</span></div>
+                        <pre><code><span class="comment"># Read the Events section — it tells you exactly why</span>
+<span class="command">kubectl</span> describe pod failing-pod | grep -A 10 Events:
+<span class="comment"># Common causes:</span>
+<span class="comment"># 1. Image tag typo: "no such image: techitfactory/api:1.4.22"</span>
+<span class="comment"># 2. Private registry: "unauthorized: authentication required"</span>
+<span class="comment"># → add imagePullSecrets or use IRSA (M12) / instance role</span>
+<span class="comment"># 3. Registry rate limit (Docker Hub): "too many requests"</span>
+<span class="comment"># → authenticate (logged-in users get 200 pulls/6h vs 100 anonymous)</span></code></pre>
+                    </div>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — OOMKilled</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>Pod restarts periodically; <code>kubectl describe pod</code> shows <code>OOMKilled</code>, exit code 137 (Module 08 callback — that was the signal, now you see it in K8s).</td></tr>
+                            <tr><td><strong>Investigation</strong></td><td><code>kubectl top pod api-pod</code> — watch memory trend over time. If it consistently approaches the limit, the limit is too low or there's a memory leak.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Raise the memory limit in the Deployment. Separately, profile the app for leaks (heap dump, APM tool). Don't just raise limits blindly — find the root cause.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 4 — Pod Stuck "Pending" Forever</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — debug Pending pods</span></div>
+                        <pre><code><span class="comment"># ⭐ Describe always shows you what the scheduler is thinking</span>
+<span class="command">kubectl</span> describe pod pending-pod | grep -A 5 "Events:"
+<span class="comment"># "Insufficient cpu" → node has less available CPU than the pod's request</span>
+<span class="comment"># "Insufficient memory" → same for memory</span>
+<span class="comment"># "no nodes available" → all nodes are at capacity or tainted</span>
+
+<span class="comment"># Check node available resources</span>
+<span class="command">kubectl</span> describe nodes | grep -A 5 "Allocated resources"</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — Microservices App on Minikube</h2>
+                    </div>
+                    <p class="content-text">
+                        Deploy a three-tier microservices app: Frontend (Deployment), API (Deployment),
+                        MongoDB (StatefulSet). Package it all as a Helm chart. Validate self-healing.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Start Minikube + Enable Add-ons</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">minikube</span> start --cpus=4 --memory=6144
+<span class="command">minikube</span> addons enable ingress
+<span class="command">minikube</span> addons enable metrics-server  <span class="comment"># needed for kubectl top + HPA</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Namespace + ConfigMap + Secret</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> create namespace techitfactory
+<span class="command">kubectl</span> create configmap api-config -n techitfactory \
+    --from-literal=NODE_ENV=production --from-literal=PORT=3000
+<span class="command">kubectl</span> create secret generic api-secrets -n techitfactory \
+    --from-literal=MONGO_URI=mongodb://mongo-0.mongo-svc:27017/app</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>MongoDB StatefulSet + Headless Service</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Apply the StatefulSet from Section 9</span>
+<span class="command">kubectl</span> apply -f mongo-statefulset.yaml -n techitfactory
+<span class="command">kubectl</span> get pods -n techitfactory --watch  <span class="comment"># wait for mongo-0 Running</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>API + Frontend Deployments and Services</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> apply -f api-deployment.yaml -n techitfactory
+<span class="command">kubectl</span> apply -f frontend-deployment.yaml -n techitfactory
+<span class="command">kubectl</span> get deployments -n techitfactory    <span class="comment"># all should show READY</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Ingress + Test</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> apply -f ingress.yaml -n techitfactory
+<span class="comment"># Add minikube IP to /etc/hosts</span>
+<span class="command">echo</span> "$(minikube ip) app.techitfactory.local" | sudo tee -a /etc/hosts
+<span class="command">curl</span> http://app.techitfactory.local/api/health
+<span class="output">{"status":"ok"}</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">6</span>Package as Helm Chart</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">helm</span> create techitfactory
+<span class="comment"># Move manifests into templates/, parameterize image.tag in values.yaml</span>
+<span class="command">helm</span> install techitfactory-dev ./techitfactory \
+    -n techitfactory --set image.tag=1.4.2</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">7</span>Self-Healing Chaos Drill</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Kill a pod — watch the Deployment recreate it automatically</span>
+<span class="command">kubectl</span> delete pod -l app=api -n techitfactory
+<span class="comment"># In another terminal:</span>
+<span class="command">kubectl</span> get pods -n techitfactory --watch
+<span class="comment"># Within seconds a new pod appears with status ContainerCreating → Running</span>
+<span class="comment"># This is desired-state reconciliation in action</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">8</span>HPA Load Test</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> apply -f hpa.yaml -n techitfactory
+<span class="comment"># Generate load</span>
+<span class="command">kubectl</span> run -it --rm loadgen --image=busybox -- \
+    sh -c "while true; do wget -q -O- http://api-service/; done"
+<span class="comment"># Watch HPA scale out</span>
+<span class="command">kubectl</span> get hpa api-hpa -n techitfactory --watch</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between a Pod, a Container, and a Deployment?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A container is the running process (Docker). A pod is a K8s wrapper around one or more containers that share a network namespace and lifecycle — pods are the smallest deployable unit. A Deployment is a controller that declares the desired number of pod replicas and manages rolling updates — it creates a ReplicaSet, which creates pods. You almost never create pods directly; you define a Deployment and let K8s manage the pods.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Walk me through what happens when you run `kubectl apply`.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>kubectl sends the manifest to the API Server. The API Server validates it, writes it to etcd (the source of truth), and returns 200. The Deployment controller (part of controller-manager) watches etcd, notices the desired state changed, creates/updates the ReplicaSet. The Scheduler watches for unscheduled pods (ReplicaSet creates them), picks the best node (by resource availability, affinity rules, etc.), and writes the binding to etcd. The kubelet on that node watches etcd for pods assigned to it, pulls the image via containerd, and starts the container.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: ClusterIP vs NodePort vs LoadBalancer vs Ingress — when to use each?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>ClusterIP (default) — internal cluster communication; use for service-to-service calls. NodePort — exposes the service on a port on every node; fine for testing, too clunky for production. LoadBalancer — provisions a cloud LB per service; works but gets expensive with many services. Ingress — the production choice: one cloud LB runs an nginx/ALB controller that does L7 routing to many ClusterIP services by host/path rules. One LB, many services, TLS termination at the edge.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you debug a CrashLoopBackOff?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>First: <code>kubectl logs &lt;pod&gt;</code> — current container logs. If the container crashed before logging anything, <code>kubectl logs &lt;pod&gt; -p</code> for previous container logs (often the actual error). Then: <code>kubectl describe pod &lt;pod&gt;</code> — the Events section shows exit codes and the exact failure reason. Common causes: missing env var (app panics at startup), wrong command/entrypoint, liveness probe too aggressive, or OOM (check exit code 137). Fix the root cause, never just increase restart limits.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between resource requests and limits?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Requests are what the scheduler uses — a pod with <code>cpu: 500m</code> request is only placed on a node that has 500m CPU available. It's the guaranteed minimum. Limits are the hard cap — if the container exceeds its CPU limit, it's throttled (slowed, not killed); if it exceeds its memory limit, it's OOMKilled. Setting requests without limits is dangerous (noisy neighbor); setting limits too low causes OOMKilled. Start with requests = typical usage, limit = 2×.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why use a StatefulSet instead of a Deployment for a database?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Databases need stable identity and stable storage. StatefulSets give pods predictable names (<code>mongo-0</code>, not random hashes) that don't change on restart — critical for replica sets where members address each other by name. Each pod gets its own PVC from a volumeClaimTemplate — if pod <code>mongo-0</code> restarts, it remounts the same volume (the same 10GB of data). Deployments share a PVC or use ephemeral storage, which is wrong for anything with persistent state.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between a rolling update and a recreate strategy?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Rolling update (default): replaces pods gradually — new pods come up, pass readiness probes, then old pods come down. With <code>maxUnavailable: 0</code> and <code>maxSurge: 1</code>, you always have at least the full replica count serving traffic — zero downtime. Recreate: terminates all old pods first, then starts new ones — there's a downtime gap. Use Recreate only when you cannot run two versions simultaneously (e.g., a DB schema migration where v1 and v2 are incompatible). Default to Rolling for everything else.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-10.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 10 — Cloud &amp; AWS</span>
+                </div>
+            </a>
+            <a href="module-12.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 12 — EKS</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

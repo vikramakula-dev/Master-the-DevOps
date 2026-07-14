@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl -pi -e 's{<a href=\"index\\\\.html#roadmap\" class=\"footer-nav-btn next-btn\">}{<a href=\"module-09.html\" class=\"footer-nav-btn next-btn\">}; s{Module 09 \\\\\\(Coming Soon\\\\\\)}{Module 09 — CI/CD + Docker}' module-08.html)",
+      "Bash(node --check script.js)",
+      "Bash(perl -0777 -pi -e 's/\\\\.interview-header \\\\{\\\\n    display: flex;/.interview-header:has\\(.interview-header-icon\\) \\\\{\\\\n    display: flex;/' module-page.css)"
+    ]
+  }
+}

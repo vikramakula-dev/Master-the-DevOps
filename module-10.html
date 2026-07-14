@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 10 — Introduction to Cloud &amp; AWS | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 10: Cloud & AWS — IaaS/PaaS/SaaS, IAM, EC2, VPC, S3, ECR, ALB, RDS, CloudWatch. Build your first VPC-based AWS deployment from scratch.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 10 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level intermediate">Intermediate</span>
+                    <span class="module-hero-duration">Phase 3 · Cloud &amp; Infrastructure</span>
+                </div>
+                <h1>Module 10 — Introduction to <span class="gradient-text">Cloud &amp; AWS</span></h1>
+                <p class="module-hero-desc">
+                    Everything so far ran on VMs you own. The cloud is the same Linux, networking, and Docker
+                    knowledge — rented by the second, with an API. Every Module 04 concept (subnets, NAT, firewalls,
+                    load balancers) reappears here with an AWS name on it. By the end you'll have deployed a
+                    Dockerized app on a VPC you built from scratch.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">AWS IAM</span>
+                    <span class="tech-tag">EC2</span>
+                    <span class="tech-tag">VPC</span>
+                    <span class="tech-tag">S3</span>
+                    <span class="tech-tag">ECR</span>
+                    <span class="tech-tag">ALB</span>
+                    <span class="tech-tag">AWS CLI</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#cloud-concepts" class="toc-link">1. Cloud Concepts — IaaS/PaaS/SaaS</a></li>
+                    <li><a href="#regions-azs" class="toc-link">2. Regions &amp; Availability Zones</a></li>
+                    <li><a href="#iam" class="toc-link">3. IAM — Identity &amp; Access</a></li>
+                    <li><a href="#ec2" class="toc-link">4. EC2 — Virtual Machines in AWS</a></li>
+                    <li><a href="#vpc" class="toc-link">5. VPC — Your Private Network</a></li>
+                    <li><a href="#s3" class="toc-link">6. S3 — Object Storage</a></li>
+                    <li><a href="#ecr" class="toc-link">7. ECR — Container Registry</a></li>
+                    <li><a href="#aws-cli" class="toc-link">8. AWS CLI — Daily Commands</a></li>
+                    <li><a href="#elb-rds-cw" class="toc-link">9. ELB + RDS + CloudWatch</a></li>
+                    <li><a href="#incidents" class="toc-link">10. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Cloud Concepts ============ -->
+                <section class="content-section" id="cloud-concepts">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☁️</div>
+                        <h2>1. Cloud Computing — IaaS, PaaS, SaaS</h2>
+                    </div>
+                    <p class="content-text">
+                        Cloud computing is renting compute, storage, and networking from a datacenter that someone else
+                        operates — by the second, via API. The three service models define <em>how much of the stack
+                        they manage for you</em>:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Model</th><th>AWS Example</th><th>You manage</th><th>AWS manages</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>IaaS</strong> — Infrastructure</td><td>EC2, VPC</td><td>OS, runtime, app, data</td><td>Physical servers, network hardware, facilities</td></tr>
+                            <tr><td><strong>PaaS</strong> — Platform</td><td>Elastic Beanstalk, RDS</td><td>App code &amp; data</td><td>OS, runtime, patching, scaling</td></tr>
+                            <tr><td><strong>SaaS</strong> — Software</td><td>WorkMail, Chime</td><td>Your data &amp; config</td><td>Everything including the application</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        This roadmap lives in IaaS — you control the OS just like your local VMs, but AWS handles
+                        the datacenter. The shift from CapEx (buying servers) to OpEx (paying per hour) is why
+                        startups can scale globally before they're profitable.
+                    </p>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why AWS?</div>
+                        <p>AWS has the largest market share (~32%), the deepest service catalog, and the most
+                        DevOps job postings. The concepts transfer to Azure/GCP — the service names change,
+                        the networking model doesn't. Learn one deeply.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Regions & AZs ============ -->
+                <section class="content-section" id="regions-azs">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌍</div>
+                        <h2>2. Regions &amp; Availability Zones</h2>
+                    </div>
+                    <p class="content-text">
+                        AWS divides the world into <strong>Regions</strong> — geographic areas like
+                        <code>us-east-1</code> (N. Virginia) or <code>eu-west-1</code> (Ireland). Each region
+                        contains multiple <strong>Availability Zones (AZs)</strong> — physically separate
+                        datacenters connected by low-latency fiber. AZs within a region share the same
+                        IP address space but have independent power, cooling, and networking.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Region → AZ → Resource hierarchy</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Region: us-east-1</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">AZ: us-east-1a</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Subnet: 10.0.1.0/24</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">EC2 instance</span>
+                        </div>
+                    </div>
+                    <p class="content-text">
+                        The capstone deploys across two AZs. If <code>us-east-1a</code> loses power,
+                        <code>us-east-1b</code> keeps serving traffic. Single-AZ deployments are development
+                        shortcuts — production always spans at least two.
+                    </p>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Data residency matters</div>
+                        <p>Regulated data (HIPAA, GDPR) must stay in specific regions. Choose your region
+                        before building — migrating later is painful. <code>us-east-1</code> is cheapest and
+                        gets new services first; choose based on user location and compliance.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 3. IAM ============ -->
+                <section class="content-section" id="iam">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>3. IAM — Identity &amp; Access Management</h2>
+                    </div>
+                    <p class="content-text">
+                        IAM is the security backbone of AWS. Before you create a single EC2 instance, you lock
+                        down IAM. It has four components:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Entity</th><th>What it is</th><th>Use case</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>User</strong></td><td>A person or application with long-term credentials</td><td>Your developer login</td></tr>
+                            <tr><td><strong>Group</strong></td><td>Collection of users sharing the same policies</td><td>"developers" group → ReadEC2 policy</td></tr>
+                            <tr><td><strong>Role</strong></td><td>Temporary credentials assumed by services or users</td><td>EC2 instance role to access S3</td></tr>
+                            <tr><td><strong>Policy</strong></td><td>JSON document listing allowed/denied actions</td><td>AmazonEC2ReadOnlyAccess</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        Policies are the JSON rules. Here's the ECR pull policy you already saw in Module 09,
+                        fully annotated:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">json — IAM Policy (annotated)</span></div>
+                        <pre><code><span class="comment">// Minimal policy: allow an EC2 to pull images from ECR (no keys needed)</span>
+{
+  <span class="string">"Version"</span>: <span class="string">"2012-10-17"</span>,       <span class="comment">// always this literal string</span>
+  <span class="string">"Statement"</span>: [
+    {
+      <span class="string">"Effect"</span>: <span class="string">"Allow"</span>,           <span class="comment">// Allow | Deny</span>
+      <span class="string">"Action"</span>: [
+        <span class="string">"ecr:GetAuthorizationToken"</span>,  <span class="comment">// get a temp docker login token</span>
+        <span class="string">"ecr:BatchGetImage"</span>,          <span class="comment">// pull images</span>
+        <span class="string">"ecr:GetDownloadUrlForLayer"</span>  <span class="comment">// pull image layers</span>
+      ],
+      <span class="string">"Resource"</span>: <span class="string">"*"</span>             <span class="comment">// GetAuthorizationToken requires *</span>
+    }
+  ]
+}</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">⭐ Root account lockdown ritual (do this on day 1)</div>
+                        <p>1. Enable MFA on root. 2. Create an admin IAM user — use that instead. 3. Delete root access keys. 4. Never use root for daily work. Root can do things that can't be undone — like deleting the account.</p>
+                    </div>
+                    <p class="content-text">
+                        <strong>Roles vs Access Keys</strong>: Access keys (a key ID + secret) are long-lived credentials
+                        that can be leaked. Roles issue short-lived tokens (15 min – 12 h) that auto-rotate.
+                        Whenever an AWS service (EC2, Lambda, ECS) needs to call other AWS services, use a role —
+                        never put access keys in your code or user-data. This is the least-privilege thread from
+                        Modules 06, 07, and 09 at the AWS level.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — debug "access denied" (⭐ daily use)</span></div>
+                        <pre><code><span class="command">aws</span> sts get-caller-identity        <span class="comment"># who am I right now? (account, user/role, ARN)</span>
+<span class="output">{
+    "UserId": "AIDA...",
+    "Account": "123456789012",
+    "Arn": "arn:aws:iam::123456789012:user/vikram"
+}</span>
+
+<span class="comment"># Then use the IAM Policy Simulator in the console to test exactly what a</span>
+<span class="comment"># user/role can do — paste the ARN, choose the action, see Allow/Deny + reason</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. EC2 ============ -->
+                <section class="content-section" id="ec2">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🖥️</div>
+                        <h2>4. EC2 — Virtual Machines in AWS</h2>
+                    </div>
+                    <p class="content-text">
+                        EC2 (Elastic Compute Cloud) is a rented virtual machine. The instance type encodes
+                        hardware: <strong>t3.micro</strong> = family <code>t</code> (burstable), generation
+                        <code>3</code>, size <code>micro</code> (2 vCPU, 1 GB RAM). For the capstone,
+                        <code>t3.small</code> is the minimum; <code>m5.large</code> for production API servers.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Family</th><th>Optimized for</th><th>Example use</th></tr></thead>
+                        <tbody>
+                            <tr><td>t3/t4g</td><td>Burstable general-purpose</td><td>Dev/staging, low-traffic apps</td></tr>
+                            <tr><td>m6i/m7g</td><td>Balanced compute/memory</td><td>App servers, API backends</td></tr>
+                            <tr><td>c6i/c7g</td><td>Compute-optimized</td><td>CI agents, batch processing</td></tr>
+                            <tr><td>r6i/r7g</td><td>Memory-optimized</td><td>Databases, in-memory caches</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        Key EC2 concepts you'll touch immediately:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — launch, connect, and query EC2 via CLI</span></div>
+                        <pre><code><span class="comment"># Launch an instance (uses the same SSH key pair as Module 02)</span>
+<span class="command">aws</span> ec2 run-instances \
+    --image-id ami-0c02fb55956c7d316 \    <span class="comment"># Amazon Linux 2 AMI (us-east-1)</span>
+    --instance-type t3.micro \
+    --key-name my-keypair \               <span class="comment"># Module 02 SSH key, now in AWS</span>
+    --security-group-ids sg-0abc123 \
+    --subnet-id subnet-0def456 \
+    --iam-instance-profile Name=ECRPullRole \  <span class="comment"># role, not keys!</span>
+    --user-data file://server-setup.sh \  <span class="comment"># Module 02's script runs at first boot</span>
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=web-1}]'
+
+<span class="comment"># ⭐ List running instances with their private IPs</span>
+<span class="command">aws</span> ec2 describe-instances \
+    --filters "Name=instance-state-name,Values=running" \
+    --query 'Reservations[*].Instances[*].[InstanceId,PrivateIpAddress,Tags[?Key==`Name`].Value|[0]]' \
+    --output table
+
+<span class="comment"># SSH using the key pair (Module 02 payoff)</span>
+<span class="command">ssh</span> -i ~/.ssh/my-keypair.pem ec2-user@&lt;public-ip&gt;</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Security Groups are stateful firewalls</div>
+                        <p>A Security Group is the M04 stateful firewall table — return traffic is automatically
+                        allowed. Inbound rules: 22 from your IP (SSH), 80/443 from 0.0.0.0/0 (web).
+                        Outbound: allow all (default). NACLs are stateless — you need both directions.
+                        When you can't connect, check SG → NACL → route table → key pair — in that order
+                        (the Module 04 layered-debug ladder, AWS edition).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. VPC ============ -->
+                <section class="content-section" id="vpc">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>5. VPC — Your Private Network</h2>
+                    </div>
+                    <p class="content-text">
+                        A VPC (Virtual Private Cloud) is a logically isolated network inside AWS — Module 04's
+                        subnetting, routing, and firewall concepts, implemented in software. The capstone VPC is
+                        <code>10.0.0.0/16</code> — 65,536 addresses, carved into public and private subnets
+                        across two AZs.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Capstone VPC — built by hand, later automated by Terraform (M13)</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Internet</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">IGW</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Public Subnets<br/>10.0.1.0/24 (1a)<br/>10.0.2.0/24 (1b)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ALB</span>
+                        </div>
+                        <div class="visual-flow" style="margin-top:8px;">
+                            <span class="flow-item">ALB</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Private Subnets<br/>10.0.3.0/24 (1a)<br/>10.0.4.0/24 (1b)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">EC2 (app)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">NAT GW → Internet</span>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — build the VPC step by step</span></div>
+                        <pre><code><span class="comment"># 1. Create VPC (Module 04 CIDR payoff — decode: 10.0.0.0 with 16-bit prefix)</span>
+<span class="variable">VPC_ID</span>=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 \
+    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=techitfactory-vpc}]' \
+    --query 'Vpc.VpcId' --output text)
+
+<span class="comment"># 2. Create public subnets (one per AZ)</span>
+<span class="variable">PUB1</span>=$(aws ec2 create-subnet --vpc-id $VPC_ID \
+    --cidr-block 10.0.1.0/24 --availability-zone us-east-1a \
+    --query 'Subnet.SubnetId' --output text)
+<span class="variable">PUB2</span>=$(aws ec2 create-subnet --vpc-id $VPC_ID \
+    --cidr-block 10.0.2.0/24 --availability-zone us-east-1b \
+    --query 'Subnet.SubnetId' --output text)
+
+<span class="comment"># 3. Create private subnets</span>
+<span class="variable">PRIV1</span>=$(aws ec2 create-subnet --vpc-id $VPC_ID \
+    --cidr-block 10.0.3.0/24 --availability-zone us-east-1a \
+    --query 'Subnet.SubnetId' --output text)
+<span class="variable">PRIV2</span>=$(aws ec2 create-subnet --vpc-id $VPC_ID \
+    --cidr-block 10.0.4.0/24 --availability-zone us-east-1b \
+    --query 'Subnet.SubnetId' --output text)
+
+<span class="comment"># 4. Internet Gateway (the VPC's default route to the internet)</span>
+<span class="variable">IGW</span>=$(aws ec2 create-internet-gateway --query 'InternetGateway.InternetGatewayId' --output text)
+<span class="command">aws</span> ec2 attach-internet-gateway --internet-gateway-id $IGW --vpc-id $VPC_ID
+
+<span class="comment"># 5. Elastic IP + NAT Gateway (private subnets route outbound through this)</span>
+<span class="variable">EIP</span>=$(aws ec2 allocate-address --domain vpc --query 'AllocationId' --output text)
+<span class="variable">NAT</span>=$(aws ec2 create-nat-gateway --subnet-id $PUB1 \
+    --allocation-id $EIP --query 'NatGateway.NatGatewayId' --output text)
+<span class="command">aws</span> ec2 wait nat-gateway-available --nat-gateway-ids $NAT
+
+<span class="comment"># 6. Route tables — public: 0.0.0.0/0 → IGW; private: 0.0.0.0/0 → NAT</span>
+<span class="variable">RT_PUB</span>=$(aws ec2 create-route-table --vpc-id $VPC_ID --query 'RouteTable.RouteTableId' --output text)
+<span class="command">aws</span> ec2 create-route --route-table-id $RT_PUB --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW
+<span class="command">aws</span> ec2 associate-route-table --route-table-id $RT_PUB --subnet-id $PUB1
+<span class="command">aws</span> ec2 associate-route-table --route-table-id $RT_PUB --subnet-id $PUB2</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Module 04 Payoff</div>
+                        <p>Every CIDR, subnet mask, and routing concept from Module 04 just landed. The public subnets
+                        have a route to the IGW — their instances can have public IPs and reach the internet directly.
+                        The private subnets route through NAT — their instances can <em>pull</em> updates outbound but
+                        have no public IP and can't be reached inbound. That's the security model.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. S3 ============ -->
+                <section class="content-section" id="s3">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🪣</div>
+                        <h2>6. S3 — Object Storage</h2>
+                    </div>
+                    <p class="content-text">
+                        S3 (Simple Storage Service) stores files as <em>objects</em> inside <em>buckets</em>.
+                        There's no filesystem hierarchy — the slash in <code>images/logo.png</code> is just
+                        part of the key name. Objects can be up to 5 TB; buckets are effectively unlimited.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — S3 daily commands (⭐)</span></div>
+                        <pre><code><span class="comment"># Create a bucket (globally unique name — prefix with your account/project)</span>
+<span class="command">aws</span> s3 mb s3://techitfactory-assets-123456 --region us-east-1
+
+<span class="comment"># ⭐ Sync a local directory to S3 (one-way mirror, skips unchanged files)</span>
+<span class="command">aws</span> s3 sync ./dist/ s3://techitfactory-assets-123456/static/ \
+    --delete                   <span class="comment"># remove S3 objects not in ./dist/</span>
+
+<span class="comment"># Enable versioning (Module 06 Nexus cleanup-policy analogy — keep N versions)</span>
+<span class="command">aws</span> s3api put-bucket-versioning \
+    --bucket techitfactory-assets-123456 \
+    --versioning-configuration Status=Enabled
+
+<span class="comment"># Lifecycle policy: move to Glacier after 30d, delete after 365d</span>
+<span class="command">aws</span> s3api put-bucket-lifecycle-configuration \
+    --bucket techitfactory-assets-123456 \
+    --lifecycle-configuration file://lifecycle.json
+
+<span class="comment"># Generate a presigned URL (time-limited, no auth needed by the requester)</span>
+<span class="command">aws</span> s3 presign s3://techitfactory-assets-123456/report.pdf --expires-in 3600</code></pre>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 Never make a bucket public without intent</div>
+                        <p>In 2023, thousands of S3 breaches were "public access" misconfigurations. AWS now blocks
+                        public access by default at the account level. For static site hosting, use CloudFront in
+                        front of a <em>private</em> bucket — never flip the public-access block off globally.
+                        If you need a file public, use a presigned URL.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. ECR ============ -->
+                <section class="content-section" id="ecr">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>7. ECR — Elastic Container Registry</h2>
+                    </div>
+                    <p class="content-text">
+                        You met ECR in Module 09 as the push destination. Now the full picture: ECR is a
+                        managed Docker registry, private by default, integrated with IAM (no separate credentials
+                        once your instance or CI role has the ECR policy), and capable of scanning images for
+                        CVEs on every push (we'll act on those alerts in Module 18).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ECR full workflow</span></div>
+                        <pre><code><span class="comment"># Create repository</span>
+<span class="command">aws</span> ecr create-repository \
+    --repository-name techitfactory/api \
+    --image-scanning-configuration scanOnPush=true \  <span class="comment"># Module 18 teaser</span>
+    --region us-east-1
+
+<span class="comment"># ⭐ Log Docker into ECR (token valid 12 hours)</span>
+<span class="command">aws</span> ecr get-login-password --region us-east-1 | \
+    docker login --username AWS \
+    --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+<span class="comment"># Tag and push (Module 09 tags land here)</span>
+<span class="command">docker</span> tag techitfactory/api:1.4.2 \
+    123456789012.dkr.ecr.us-east-1.amazonaws.com/techitfactory/api:1.4.2
+<span class="command">docker</span> push 123456789012.dkr.ecr.us-east-1.amazonaws.com/techitfactory/api:1.4.2
+
+<span class="comment"># Lifecycle rule: keep only the 10 most recent images per tag prefix</span>
+<span class="command">aws</span> ecr put-lifecycle-policy \
+    --repository-name techitfactory/api \
+    --lifecycle-policy-text file://ecr-lifecycle.json</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. AWS CLI ============ -->
+                <section class="content-section" id="aws-cli">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⌨️</div>
+                        <h2>8. AWS CLI — Daily Commands</h2>
+                    </div>
+                    <p class="content-text">
+                        The AWS CLI is the Module 02 command-line discipline applied to cloud resources.
+                        Install, configure, and master <code>--query</code> + <code>--output</code> —
+                        they turn noisy JSON into useful data.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install and configure</span></div>
+                        <pre><code><span class="comment"># Install (Linux — Module 02 curl/unzip payoff)</span>
+<span class="command">curl</span> "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+<span class="command">unzip</span> awscliv2.zip
+<span class="command">sudo</span> ./aws/install
+
+<span class="comment"># Configure (creates ~/.aws/credentials and ~/.aws/config)</span>
+<span class="command">aws</span> configure
+<span class="comment"># AWS Access Key ID:     AKIA...     ← from IAM user (never root)</span>
+<span class="comment"># AWS Secret Access Key: xxxxxxx</span>
+<span class="comment"># Default region:        us-east-1</span>
+<span class="comment"># Default output:        json</span>
+
+<span class="comment"># Named profiles (multiple accounts)</span>
+<span class="command">aws</span> configure --profile prod
+<span class="command">aws</span> s3 ls --profile prod         <span class="comment"># use non-default profile</span>
+<span class="variable">AWS_PROFILE</span>=prod aws ec2 describe-instances  <span class="comment"># or via env var</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ daily-use commands</span></div>
+                        <pre><code><span class="comment"># ⭐ Tail CloudWatch Logs in real time (like Module 02's tail -f)</span>
+<span class="command">aws</span> logs tail /aws/ecs/techitfactory-api --follow
+
+<span class="comment"># ⭐ Describe instances — filter + JMESPath query</span>
+<span class="command">aws</span> ec2 describe-instances \
+    --filters "Name=tag:Name,Values=web-*" \
+    --query 'Reservations[*].Instances[*].[InstanceId,State.Name,PrivateIpAddress]' \
+    --output table
+
+<span class="comment"># ⭐ S3 sync (faster than cp for directories)</span>
+<span class="command">aws</span> s3 sync ./dist/ s3://my-bucket/static/
+
+<span class="comment"># Alternative to --query: pipe to jq (Module 02 payoff)</span>
+<span class="command">aws</span> ec2 describe-instances | jq '.Reservations[].Instances[] | {id:.InstanceId, state:.State.Name}'
+
+<span class="comment"># Check current region + account</span>
+<span class="command">aws</span> configure get region
+<span class="command">aws</span> sts get-caller-identity</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. ELB + RDS + CloudWatch ============ -->
+                <section class="content-section" id="elb-rds-cw">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚖️</div>
+                        <h2>9. ELB, RDS &amp; CloudWatch — The Intro Trio</h2>
+                    </div>
+                    <p class="content-text">
+                        Three services you'll configure in every real project:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Service</th><th>What it is</th><th>Module 04 / earlier link</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>ALB</strong> (Application Load Balancer)</td><td>HTTP/HTTPS L7 load balancer with path-based routing and health checks</td><td>Module 04 load-balancer concept, Module 09 Compose LB</td></tr>
+                            <tr><td><strong>RDS</strong> (Relational Database Service)</td><td>Managed MySQL/Postgres/Aurora with automatic backups, Multi-AZ failover</td><td>Module 06 backup-restore thread</td></tr>
+                            <tr><td><strong>CloudWatch</strong></td><td>AWS-native metrics, logs, and alarms</td><td>Module 16 teaser — "Prometheus-lite"</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — create an ALB with a target group and health check</span></div>
+                        <pre><code><span class="comment"># Create a target group (instances the ALB forwards to)</span>
+<span class="variable">TG_ARN</span>=$(aws elbv2 create-target-group \
+    --name techitfactory-tg \
+    --protocol HTTP --port 3000 \
+    --vpc-id $VPC_ID \
+    --health-check-path /health \        <span class="comment"># Module 09 smoke-test endpoint</span>
+    --health-check-interval-seconds 30 \
+    --healthy-threshold-count 2 \
+    --query 'TargetGroups[0].TargetGroupArn' --output text)
+
+<span class="comment"># Register instances into the target group</span>
+<span class="command">aws</span> elbv2 register-targets \
+    --target-group-arn $TG_ARN \
+    --targets Id=$INSTANCE_ID
+
+<span class="comment"># Create the ALB in the public subnets</span>
+<span class="variable">ALB_ARN</span>=$(aws elbv2 create-load-balancer \
+    --name techitfactory-alb \
+    --subnets $PUB1 $PUB2 \
+    --security-groups $ALB_SG \
+    --query 'LoadBalancers[0].LoadBalancerArn' --output text)
+
+<span class="comment"># Set up a billing alarm (prevents the Module 10 incident #1)</span>
+<span class="command">aws</span> cloudwatch put-metric-alarm \
+    --alarm-name BillingAlert50USD \
+    --metric-name EstimatedCharges \
+    --namespace AWS/Billing \
+    --statistic Maximum --period 86400 \
+    --threshold 50 --comparison-operator GreaterThanThreshold \
+    --alarm-actions arn:aws:sns:us-east-1:123456789012:billing-alerts</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 10. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>10. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — Surprise Bill: Forgotten NAT Gateway + Unattached EIPs</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>AWS bill is $80 when you expected $10. Nothing is "running" in the console.</td></tr>
+                            <tr><td><strong>Investigation</strong></td><td>AWS Cost Explorer → group by Service. NAT Gateway: $32 (idle hourly fee). EC2 → Elastic IPs: $7.20 (unattached EIPs bill by the hour). Check CloudTrail for what was created and never destroyed.</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>NAT Gateways charge ~$0.045/hr even with zero traffic. EIPs charge when not attached to a running instance. A VPC teardown that misses these resources keeps billing silently.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Delete the NAT GW + release the EIP. In Cost Explorer, filter last 30 days to confirm charge stops.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Create a billing budget: Console → Billing → Budgets → $20/month alert. Tag every resource (<code>Project=techitfactory</code>). Create a teardown checklist: EIP → NAT GW → IGW → subnets → VPC (in that order).</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — "Can't SSH to Instance"</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td><code>ssh: connect to host ... port 22: Connection timed out</code></td></tr>
+                            <tr><td><strong>Investigation</strong></td><td>Follow the Module 04 layered debug ladder: (1) SG inbound rule — port 22 from your IP? (2) NACL — stateless, needs both inbound 22 and outbound ephemeral ports 1024-65535. (3) Route table — does the public subnet route to the IGW? (4) Does the instance have a public IP? (5) Is the instance in a public subnet?</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>Instance launched in a private subnet (no route to IGW). Private instances aren't reachable directly — use a bastion host or AWS SSM Session Manager.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Use AWS Systems Manager Session Manager (no SSH, no key, no open port 22 needed): <code>aws ssm start-session --target i-0abc123</code></td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Prefer SSM over SSH — no open port 22, all sessions logged to CloudWatch. Only open port 22 to a bastion, never to 0.0.0.0/0.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — "AccessDenied" IAM Debugging</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ systematic IAM debug</span></div>
+                        <pre><code><span class="comment"># Step 1: Who is the caller?</span>
+<span class="command">aws</span> sts get-caller-identity
+<span class="comment"># → check it's the role/user you think it is</span>
+
+<span class="comment"># Step 2: Simulate the action</span>
+<span class="comment"># Console: IAM → Policy Simulator → select role → choose action → Simulate</span>
+
+<span class="comment"># Step 3: Check for explicit Deny (Deny always wins over Allow)</span>
+<span class="comment"># Look at: attached policies + inline policies + SCP (if Organizations)</span>
+
+<span class="comment"># Step 4: For S3, also check the bucket policy (resource-based policy)</span>
+<span class="command">aws</span> s3api get-bucket-policy --bucket my-bucket
+
+<span class="comment"># Step 5: Check CloudTrail for the exact error event</span>
+<span class="command">aws</span> cloudtrail lookup-events \
+    --lookup-attributes AttributeKey=EventName,AttributeValue=GetObject \
+    --query 'Events[?contains(CloudTrailEvent, `AccessDenied`)]'</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — Deploy Dockerized App on AWS</h2>
+                    </div>
+                    <p class="content-text">
+                        Build a complete VPC-based deployment: private EC2s running Docker behind an ALB, pulling
+                        images from ECR using an IAM role (zero access keys), and serving static assets from S3.
+                        This is the Module 09 pipeline's destination — the same image, now on AWS infrastructure.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Bootstrap: VPC, Subnets, IGW, NAT</div>
+                        <p>Run the VPC commands from Section 5. Verify connectivity with a test EC2 in the public subnet — it should reach <code>8.8.8.8</code> via ping.</p>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Verify internet access from public subnet</span>
+<span class="command">aws</span> ec2 run-instances --image-id ami-0c02fb55956c7d316 \
+    --instance-type t3.micro --subnet-id $PUB1 \
+    --associate-public-ip-address \
+    --key-name my-keypair --security-group-ids $SSH_SG
+<span class="comment"># SSH in and ping 8.8.8.8 — should work</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>IAM — Create the EC2 Instance Role</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Trust policy: allow EC2 to assume this role</span>
+<span class="command">cat</span> &gt; ec2-trust.json &lt;&lt;'EOF'
+{"Version":"2012-10-17","Statement":[{"Effect":"Allow",
+"Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}
+EOF
+
+<span class="command">aws</span> iam create-role --role-name EC2ECRPullRole \
+    --assume-role-policy-document file://ec2-trust.json
+<span class="command">aws</span> iam attach-role-policy --role-name EC2ECRPullRole \
+    --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+<span class="command">aws</span> iam create-instance-profile --instance-profile-name EC2ECRPullProfile
+<span class="command">aws</span> iam add-role-to-instance-profile \
+    --instance-profile-name EC2ECRPullProfile --role-name EC2ECRPullRole</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>ECR — Push the Module 09 Image</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">aws</span> ecr create-repository --repository-name techitfactory/api
+<span class="command">aws</span> ecr get-login-password | docker login --username AWS \
+    --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
+<span class="comment"># Retag the Module 09 image and push</span>
+<span class="command">docker</span> tag techitfactory-api:latest \
+    123456789012.dkr.ecr.us-east-1.amazonaws.com/techitfactory/api:latest
+<span class="command">docker</span> push 123456789012.dkr.ecr.us-east-1.amazonaws.com/techitfactory/api:latest</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>EC2 in Private Subnet — User-Data Installs Docker + Pulls Image</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash — user-data.sh (runs at first boot)</span></div>
+                            <pre><code><span class="comment">#!/bin/bash</span>
+<span class="comment"># Module 02 server-setup.sh now runs at EC2 boot — zero manual SSH</span>
+yum update -y
+yum install -y docker
+systemctl start docker
+systemctl enable docker
+
+<span class="comment"># Pull from ECR using instance role (no keys needed)</span>
+<span class="variable">REGION</span>=us-east-1
+<span class="variable">ACCOUNT</span>=123456789012
+<span class="variable">REGISTRY</span>=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com
+aws ecr get-login-password --region $REGION | \
+    docker login --username AWS --password-stdin $REGISTRY
+
+docker pull $REGISTRY/techitfactory/api:latest
+docker run -d --name api -p 3000:3000 $REGISTRY/techitfactory/api:latest</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>ALB — Create, Wire Target Group, Test</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Use the Section 9 ALB commands; then get the DNS name</span>
+<span class="command">aws</span> elbv2 describe-load-balancers \
+    --names techitfactory-alb \
+    --query 'LoadBalancers[0].DNSName' --output text
+<span class="output">techitfactory-alb-123456789.us-east-1.elb.amazonaws.com</span>
+
+<span class="comment"># Smoke test through the ALB</span>
+<span class="command">curl</span> http://techitfactory-alb-123456789.us-east-1.elb.amazonaws.com/health
+<span class="output">{"status":"ok","version":"1.4.2"}</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">6</span>S3 — Static Assets</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">aws</span> s3 mb s3://techitfactory-static-123456
+<span class="command">aws</span> s3 sync ./frontend/dist/ s3://techitfactory-static-123456/
+<span class="comment"># Serve via CloudFront (not a public bucket!) — console: CloudFront → Create distribution</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">7</span>Billing Alarm + Teardown Checklist</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash — teardown in the right order</span></div>
+                            <pre><code><span class="comment"># Stop billing immediately after the project — in reverse creation order:</span>
+<span class="comment"># 1. Terminate EC2 instances</span>
+<span class="command">aws</span> ec2 terminate-instances --instance-ids $INSTANCE_ID
+<span class="comment"># 2. Delete ALB + target group</span>
+<span class="command">aws</span> elbv2 delete-load-balancer --load-balancer-arn $ALB_ARN
+<span class="command">aws</span> elbv2 delete-target-group --target-group-arn $TG_ARN
+<span class="comment"># 3. Delete NAT Gateway (billing stops immediately)</span>
+<span class="command">aws</span> ec2 delete-nat-gateway --nat-gateway-id $NAT
+<span class="command">aws</span> ec2 wait nat-gateway-deleted --nat-gateway-ids $NAT
+<span class="comment"># 4. Release Elastic IP</span>
+<span class="command">aws</span> ec2 release-address --allocation-id $EIP
+<span class="comment"># 5. Detach and delete IGW</span>
+<span class="command">aws</span> ec2 detach-internet-gateway --internet-gateway-id $IGW --vpc-id $VPC_ID
+<span class="command">aws</span> ec2 delete-internet-gateway --internet-gateway-id $IGW
+<span class="comment"># 6. Delete subnets, route tables, security groups, VPC</span>
+<span class="command">aws</span> ec2 delete-vpc --vpc-id $VPC_ID</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between a Region and an Availability Zone?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A Region is a geographic area containing multiple, isolated datacenters called Availability Zones. AZs within a region are connected by low-latency, high-bandwidth fiber but have completely independent power, cooling, and networking — so a fire in <code>us-east-1a</code> doesn't affect <code>us-east-1b</code>. For production, you always span at least two AZs. Regions are chosen for user proximity and data residency requirements.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between a Security Group and a NACL?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Security Groups are <em>stateful</em> and operate at the instance level — if you allow port 443 inbound, the return traffic is automatically allowed. NACLs are <em>stateless</em> and operate at the subnet level — you must explicitly allow both directions. SGs have only allow rules (deny by default); NACLs can have explicit deny rules and are evaluated in numbered order. For most use cases, Security Groups are sufficient — NACLs add a second layer for compliance requirements.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: When would you use an IAM Role instead of an IAM User with access keys?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Always prefer roles for AWS services. Roles issue short-lived credentials that auto-rotate — no credentials to rotate, lose, or accidentally commit to Git. An EC2 instance with an instance profile (role attached) can call S3 or ECR without a single access key anywhere. Access keys are only for humans logging in from outside AWS, and even then you should use SSO or federated access. The rule: if it's running <em>inside</em> AWS, it gets a role.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why put app servers in private subnets with a NAT Gateway instead of public subnets?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Private subnets have no route from the internet — a scanner can't reach your app servers directly even if port 22 is accidentally open. The ALB in the public subnet is the only inbound path, which narrows your attack surface to a managed service. The NAT Gateway allows outbound traffic (package updates, ECR pulls) without exposing the instance to inbound connections. Compliance frameworks like PCI-DSS explicitly require this architecture.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does an ALB health check work?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The ALB sends periodic HTTP(S) requests to a configured path (e.g., <code>/health</code>) on each target. If a target returns a 2xx response within the timeout and does so for a configured number of consecutive checks (healthy threshold), it becomes <em>healthy</em> and receives traffic. If it fails enough consecutive checks (unhealthy threshold), the ALB removes it from rotation silently — no traffic reaches a broken instance. This is why exposing a <code>/health</code> endpoint that verifies the app is genuinely ready (DB connection, cache, etc.) is critical.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you debug an "Access Denied" error in AWS?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>First: <code>aws sts get-caller-identity</code> — confirm you're authenticated as who you think. Then use the IAM Policy Simulator to test the exact action. Check for explicit Deny (Deny wins over Allow) in: attached policies, inline policies, and if using AWS Organizations, SCPs. For S3, also check the resource-based bucket policy — bucket policies can deny even if the user policy allows. Finally, CloudTrail logs the exact denied event with the error code, which is the ground truth.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between S3 versioning and lifecycle policies?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Versioning keeps every version of every object — a delete creates a delete marker, and you can restore any previous version. It's your protection against accidental overwrites. Lifecycle policies act on object age and version count — you might say "move to S3-IA after 30 days, Glacier after 90, delete after 365." They're cost management tools. You typically use both: versioning for safety, lifecycle policies to prevent versioning from becoming a storage bill.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-09.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 09 — CI/CD + Docker</span>
+                </div>
+            </a>
+            <a href="module-11.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 11 — Kubernetes</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 12 — Kubernetes on AWS: EKS | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 12: EKS — managed Kubernetes on AWS. eksctl, node groups, IAM auth, IRSA, VPC CNI, ALB controller, and CI/CD to EKS. The capstone cluster is born here.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 12 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 3 · Cloud &amp; Infrastructure</span>
+                </div>
+                <h1>Module 12 — Kubernetes on AWS: <span class="gradient-text">EKS</span></h1>
+                <p class="module-hero-desc">
+                    Minikube taught concepts; EKS is where they meet production — and where Kubernetes meets IAM.
+                    AWS manages the control plane (etcd, API server, upgrades). You own the nodes, add-ons, and
+                    workloads. The capstone cluster is created in this module.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">EKS</span>
+                    <span class="tech-tag">eksctl</span>
+                    <span class="tech-tag">IRSA</span>
+                    <span class="tech-tag">VPC CNI</span>
+                    <span class="tech-tag">ALB Controller</span>
+                    <span class="tech-tag">Helm</span>
+                    <span class="tech-tag">Jenkins → EKS</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#why-managed" class="toc-link">1. Why Managed K8s</a></li>
+                    <li><a href="#create-cluster" class="toc-link">2. Creating an EKS Cluster</a></li>
+                    <li><a href="#node-groups" class="toc-link">3. Node Groups</a></li>
+                    <li><a href="#kubectl-auth" class="toc-link">4. kubectl → EKS Auth</a></li>
+                    <li><a href="#deploy-ecr" class="toc-link">5. Deploy from ECR</a></li>
+                    <li><a href="#networking" class="toc-link">6. VPC CNI &amp; ALB Controller</a></li>
+                    <li><a href="#irsa" class="toc-link">7. IRSA — Pod-Level IAM</a></li>
+                    <li><a href="#cicd-eks" class="toc-link">8. CI/CD → EKS</a></li>
+                    <li><a href="#incidents" class="toc-link">9. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Why Managed K8s ============ -->
+                <section class="content-section" id="why-managed">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤔</div>
+                        <h2>1. Why Managed Kubernetes?</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Option</th><th>You manage</th><th>AWS manages</th><th>Cost (est.)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>EKS (managed)</strong></td><td>Nodes, add-ons, workloads</td><td>Control plane (API server, etcd, upgrades)</td><td>$0.10/h + nodes</td></tr>
+                            <tr><td>Self-managed K8s on EC2</td><td>Everything including control plane</td><td>EC2 infra only</td><td>Node cost only, but high ops overhead</td></tr>
+                            <tr><td>Fargate on EKS</td><td>Workloads only (no nodes to manage)</td><td>Control plane + node-level compute</td><td>Per-pod pricing, higher per-unit cost</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ EKS is not free</div>
+                        <p>The control plane alone costs ~$72/month ($0.10/hr). Add t3.medium nodes (~$30/month each), NAT Gateway ($32/month), and ALB, and a minimal cluster costs ~$150-200/month. <strong>Always teardown lab clusters after learning.</strong></p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. Creating a Cluster ============ -->
+                <section class="content-section" id="create-cluster">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. Creating an EKS Cluster with eksctl</h2>
+                    </div>
+                    <p class="content-text">
+                        <code>eksctl</code> is the recommended CLI for EKS — it creates the cluster, node group,
+                        IAM roles, and VPC attachments in a single command. Under the hood it generates and applies
+                        CloudFormation stacks.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install eksctl</span></div>
+                        <pre><code><span class="command">curl</span> --silent --location \
+    "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" \
+    | tar xz -C /tmp
+<span class="command">sudo</span> mv /tmp/eksctl /usr/local/bin/
+<span class="command">eksctl</span> version</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — cluster config file (eksctl)</span></div>
+                        <pre><code><span class="comment"># cluster.yaml — the capstone cluster definition</span>
+<span class="keyword">apiVersion</span>: eksctl.io/v1alpha5
+<span class="keyword">kind</span>: ClusterConfig
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory-cluster
+  <span class="keyword">region</span>: us-east-1           <span class="comment"># Module 10 region choice</span>
+  <span class="keyword">version</span>: <span class="string">"1.29"</span>
+
+<span class="keyword">vpc</span>:
+  <span class="keyword">subnets</span>:
+    <span class="keyword">private</span>:                   <span class="comment"># worker nodes go in private subnets (Module 10 security model)</span>
+      <span class="keyword">us-east-1a</span>: { id: subnet-0priv1 }
+      <span class="keyword">us-east-1b</span>: { id: subnet-0priv2 }
+    <span class="keyword">public</span>:                    <span class="comment"># ALB goes in public subnets</span>
+      <span class="keyword">us-east-1a</span>: { id: subnet-0pub1 }
+      <span class="keyword">us-east-1b</span>: { id: subnet-0pub2 }
+
+<span class="keyword">managedNodeGroups</span>:
+- <span class="keyword">name</span>: workers
+  <span class="keyword">instanceType</span>: t3.medium    <span class="comment"># 2 vCPU, 4 GB — minimum for a real workload</span>
+  <span class="keyword">minSize</span>: 2
+  <span class="keyword">maxSize</span>: 5
+  <span class="keyword">desiredCapacity</span>: 2
+  <span class="keyword">privateNetworking</span>: true    <span class="comment"># nodes in private subnets</span>
+  <span class="keyword">labels</span>: { role: worker }
+
+<span class="keyword">iam</span>:
+  <span class="keyword">withOIDC</span>: true              <span class="comment"># enables IRSA (Section 7)</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — create the cluster (~15 min)</span></div>
+                        <pre><code><span class="comment"># eksctl reads cluster.yaml, creates CloudFormation stacks</span>
+<span class="command">eksctl</span> create cluster -f cluster.yaml
+
+<span class="comment"># Verify</span>
+<span class="command">kubectl</span> get nodes
+<span class="output">NAME                          STATUS   ROLES    AGE   VERSION
+ip-10-0-3-142.ec2.internal   Ready    &lt;none&gt;   2m    v1.29.3-eks-ae9a62a
+ip-10-0-4-87.ec2.internal    Ready    &lt;none&gt;   2m    v1.29.3-eks-ae9a62a</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 3. Node Groups ============ -->
+                <section class="content-section" id="node-groups">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>3. Node Groups</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Type</th><th>What AWS manages</th><th>FinOps consideration</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Managed Node Group</strong></td><td>Node lifecycle, OS patches, coordinated drains</td><td>On-demand pricing — predictable</td></tr>
+                            <tr><td>Self-managed Node Group</td><td>Nothing — you own the EC2 ASG</td><td>Full control, but you handle upgrades</td></tr>
+                            <tr><td>Spot Node Group</td><td>Same as managed but on Spot instances</td><td>Up to 90% cheaper — for stateless workloads (capstone FinOps)</td></tr>
+                            <tr><td>Fargate Profile</td><td>Compute + OS (serverless nodes)</td><td>Per-pod/vCPU/GB — no idle capacity cost</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Spot node groups for stateless workloads</div>
+                        <p>Add a second node group with Spot instances and a taint (<code>spot=true:NoSchedule</code>). Stateless Deployments with a <code>spot=true:NoSchedule</code> toleration run cheaply on Spot. Stateful workloads (databases, Prometheus) use a toleration only for on-demand nodes. The capstone FinOps section links here — this is how you cut a $200 cluster bill in half.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 4. kubectl Auth ============ -->
+                <section class="content-section" id="kubectl-auth">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔑</div>
+                        <h2>4. kubectl Authentication to EKS</h2>
+                    </div>
+                    <p class="content-text">
+                        The most common EKS surprise: "kubectl access denied" is usually an IAM problem, not
+                        a Kubernetes RBAC problem. Here's how the auth chain works:
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">EKS Authentication Flow</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">kubectl</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">aws-iam-authenticator<br/>(generates token from IAM creds)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">EKS API Server</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">aws-auth ConfigMap<br/>(maps IAM → K8s user/group)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">K8s RBAC</span>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — configure kubectl for EKS</span></div>
+                        <pre><code><span class="comment"># Update your local kubeconfig (adds EKS cluster to ~/.kube/config)</span>
+<span class="command">aws</span> eks update-kubeconfig \
+    --region us-east-1 \
+    --name techitfactory-cluster
+
+<span class="comment"># Verify you're talking to the right cluster</span>
+<span class="command">kubectl</span> config current-context
+<span class="output">arn:aws:eks:us-east-1:123456789012:cluster/techitfactory-cluster</span>
+
+<span class="command">kubectl</span> get nodes   <span class="comment"># should show your EC2 worker nodes</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — aws-auth ConfigMap (grant a CI role cluster access)</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: v1
+<span class="keyword">kind</span>: ConfigMap
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: aws-auth
+  <span class="keyword">namespace</span>: kube-system
+<span class="keyword">data</span>:
+  <span class="keyword">mapRoles</span>: |
+    <span class="comment"># Node group role (must be here — nodes use this to join the cluster)</span>
+    - rolearn: arn:aws:iam::123456789012:role/eksctl-workers-NodeInstanceRole
+      username: system:node:{{EC2PrivateDNSName}}
+      groups: [system:bootstrappers, system:nodes]
+    <span class="comment"># Jenkins role — gets deploy rights (Incident 1: this line missing = auth failure)</span>
+    - rolearn: arn:aws:iam::123456789012:role/JenkinsDeployRole
+      username: jenkins
+      groups: [deploy-group]           <span class="comment"># bound to a K8s ClusterRole via RBAC</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 5. Deploy from ECR ============ -->
+                <section class="content-section" id="deploy-ecr">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>5. Deploy the Module 11 App on EKS</h2>
+                    </div>
+                    <p class="content-text">
+                        Node group instances have an instance role with ECR pull permissions — no
+                        <code>imagePullSecrets</code> needed (Module 10 instance-role payoff in action).
+                        The Helm chart from Module 11 deploys unchanged; only the image registry URL changes.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — deploy to EKS via Helm</span></div>
+                        <pre><code><span class="comment"># Ensure you're pointing at the EKS cluster</span>
+<span class="command">kubectl</span> config use-context arn:aws:eks:us-east-1:123456789012:cluster/techitfactory-cluster
+
+<span class="comment"># Install with ECR image (no imagePullSecrets — node role handles auth)</span>
+<span class="command">helm</span> upgrade --install techitfactory-prod ./techitfactory \
+    --namespace production --create-namespace \
+    --set image.repository=123456789012.dkr.ecr.us-east-1.amazonaws.com/techitfactory/api \
+    --set image.tag=1.4.2 \
+    -f values-prod.yaml
+
+<span class="comment"># Verify pods are running on real EC2 nodes</span>
+<span class="command">kubectl</span> get pods -n production -o wide</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Networking ============ -->
+                <section class="content-section" id="networking">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌐</div>
+                        <h2>6. VPC CNI &amp; AWS Load Balancer Controller</h2>
+                    </div>
+                    <p class="content-text">
+                        <strong>VPC CNI</strong>: Unlike Minikube (where pods get an internal overlay IP),
+                        EKS pods get <em>real VPC IPs</em> from the subnet. Each node can host pods equal to
+                        its ENI limit × IPs per ENI — a t3.medium can host ~17 pods. This is efficient (no
+                        overlay overhead) but means your subnets must be sized for peak pod count.
+                    </p>
+                    <p class="content-text">
+                        <strong>AWS Load Balancer Controller</strong>: When you apply an Ingress manifest on EKS,
+                        the ALB controller creates a real AWS Application Load Balancer automatically.
+                        Service type LoadBalancer creates an NLB.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install AWS Load Balancer Controller via Helm</span></div>
+                        <pre><code><span class="comment"># Add the EKS chart repository</span>
+<span class="command">helm</span> repo add eks https://aws.github.io/eks-charts
+<span class="command">helm</span> repo update
+
+<span class="comment"># Install the controller (requires IRSA service account — see Section 7)</span>
+<span class="command">helm</span> install aws-load-balancer-controller eks/aws-load-balancer-controller \
+    -n kube-system \
+    --set clusterName=techitfactory-cluster \
+    --set serviceAccount.create=false \
+    --set serviceAccount.name=aws-load-balancer-controller
+
+<span class="comment"># Tag the public subnets (required for the controller to discover them)</span>
+<span class="command">aws</span> ec2 create-tags --resources $PUB1 $PUB2 \
+    --tags Key=kubernetes.io/role/elb,Value=1</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Subnet IP exhaustion</div>
+                        <p>With VPC CNI, each pod consumes a real subnet IP. A /24 subnet (256 IPs) supports ~250 pods across all nodes in that AZ. Size your subnets generously — /23 (512) or /22 (1024) for production. Incident 2 (pods stuck Pending) is often this. Mitigation: enable prefix delegation (each ENI gets a /28 block instead of individual IPs).</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. IRSA ============ -->
+                <section class="content-section" id="irsa">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>7. IRSA — IAM Roles for Service Accounts</h2>
+                    </div>
+                    <p class="content-text">
+                        A node role grants all pods on a node the same AWS permissions — too broad. IRSA lets
+                        individual pods assume their own IAM role via a Kubernetes Service Account, with no
+                        credentials on disk. This is the capstone security table's IRSA row, delivered.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">IRSA Authentication Flow</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Pod</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">K8s Service Account<br/>(annotated with IAM role ARN)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">OIDC Provider<br/>(on EKS cluster)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">AWS STS<br/>(issues temp creds)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">AWS Service<br/>(S3, DynamoDB…)</span>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — create IRSA for the app to access S3</span></div>
+                        <pre><code><span class="comment"># Create IAM role + K8s Service Account in one eksctl command</span>
+<span class="command">eksctl</span> create iamserviceaccount \
+    --cluster techitfactory-cluster \
+    --namespace production \
+    --name api-service-account \
+    --attach-policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess \
+    --approve
+
+<span class="comment"># The service account gets an annotation:</span>
+<span class="command">kubectl</span> describe sa api-service-account -n production
+<span class="comment"># Annotations: eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/...</span>
+
+<span class="comment"># Reference it in the Deployment pod spec:</span>
+<span class="comment"># spec.serviceAccountName: api-service-account</span>
+<span class="comment"># The AWS SDK inside the pod automatically picks up the IRSA token — no code changes</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. CI/CD → EKS ============ -->
+                <section class="content-section" id="cicd-eks">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>8. CI/CD Pipeline → EKS</h2>
+                    </div>
+                    <p class="content-text">
+                        The Module 09 Jenkins pipeline's SSH deploy stage gets replaced with an EKS Helm upgrade.
+                        The image tag built in CI becomes the Helm release value. This is the Module 09 tag-naming
+                        discipline reaching its destination.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">groovy — Jenkinsfile deploy stage for EKS</span></div>
+                        <pre><code><span class="keyword">stage</span>(<span class="string">'Deploy to EKS'</span>) {
+    <span class="keyword">steps</span> {
+        withCredentials([[$class: <span class="string">'AmazonWebServicesCredentialsBinding'</span>,
+                          credentialsId: <span class="string">'aws-deploy-role'</span>]]) {
+            <span class="function">sh</span> <span class="string">"""
+                <span class="comment"># Configure kubectl for the EKS cluster</span>
+                aws eks update-kubeconfig \\
+                    --region us-east-1 \\
+                    --name techitfactory-cluster
+
+                <span class="comment"># Helm upgrade — bumps image.tag to the new build</span>
+                helm upgrade --install techitfactory-prod ./techitfactory \\
+                    --namespace production \\
+                    --set image.tag=${IMAGE_TAG} \\    <span class="comment"># Module 09 dynamic version</span>
+                    -f values-prod.yaml \\
+                    --wait --timeout 5m               <span class="comment"># block until rollout completes</span>
+
+                <span class="comment"># Smoke test against the ALB DNS</span>
+                ALB_DNS=\$(kubectl get ingress -n production \\
+                    -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
+                curl -f http://\$ALB_DNS/health
+            """</span>
+        }
+    }
+}
+
+<span class="keyword">stage</span>(<span class="string">'Rollback on Failure'</span>) {
+    <span class="keyword">when</span> { <span class="function">expression</span> { currentBuild.result == <span class="string">'FAILURE'</span> } }
+    <span class="keyword">steps</span> {
+        <span class="function">sh</span> <span class="string">'helm rollback techitfactory-prod 0 -n production'</span>  <span class="comment"># 0 = previous</span>
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>9. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — "kubectl: You must be logged in to the server"</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>Jenkins pipeline fails: <code>error: You must be logged in to the server (Unauthorized)</code></td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>The Jenkins IAM role is not in the <code>aws-auth</code> ConfigMap. EKS only trusts IAM identities that are explicitly mapped in this ConfigMap.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Edit the ConfigMap (<code>kubectl edit configmap aws-auth -n kube-system</code>) and add a <code>mapRoles</code> entry for the Jenkins role ARN. Grant it the minimum necessary K8s group (a custom group with only <code>helm upgrade</code> rights).</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Store the aws-auth ConfigMap in Git and apply it via CI — treat it as infrastructure code, not a manual config. Changes need to go through the same review process as IAM changes.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Pods Stuck Pending (Subnet IP Exhaustion)</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — diagnose and fix VPC CNI exhaustion</span></div>
+                        <pre><code><span class="command">kubectl</span> describe pod pending-pod | grep -A 5 Events:
+<span class="output">Warning  FailedCreatePodSandBox  ... failed to assign an IP address to the container</span>
+
+<span class="comment"># Check how many IPs are left in each subnet</span>
+<span class="command">aws</span> ec2 describe-subnets \
+    --filters "Name=vpc-id,Values=$VPC_ID" \
+    --query 'Subnets[*].[SubnetId,AvailableIpAddressCount,CidrBlock]' \
+    --output table
+
+<span class="comment"># Enable prefix delegation (each ENI gets a /28 = 16 IPs instead of 1)</span>
+<span class="command">kubectl</span> set env daemonset aws-node \
+    -n kube-system ENABLE_PREFIX_DELEGATION=true
+<span class="command">kubectl</span> rollout restart daemonset aws-node -n kube-system</code></pre>
+                    </div>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — ALB Never Provisions</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>Ingress resource created but <code>kubectl get ingress</code> shows empty ADDRESS column forever.</td></tr>
+                            <tr><td><strong>Investigation</strong></td><td>Check the controller logs: <code>kubectl logs -n kube-system deploy/aws-load-balancer-controller</code>. Common errors: controller not installed, subnet tags missing, IRSA not configured for the controller service account.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Tag subnets: public subnets need <code>kubernetes.io/role/elb=1</code>; private subnets need <code>kubernetes.io/role/internal-elb=1</code>. Also verify the Ingress annotation: <code>kubernetes.io/ingress.class: alb</code>.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 4 — Bill Shock: Forgotten EKS Cluster</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ teardown discipline</span></div>
+                        <pre><code><span class="comment"># Delete all workloads first (prevents ALBs from not cleaning up)</span>
+<span class="command">helm</span> uninstall techitfactory-prod -n production
+<span class="command">kubectl</span> delete ns production staging development
+
+<span class="comment"># Delete the cluster (eksctl removes nodes, security groups, CloudFormation stacks)</span>
+<span class="command">eksctl</span> delete cluster --name techitfactory-cluster --region us-east-1
+
+<span class="comment"># Verify no dangling ALBs (common bill source)</span>
+<span class="command">aws</span> elbv2 describe-load-balancers \
+    --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output table
+
+<span class="comment"># Check for unattached EIPs</span>
+<span class="command">aws</span> ec2 describe-addresses \
+    --query 'Addresses[?AssociationId==null].[AllocationId,PublicIp]' --output table</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — Production CI/CD Pipeline to EKS</h2>
+                    </div>
+                    <p class="content-text">
+                        Build the full path: eksctl cluster → Jenkins pipeline → ECR push → Helm deploy to EKS →
+                        ALB smoke test → rollback drill. This is the Module 09 pipeline promoted to production.
+                        Links directly to <a href="project1.html">Capstone Project</a> §§7–9.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Create EKS Cluster in the Module 10 VPC</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Use the cluster.yaml from Section 2 — references M10 VPC subnet IDs</span>
+<span class="command">eksctl</span> create cluster -f cluster.yaml
+<span class="comment"># This takes 15-20 min — grab a coffee</span>
+<span class="command">kubectl</span> get nodes --watch</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Install Add-ons: ALB Controller + metrics-server</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Create IRSA for ALB controller first</span>
+<span class="command">eksctl</span> create iamserviceaccount \
+    --cluster techitfactory-cluster \
+    --namespace kube-system \
+    --name aws-load-balancer-controller \
+    --attach-policy-arn arn:aws:iam::123456789012:policy/AWSLoadBalancerControllerIAMPolicy \
+    --approve
+
+<span class="comment"># Install ALB controller + metrics-server</span>
+<span class="command">helm</span> install aws-load-balancer-controller eks/aws-load-balancer-controller \
+    -n kube-system --set clusterName=techitfactory-cluster \
+    --set serviceAccount.create=false \
+    --set serviceAccount.name=aws-load-balancer-controller
+<span class="command">kubectl</span> apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Jenkins Pipeline: Build → ECR Push → Helm Deploy</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">groovy — complete Jenkinsfile (excerpted)</span></div>
+                            <pre><code><span class="variable">IMAGE_TAG</span> = <span class="string">"${env.BUILD_NUMBER}-${env.GIT_COMMIT[0..6]}"</span>
+
+<span class="keyword">stage</span>(<span class="string">'Build + Push to ECR'</span>) {  <span class="comment">/* Module 09 shared library reused */</span>
+    <span class="function">sh</span> <span class="string">"docker build -t ${ECR_REPO}:${IMAGE_TAG} ."</span>
+    <span class="function">sh</span> <span class="string">"docker push ${ECR_REPO}:${IMAGE_TAG}"</span>
+}
+<span class="keyword">stage</span>(<span class="string">'Deploy to EKS'</span>) {
+    <span class="function">sh</span> <span class="string">"""
+        aws eks update-kubeconfig --region us-east-1 --name techitfactory-cluster
+        helm upgrade --install techitfactory-prod ./chart \\
+            -n production --set image.tag=${IMAGE_TAG} --wait
+        curl -f http://\$(kubectl get ing -n production -o jsonpath='{...hostname}')/health
+    """</span>
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Rollback Drill</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Simulate a bad deploy: push an image that fails the health check</span>
+<span class="comment"># Watch helm upgrade --wait timeout and Jenkins mark the build failed</span>
+<span class="comment"># Then manually rollback:</span>
+<span class="command">helm</span> rollback techitfactory-prod 0 -n production
+<span class="comment"># Verify previous version is serving</span>
+<span class="command">curl</span> http://&lt;ALB-DNS&gt;/health</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Teardown</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">helm</span> uninstall techitfactory-prod -n production
+<span class="command">eksctl</span> delete cluster --name techitfactory-cluster
+<span class="comment"># Verify no ALBs or EIPs remain (billing check from Incident 4)</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What does EKS manage for you versus what you still own?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>EKS manages the control plane — the API server, etcd, controller-manager, scheduler — across multiple AZs with automatic failover and managed upgrades. You own everything else: worker nodes (OS patches, instance types, scaling), add-ons (CNI, CoreDNS, ALB controller), workloads, namespaces, and networking configuration. The $0.10/hr control plane fee is the price of not running five control plane EC2s yourself. The real operational win is automatic etcd backups and control-plane HA.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does kubectl authenticate to an EKS cluster?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>kubectl uses the aws-iam-authenticator exec plugin to exchange your current IAM credentials for a bearer token. The EKS API server validates this token against AWS STS. If the IAM identity is in the <code>aws-auth</code> ConfigMap, it's mapped to a Kubernetes user or group. From there, standard K8s RBAC takes over. The two failure points: (1) IAM identity not in aws-auth — "unauthorized" at the IAM layer, (2) K8s RBAC denies the action — "forbidden" at the K8s layer. Read the error message carefully — it tells you which layer failed.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is IRSA and when should you use it over a node role?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A node role grants every pod on a node the same AWS permissions — the blast radius of a compromised pod is the entire node's IAM scope. IRSA (IAM Roles for Service Accounts) uses OIDC federation to bind an IAM role to a specific K8s service account, so only pods using that service account get those permissions. A backend API pod gets S3 read; a batch job pod gets DynamoDB write; other pods get nothing. This is least-privilege at the pod level. Always use IRSA in production — node roles only for the node group itself.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why do EKS pods get real VPC IPs, and what can go wrong?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>EKS uses the VPC CNI plugin, which assigns each pod an actual VPC IP address from the node's ENI. This is efficient — no overlay network — and pods are directly routable from the VPC without NAT. What breaks: your subnets can run out of IPs. A /24 subnet has 251 usable IPs; with many pods per node, a deployment surge can exhaust the subnet. Fix: size subnets generously (/23 or larger), enable prefix delegation (each ENI gets a /28 block = 16 IPs instead of 1), and monitor <code>AvailableIpAddressCount</code> in CloudWatch.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does an Ingress on EKS provision an ALB?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>When you apply an Ingress resource with <code>ingressClassName: alb</code>, the AWS Load Balancer Controller (running as a Deployment in kube-system) watches for new Ingress objects. It calls the AWS ELBv2 API to create an ALB in the annotated subnets, creates target groups for each backend service, and registers the pod IPs directly (not the node ports). The ALB's address appears in <code>kubectl get ingress</code> after ~30-60 seconds. Prerequisites: subnets must be tagged, the controller needs IRSA with the LBC IAM policy.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How would a CI system safely deploy to EKS?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The CI system (Jenkins, GitHub Actions) assumes a dedicated IAM role with only the minimum K8s permissions needed — specifically, only <code>helm upgrade</code> rights on specific namespaces, not cluster-admin. This role is mapped in aws-auth. The pipeline calls <code>aws eks update-kubeconfig</code>, runs <code>helm upgrade --install --wait</code> (blocking until the rollout is confirmed healthy), then does a smoke test. If any step fails, the pipeline calls <code>helm rollback</code>. No long-lived kubeconfig files in Jenkins — the IAM role credential is short-lived and rotates automatically.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-11.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 11 — Kubernetes</span>
+                </div>
+            </a>
+            <a href="module-13.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 13 — Terraform</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

@@ -3,8 +3,8 @@
   <p><strong>The Ultimate, Step-by-Step Guide to Becoming a Modern DevOps Engineer</strong></p>
   
   <p>
-    <img src="https://img.shields.io/badge/Status-In%20Progress-blue?style=for-the-badge&logo=github" alt="Status" />
-    <img src="https://img.shields.io/badge/Modules-20-success?style=for-the-badge" alt="Modules" />
+    <img src="https://img.shields.io/badge/Status-Complete-success?style=for-the-badge&logo=github" alt="Status" />
+    <img src="https://img.shields.io/badge/Modules-20%2F20%20Live-success?style=for-the-badge" alt="Modules" />
     <img src="https://img.shields.io/badge/Tech-HTML%20%7C%20CSS%20%7C%20JS-yellow?style=for-the-badge" alt="Stack" />
   </p>
 </div>
@@ -31,43 +31,51 @@ This repository holds the source code for the interactive roadmap website, featu
 
 ## 🗺️ The Roadmap Curriculum
 
-The roadmap is divided into **4 Phases** across **20 Modules**:
+All **20 modules** are live as full learning pages — notes, annotated code, real-time incidents, hands-on projects, and interview Q&A. Click any module to open it:
 
 ### Phase 1: The Foundations 🟢
-*   **Module 01:** What is DevOps? (Culture, CALMS, Agile vs DevOps)
-*   **Module 02:** Linux Essentials & Scripting (Bash, Permissions, Systemd)
-*   **Module 03:** Version Control with Git (Branching, Rebasing, GitFlow)
-*   **Module 04:** Networking & Security Fundamentals (TCP/IP, DNS, SSL)
-*   **Module 05:** Build & Package Managers (Maven, npm, Gradle)
+*   **[Module 01](https://vikramakula-dev.github.io/Master-the-DevOps/module-01.html):** Introduction to DevOps (Culture, CALMS, SDLC, CI/CD Concepts, Toolchain)
+*   **[Module 02](https://vikramakula-dev.github.io/Master-the-DevOps/module-02.html):** Operating Systems & Linux (CLI, Permissions, Bash Scripting, SSH, Log Analysis)
+*   **[Module 03](https://vikramakula-dev.github.io/Master-the-DevOps/module-03.html):** Version Control with Git & GitHub (Branching, Rebase, Workflows, PRs)
+*   **[Module 04](https://vikramakula-dev.github.io/Master-the-DevOps/module-04.html):** Networking & Security Fundamentals (OSI, DNS, HTTP/S, TLS, Firewalls, Proxies)
+*   **[Module 05](https://vikramakula-dev.github.io/Master-the-DevOps/module-05.html):** Build & Package Manager Tools (Maven, Gradle, npm, pip, Artifacts & Versioning)
 
 ### Phase 2: CI/CD & Containers 🟡
-*   **Module 06:** Artifact Repository Manager (Nexus)
-*   **Module 07:** CI/CD with Jenkins (Pipelines, Groovy, Webhooks)
-*   **Module 08:** Containers with Docker (Images, Volumes, Compose, Networking)
-*   **Module 09:** CI/CD Pipeline + Docker Integration
+*   **[Module 06](https://vikramakula-dev.github.io/Master-the-DevOps/module-06.html):** Artifact Repository Manager — Nexus (Hosted/Proxy/Group Repos, REST API)
+*   **[Module 07](https://vikramakula-dev.github.io/Master-the-DevOps/module-07.html):** CI/CD with Jenkins (Jenkinsfile, Multibranch, Shared Libraries, Agents)
+*   **[Module 08](https://vikramakula-dev.github.io/Master-the-DevOps/module-08.html):** Containers with Docker (Dockerfile, Networking, Volumes, Compose)
+*   **[Module 09](https://vikramakula-dev.github.io/Master-the-DevOps/module-09.html):** CI/CD Pipeline + Docker Integration (ECR, Dynamic Versioning, SSH Deploys, Smoke Tests)
 
 ### Phase 3: Cloud & Orchestration 🔴
-*   **Module 10:** Introduction to Cloud & AWS
-*   **Module 11:** Container Orchestration with Kubernetes (Pods, Deployments, Services)
-*   **Module 12:** Kubernetes on AWS — EKS
-*   **Module 13:** Infrastructure as Code with Terraform
+*   **[Module 10](https://vikramakula-dev.github.io/Master-the-DevOps/module-10.html):** Introduction to Cloud & AWS (IAM, EC2, VPC, S3, ALB, RDS, CloudWatch)
+*   **[Module 11](https://vikramakula-dev.github.io/Master-the-DevOps/module-11.html):** Container Orchestration with Kubernetes (Pods, Deployments, Services, Helm, HPA)
+*   **[Module 12](https://vikramakula-dev.github.io/Master-the-DevOps/module-12.html):** Kubernetes on AWS — EKS (eksctl, IRSA, ALB Controller, CI/CD → EKS)
+*   **[Module 13](https://vikramakula-dev.github.io/Master-the-DevOps/module-13.html):** Infrastructure as Code with Terraform (HCL, State, Modules, EKS via TF)
 
 ### Phase 4: Automation & Observability 🚀
-*   **Module 14:** Programming & Automation with Python
-*   **Module 15:** Configuration Management with Ansible
-*   **Module 16:** Monitoring & Observability (Prometheus, Grafana, ELK)
-*   **Module 17:** GitOps with ArgoCD
-*   *(And more advanced topics up to Module 20...)*
+*   **[Module 14](https://vikramakula-dev.github.io/Master-the-DevOps/module-14.html):** Programming & Automation with Python (boto3, REST APIs, Automation Suite)
+*   **[Module 15](https://vikramakula-dev.github.io/Master-the-DevOps/module-15.html):** Configuration Management with Ansible (Playbooks, Roles, Vault, Dynamic Inventory)
+*   **[Module 16](https://vikramakula-dev.github.io/Master-the-DevOps/module-16.html):** Monitoring & Observability (Prometheus, PromQL, Grafana, AlertManager, Loki)
+
+### Phase 5: Pro Level 🏆
+*   **[Module 17](https://vikramakula-dev.github.io/Master-the-DevOps/module-17.html):** GitOps with ArgoCD (Pull-based CD, App of Apps, Multi-Env)
+*   **[Module 18](https://vikramakula-dev.github.io/Master-the-DevOps/module-18.html):** DevSecOps (SAST/DAST, Trivy, Vault, K8s Security, Supply Chain, OPA)
+*   **[Module 19](https://vikramakula-dev.github.io/Master-the-DevOps/module-19.html):** SRE & Platform Engineering (SLOs, Error Budgets, Chaos Engineering, IDPs, FinOps)
+*   **[Module 20](https://vikramakula-dev.github.io/Master-the-DevOps/module-20.html):** AI in DevOps & Career Mastery (AIOps, Service Mesh, Portfolio, Interviews, Certs)
+
+### 🏆 Capstone Project
+*   **[Production-Grade E-Commerce Platform on AWS EKS](https://vikramakula-dev.github.io/Master-the-DevOps/project1.html)** — the end-to-end platform that every module builds toward: Terraform-provisioned VPC + EKS, Jenkins CI, GitOps deployment with ArgoCD, Prometheus/Grafana/Loki observability, DevSecOps controls, rollback strategy, FinOps, and load testing.
 
 ---
 
 ## 🛠️ Features of the Platform
 
-*   **Premium UI/UX:** Built with modern CSS (glassmorphism, glowing gradients, animated grids) without heavy frameworks.
-*   **Structured Content:** Every module follows a strict *Beginner → Practitioner → Advanced* flow.
-*   **Real-World Post-Mortems:** Every tech module includes "Real-Time Incidents" (e.g., OOM Kills, Disk Full) to teach actual debugging, not just syntax.
-*   **Interview Preparation:** Flashcards with real DevOps interview questions at the end of every module.
-*   **Capstone Projects:** Step-by-step projects integrating tools (e.g., Dockerizing a Full-Stack Node+React app).
+*   **Premium UI/UX:** Modern CSS (glassmorphism, glowing gradients, animated particle-network background) without heavy frameworks.
+*   **20 Full Module Pages:** Each with a sticky table of contents, annotated code blocks, diagrams, tables, and pro-tip callouts.
+*   **Real-World Post-Mortems:** Every tech module includes 🔥 "Real-Time Incidents" (OOM kills, disk-full, leaked secrets, hung deploys) taught as symptom → investigation → root cause → fix → prevention.
+*   **Hands-On Projects:** Every module ends with a real-time project walkthrough with complete, copy-paste-ready code.
+*   **Interview Preparation:** Expandable Q&A cards with real DevOps interview questions at the end of every module.
+*   **Connected Curriculum:** Modules explicitly build on each other (Bash exit codes → pipeline gates → smoke tests → alerts), all converging on the Capstone.
 
 ---
 

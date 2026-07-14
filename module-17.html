@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 17 — GitOps with ArgoCD | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 17: GitOps with ArgoCD — pull-based deployments, app repo vs config repo, App of Apps, multi-environment promotion, and rollbacks via git revert.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 17 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level pro">Pro</span>
+                    <span class="module-hero-duration">Phase 5 · Advanced DevOps</span>
+                </div>
+                <h1>Module 17 — GitOps with <span class="gradient-text">ArgoCD</span></h1>
+                <p class="module-hero-desc">
+                    Modules 09/12 pipelines <em>push</em> to clusters — CI holds cluster credentials and drift
+                    goes undetected. GitOps inverts it: the cluster <em>pulls</em> from Git, continuously
+                    reconciling. This is the capstone's deployment model, and "Git is the source of truth"
+                    (Module 03) reaching its final destination.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">ArgoCD</span>
+                    <span class="tech-tag">GitOps</span>
+                    <span class="tech-tag">App of Apps</span>
+                    <span class="tech-tag">Helm</span>
+                    <span class="tech-tag">Config Repo</span>
+                    <span class="tech-tag">yq</span>
+                    <span class="tech-tag">Sealed Secrets</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#gitops-principles" class="toc-link">1. GitOps Principles</a></li>
+                    <li><a href="#argocd-arch" class="toc-link">2. ArgoCD Architecture</a></li>
+                    <li><a href="#install" class="toc-link">3. Install ArgoCD</a></li>
+                    <li><a href="#applications" class="toc-link">4. Applications &amp; Sync</a></li>
+                    <li><a href="#argocd-helm" class="toc-link">5. ArgoCD + Helm + Config Repo</a></li>
+                    <li><a href="#multi-env" class="toc-link">6. Multi-Environment</a></li>
+                    <li><a href="#app-of-apps" class="toc-link">7. App of Apps</a></li>
+                    <li><a href="#rbac-sso" class="toc-link">8. RBAC &amp; SSO</a></li>
+                    <li><a href="#incidents" class="toc-link">9. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. GitOps Principles ============ -->
+                <section class="content-section" id="gitops-principles">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📖</div>
+                        <h2>1. GitOps Principles</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Principle</th><th>What it means</th><th>Traditional CD contrast</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Declarative</strong></td><td>Desired cluster state is in Git as YAML/Helm</td><td>Imperative <code>kubectl apply</code> in CI scripts</td></tr>
+                            <tr><td><strong>Versioned</strong></td><td>Every state change = a Git commit with author, PR, review</td><td>Deployment is a CI job with no persistent audit trail</td></tr>
+                            <tr><td><strong>Pulled</strong></td><td>Cluster agent pulls from Git — CI has no cluster credentials</td><td>CI pushes (holds kubeconfig, broad permissions)</td></tr>
+                            <tr><td><strong>Reconciled</strong></td><td>ArgoCD continuously diffs Git vs cluster, auto-heals drift</td><td>Drift undetected until next deploy or manual inspection</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Push CD vs GitOps Pull</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Push CD:<br/>CI builds → CI deploys<br/>(CI holds kubeconfig)</span>
+                            <span class="flow-arrow">vs</span>
+                            <span class="flow-item">GitOps:<br/>CI builds → commits tag to config repo<br/>→ ArgoCD detects → pulls → deploys</span>
+                        </div>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Security argument for pull</div>
+                        <p>In push CD, every CI runner holds a kubeconfig (cluster-admin in most naive setups). Compromise one CI machine and you own the cluster. In GitOps, CI only writes to a Git repo. ArgoCD, running inside the cluster, is the only thing that applies manifests — and its credentials never leave the cluster. The attack surface is dramatically smaller.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 2. ArgoCD Architecture ============ -->
+                <section class="content-section" id="argocd-arch">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. ArgoCD Architecture</h2>
+                    </div>
+                    <p class="content-text">
+                        This is the <strong>third time</strong> you're seeing the reconciliation loop —
+                        Kubernetes controllers (M11), Terraform (M13), and now ArgoCD.
+                        Convergence is <em>the</em> pattern of modern operations.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Application Controller</strong></td><td>Watches clusters and Git. Computes diff. Applies resources. The reconciliation engine.</td></tr>
+                            <tr><td><strong>Repo Server</strong></td><td>Clones Git repos, renders Helm/Kustomize manifests, caches results</td></tr>
+                            <tr><td><strong>API Server</strong></td><td>REST/gRPC API for the UI, CLI, and automation. Manages auth + RBAC.</td></tr>
+                            <tr><td><strong>Redis</strong></td><td>Cache for rendered manifests and cluster state</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 3. Install ============ -->
+                <section class="content-section" id="install">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>3. Install ArgoCD</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — install + first login</span></div>
+                        <pre><code><span class="comment"># Install ArgoCD into its own namespace</span>
+<span class="command">kubectl</span> create namespace argocd
+<span class="command">kubectl</span> apply -n argocd \
+    -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+<span class="comment"># Install the argocd CLI</span>
+<span class="command">curl</span> -sSL -o argocd-linux-amd64 \
+    https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+<span class="command">sudo</span> install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+
+<span class="comment"># Wait for ArgoCD to be ready</span>
+<span class="command">kubectl</span> wait --for=condition=available deployment/argocd-server \
+    -n argocd --timeout=120s
+
+<span class="comment"># Port-forward the UI</span>
+<span class="command">kubectl</span> port-forward svc/argocd-server -n argocd 8080:443
+
+<span class="comment"># Get the initial admin password</span>
+<span class="command">argocd</span> admin initial-password -n argocd
+<span class="comment"># Login</span>
+<span class="command">argocd</span> login localhost:8080 --username admin --insecure
+
+<span class="comment"># Connect the Git repo (use SSH key or HTTPS token)</span>
+<span class="command">argocd</span> repo add git@github.com:techitfactory/gitops.git \
+    --ssh-private-key-path ~/.ssh/argocd-deploy-key</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Applications ============ -->
+                <section class="content-section" id="applications">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📱</div>
+                        <h2>4. ArgoCD Applications &amp; Sync Policy</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — annotated Application manifest</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: argoproj.io/v1alpha1
+<span class="keyword">kind</span>: Application
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory-dev
+  <span class="keyword">namespace</span>: argocd              <span class="comment"># ArgoCD always lives in argocd namespace</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">project</span>: default               <span class="comment"># ArgoCD project (RBAC boundary — Section 8)</span>
+  <span class="keyword">source</span>:
+    <span class="keyword">repoURL</span>: git@github.com:techitfactory/gitops.git
+    <span class="keyword">targetRevision</span>: HEAD          <span class="comment"># or a branch name, tag, or commit SHA</span>
+    <span class="keyword">path</span>: environments/dev        <span class="comment"># directory inside the repo</span>
+    <span class="keyword">helm</span>:
+      <span class="keyword">valueFiles</span>: [values-dev.yaml]
+  <span class="keyword">destination</span>:
+    <span class="keyword">server</span>: https://kubernetes.default.svc  <span class="comment"># the cluster ArgoCD runs in</span>
+    <span class="keyword">namespace</span>: development
+  <span class="keyword">syncPolicy</span>:
+    <span class="keyword">automated</span>:                    <span class="comment"># auto-sync: ArgoCD applies whenever Git changes</span>
+      <span class="keyword">selfHeal</span>: true              <span class="comment"># revert manual kubectl changes (drift fix)</span>
+      <span class="keyword">prune</span>: true                 <span class="comment"># delete resources removed from Git</span>
+    <span class="keyword">syncOptions</span>:
+    - CreateNamespace=true</code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Sync mode</th><th>Behavior</th><th>Use case</th></tr></thead>
+                        <tbody>
+                            <tr><td>Manual</td><td>ArgoCD detects diff but waits for human to click Sync</td><td>Production (governance gate)</td></tr>
+                            <tr><td>Auto-sync</td><td>Applies changes immediately when Git changes</td><td>Dev/staging</td></tr>
+                            <tr><td>Auto-sync + selfHeal</td><td>Also reverts any manual cluster changes</td><td>Strict staging where drift = bug</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 5. ArgoCD + Helm + Config Repo ============ -->
+                <section class="content-section" id="argocd-helm">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>5. ArgoCD + Helm + Config Repo — The CI Handoff</h2>
+                    </div>
+                    <p class="content-text">
+                        The capstone uses a three-repo model (app code, Helm chart, config repo). CI builds the
+                        image and commits the new tag to the config repo. ArgoCD detects the commit and syncs.
+                        Jenkins <em>never</em> touches the cluster.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The CI/CD Handoff — Module 09 Pipeline's Final Form</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Dev pushes code<br/>to app repo</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Jenkins:<br/>Build + Test + Push ECR</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Jenkins commits<br/>new image.tag to<br/>config repo</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD detects<br/>config change</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Cluster pulls +<br/>applies new tag</span>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — Jenkins stage: commit image tag to config repo (yq)</span></div>
+                        <pre><code><span class="comment"># In the Jenkins pipeline (after docker push to ECR):</span>
+<span class="variable">IMAGE_TAG</span>=<span class="string">"${BUILD_NUMBER}-${GIT_COMMIT[0..6]}"</span>
+
+<span class="comment"># Clone the config repo</span>
+<span class="command">git</span> clone git@github.com:techitfactory/gitops.git /tmp/gitops
+<span class="command">cd</span> /tmp/gitops
+
+<span class="comment"># Update the image tag using yq (Module 02/14 YAML-patching payoff)</span>
+<span class="command">yq</span> eval ".image.tag = \"${IMAGE_TAG}\"" -i environments/dev/values-dev.yaml
+
+<span class="comment"># Commit and push</span>
+<span class="command">git</span> add environments/dev/values-dev.yaml
+<span class="command">git</span> commit -m "ci: bump api image to ${IMAGE_TAG} [skip ci]"
+<span class="command">git</span> push origin main
+
+<span class="comment"># ArgoCD detects the commit within ~3 minutes (default poll interval)</span>
+<span class="comment"># Or configure a webhook for instant detection</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Multi-Environment ============ -->
+                <section class="content-section" id="multi-env">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌍</div>
+                        <h2>6. Multi-Environment — Dev Auto, Prod Manual</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">text — config repo structure</span></div>
+                        <pre><code>techitfactory-gitops/
+├── apps/                        <span class="comment"># ArgoCD Application manifests</span>
+│   ├── techitfactory-dev.yaml   <span class="comment"># auto-sync, selfHeal</span>
+│   └── techitfactory-prod.yaml  <span class="comment"># manual sync (governance)</span>
+├── base/                        <span class="comment"># shared Helm chart</span>
+│   └── chart/
+└── environments/
+    ├── dev/
+    │   └── values-dev.yaml      <span class="comment"># image.tag updated by CI</span>
+    └── prod/
+        └── values-prod.yaml     <span class="comment"># updated via PR from dev (promotion)</span></code></pre>
+                    </div>
+                    <p class="content-text">
+                        Promotion to production is a PR: update <code>values-prod.yaml</code> with the tag that
+                        passed in dev, get a code review, merge. ArgoCD detects the merge, shows the diff in
+                        the UI, and a human clicks Sync. <strong>Deployment review = code review.</strong>
+                    </p>
+                </section>
+
+                <!-- ============ 7. App of Apps ============ -->
+                <section class="content-section" id="app-of-apps">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌳</div>
+                        <h2>7. App of Apps — Bootstrap an Entire Cluster</h2>
+                    </div>
+                    <p class="content-text">
+                        Instead of applying each ArgoCD Application manually, create a <em>root</em> Application
+                        that manages the other Applications. Apply one manifest → ArgoCD bootstraps everything.
+                        This is the capstone disaster recovery story: new cluster + one apply = everything back.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — root App of Apps</span></div>
+                        <pre><code><span class="comment"># root-app.yaml — apply this once to bootstrap the whole cluster</span>
+<span class="keyword">apiVersion</span>: argoproj.io/v1alpha1
+<span class="keyword">kind</span>: Application
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: root
+  <span class="keyword">namespace</span>: argocd
+<span class="keyword">spec</span>:
+  <span class="keyword">project</span>: default
+  <span class="keyword">source</span>:
+    <span class="keyword">repoURL</span>: git@github.com:techitfactory/gitops.git
+    <span class="keyword">targetRevision</span>: HEAD
+    <span class="keyword">path</span>: apps/                     <span class="comment"># directory containing child Application manifests</span>
+  <span class="keyword">destination</span>:
+    <span class="keyword">server</span>: https://kubernetes.default.svc
+    <span class="keyword">namespace</span>: argocd
+  <span class="keyword">syncPolicy</span>:
+    <span class="keyword">automated</span>: { selfHeal: true, prune: true }</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — disaster recovery: new cluster, one command</span></div>
+                        <pre><code><span class="comment"># 1. New EKS cluster (terraform apply — Module 13)</span>
+<span class="comment"># 2. Install ArgoCD</span>
+<span class="command">kubectl</span> apply -n argocd -f https://...argocd/stable/manifests/install.yaml
+
+<span class="comment"># 3. Connect repo and apply the root app</span>
+<span class="command">kubectl</span> apply -f root-app.yaml
+
+<span class="comment"># Result: ArgoCD discovers all child apps, syncs them all</span>
+<span class="comment"># All namespaces, monitoring, the app — everything converges from Git</span>
+<span class="comment"># This is Modules 13 + 17 combined: full stack from code</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. RBAC & SSO ============ -->
+                <section class="content-section" id="rbac-sso">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔐</div>
+                        <h2>8. RBAC &amp; SSO</h2>
+                    </div>
+                    <p class="content-text">
+                        ArgoCD Projects are RBAC tenancy boundaries — a project restricts which repos and clusters
+                        an Application can use. Roles within projects control who can sync.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — ArgoCD Project with RBAC</span></div>
+                        <pre><code><span class="keyword">apiVersion</span>: argoproj.io/v1alpha1
+<span class="keyword">kind</span>: AppProject
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: techitfactory
+  <span class="keyword">namespace</span>: argocd
+<span class="keyword">spec</span>:
+  <span class="keyword">description</span>: techitfactory applications
+  <span class="keyword">sourceRepos</span>:
+  - git@github.com:techitfactory/gitops.git    <span class="comment"># only this repo allowed</span>
+  <span class="keyword">destinations</span>:
+  - namespace: production
+    server: https://kubernetes.default.svc
+  <span class="keyword">roles</span>:
+  - <span class="keyword">name</span>: read-only
+    <span class="keyword">description</span>: Read-only for developers
+    <span class="keyword">policies</span>:
+    - p, proj:techitfactory:read-only, applications, get, techitfactory/*, allow
+  - <span class="keyword">name</span>: deployer
+    <span class="keyword">description</span>: Can sync apps
+    <span class="keyword">policies</span>:
+    - p, proj:techitfactory:deployer, applications, sync, techitfactory/*, allow</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>9. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — App Stuck "OutOfSync" (Drift)</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>ArgoCD shows application as OutOfSync even though no recent Git commit. A team member ran <code>kubectl edit deployment api</code> to hotfix a bug.</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>Manual kubectl change created drift. With <code>selfHeal: true</code>, ArgoCD reverts it within 3 minutes automatically — demonstrating the power and the danger of GitOps: the hotfix disappears unless it's committed to Git first.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Commit the intended change to Git (open a PR). ArgoCD syncs it properly. The lesson: there are no more "quick kubectl fixes" in GitOps — all changes go through Git.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>K8s RBAC in production: deny direct kubectl patch/edit to most developers. Only ArgoCD's service account has cluster-write. Engineers must go through Git.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Sync Fails with Immutable Field Error</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — fix immutable field conflict</span></div>
+                        <pre><code><span class="comment"># Error: "field is immutable" — e.g., changed a Job's selector or Service's clusterIP</span>
+<span class="comment"># Strategy 1: Replace=true annotation (ArgoCD deletes and recreates)</span>
+<span class="comment"># Add to the Application's syncPolicy:</span>
+<span class="comment"># syncOptions: [Replace=true]</span>
+
+<span class="comment"># Strategy 2: Manual delete and let ArgoCD recreate</span>
+<span class="command">kubectl</span> delete job my-migration-job -n production
+<span class="comment"># ArgoCD next sync creates it fresh</span>
+
+<span class="comment"># Note: Replace=true causes downtime — use only for immutable-field updates</span></code></pre>
+                    </div>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — Secret in Config Repo</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>A developer committed a real database password to values-prod.yaml in the config repo.</td></tr>
+                            <tr><td><strong>Immediate actions</strong></td><td>(1) Rotate the credential immediately. (2) Remove from Git history (<code>git filter-repo</code>). (3) Force-push (coordinate with team). (4) Assume compromised.</td></tr>
+                            <tr><td><strong>Long-term fix</strong></td><td>Use Sealed Secrets or External Secrets Operator. Sealed Secrets encrypt the secret with a cluster-specific key — the SealedSecret CRD is safe to commit. ESO fetches secrets from AWS Secrets Manager at sync time (Module 18 bridge).</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 4 — ArgoCD Shows Healthy, App is Broken</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Root Cause</strong></td><td>ArgoCD's Healthy status = Deployment has desired replicas running. It doesn't know if the app is actually serving requests correctly. A misconfigured env var causes 500 errors on every request — pods are Running, ArgoCD is happy, users are not.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Combine ArgoCD with the Module 16 Prometheus alerts. ArgoCD handles deployment lifecycle; Prometheus/AlertManager handles runtime correctness. Both are needed.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — GitHub → ArgoCD → EKS GitOps Pipeline</h2>
+                    </div>
+                    <p class="content-text">
+                        Full GitOps pipeline: ArgoCD on EKS → config repo → Jenkins commits tags →
+                        ArgoCD auto-syncs dev, human-approves prod → drift drill → git-revert rollback.
+                        The ultimate payoff: rollback is a <code>git revert</code>.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Install ArgoCD on the EKS Cluster</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">kubectl</span> apply -n argocd \
+    -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+<span class="command">kubectl</span> wait --for=condition=available deployment/argocd-server -n argocd --timeout=120s
+<span class="command">argocd</span> login localhost:8080 --username admin --password $(argocd admin initial-password -n argocd | head -1) --insecure</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Create techitfactory-gitops Config Repo</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Structure: apps/ + base/chart/ + environments/dev/ + environments/prod/</span>
+<span class="comment"># Copy the Module 11 Helm chart to base/chart/</span>
+<span class="comment"># Create values-dev.yaml and values-prod.yaml with initial image.tag</span>
+<span class="command">argocd</span> repo add git@github.com:techitfactory/gitops.git \
+    --ssh-private-key-path ~/.ssh/argocd-deploy-key</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Create ArgoCD Applications (Dev + Prod)</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Apply Application manifests from Section 4 (auto for dev, manual for prod)</span>
+<span class="command">kubectl</span> apply -f apps/techitfactory-dev.yaml
+<span class="command">kubectl</span> apply -f apps/techitfactory-prod.yaml
+<span class="comment"># Verify in the ArgoCD UI: both apps should show Synced + Healthy</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Wire Jenkins to Commit Image Tags</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Add the config-repo-commit stage to the Module 09/12 Jenkinsfile</span>
+<span class="comment"># Jenkins needs SSH access to the gitops repo (separate deploy key, read/write)</span>
+<span class="comment"># After successful ECR push: yq + git commit + push (Section 5 commands)</span>
+<span class="comment"># Test: push a code change, watch the image tag update in dev values, ArgoCD syncs</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>App of Apps</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Apply root-app.yaml (Section 7) — manages all child apps from Git</span>
+<span class="command">kubectl</span> apply -f root-app.yaml
+<span class="comment"># ArgoCD discovers apps/ directory and syncs all children</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">6</span>Drift Drill + Git Rollback</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Drift drill: kubectl edit deployment api -n development (change replicas to 1)</span>
+<span class="comment"># Wait 3 minutes — selfHeal reverts it back to 2 automatically</span>
+<span class="comment"># Watch in the ArgoCD UI: OutOfSync → Syncing → Synced</span>
+
+<span class="comment"># Rollback drill: revert the last image-tag commit</span>
+<span class="command">git</span> revert HEAD --no-edit
+<span class="command">git</span> push origin main
+<span class="comment"># ArgoCD syncs the revert → previous image deployed in minutes</span>
+<span class="comment"># This is the ultimate payoff: rollback = git revert (no helm rollback, no kubectl)</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is GitOps and how does it differ from traditional CD?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>GitOps is a CD approach where Git is the single source of truth for the desired cluster state. A reconciliation agent (ArgoCD) continuously compares Git to the cluster and applies any diff. Traditional CD (push): a CI pipeline holds cluster credentials and applies manifests during a build job — the cluster state after the pipeline is unknown until the next plan. GitOps advantages: all changes have a Git audit trail, CI never holds cluster credentials (pull reduces attack surface), drift is detected and auto-healed, rollback is a git revert. The tradeoff: more tooling, and engineers must change the habit of <code>kubectl apply</code>.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the security argument for the pull model?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>In push CD, every CI runner needs cluster credentials (typically kubeconfig with broad permissions). Compromise one Jenkins agent and you can deploy arbitrary code or delete everything. In GitOps pull, CI runners only need write access to a Git repository — a far narrower blast radius. ArgoCD, running inside the cluster, is the only system that applies manifests, and its service account credentials never leave the cluster. Even a full compromise of the CI system can't directly deploy to the cluster — an attacker would need to also control the Git repo (which has branch protection and PR reviews).</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What happens when someone does a kubectl edit in a GitOps setup?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>ArgoCD detects the drift immediately and marks the application OutOfSync. If selfHeal is enabled (typical for staging), ArgoCD reverts the change within its sync interval (default 3 minutes). In production with manual sync, the app stays OutOfSync until a human reviews and decides whether to sync (reverting the kubectl change) or commits the change to Git (codifying it). This is the key cultural shift in GitOps: the cluster state always mirrors Git, so any change not in Git is temporary at best.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Why split app repo from config repo?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Separation of concerns. The app repo contains source code — it changes frequently and triggers builds. The config repo contains deployment state (image tags, replica counts, env-specific values) — it changes when you want to deploy a specific version. Separation means: CI commits image tags to the config repo without triggering a new CI build (no infinite loop). Different teams can have different permissions — developers commit to the app repo; platform team controls config repo merge rules. Multiple microservices can share one config repo (a monorepo for infra state). ArgoCD watches the config repo, not the app repo.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do rollbacks work in GitOps?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A rollback is a git operation — <code>git revert HEAD</code> or <code>git checkout HEAD~1 -- values-prod.yaml &amp;&amp; git commit</code>. This produces a new commit in the config repo that sets the image.tag back to the previous value. ArgoCD detects the commit, syncs, and the cluster deploys the previous image. The entire operation is audited in Git: who decided to roll back, when, and why (the commit message). No special rollback tool needed. This is cleaner than <code>helm rollback</code> because the rollback state is recorded in Git history.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is App of Apps and when would you use it?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>App of Apps is a pattern where one ArgoCD Application manages a directory of other Application manifests. Instead of manually creating each app via CLI or UI, you apply one root app and ArgoCD recursively manages all the children. Use cases: bootstrapping a new cluster (apply one manifest, everything converges), managing many microservices across environments (the root app watches apps/), disaster recovery (new cluster + one apply = full restore from Git). The tradeoff: delete the root app and ArgoCD tries to prune all children — be careful with prune settings on the root app.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-16.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 16 — Monitoring</span>
+                </div>
+            </a>
+            <a href="module-18.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 18 — DevSecOps</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

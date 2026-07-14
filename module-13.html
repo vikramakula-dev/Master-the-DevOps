@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 13 — Infrastructure as Code with Terraform | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 13: Terraform — HCL syntax, providers, state management, modules, workspaces, EKS via Terraform, and CI/CD integration. Make infrastructure a Git artifact.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 13 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 4 · Automation &amp; IaC</span>
+                </div>
+                <h1>Module 13 — Infrastructure as Code with <span class="gradient-text">Terraform</span></h1>
+                <p class="module-hero-desc">
+                    Modules 10–12 clicked and typed infrastructure into existence — unrepeatable and undocumented.
+                    Terraform makes infrastructure a Git artifact: reviewed, versioned, and reproducible. The entire
+                    capstone VPC + EKS cluster is this module's output, expressed in ~200 lines of HCL.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Terraform</span>
+                    <span class="tech-tag">HCL</span>
+                    <span class="tech-tag">Remote State</span>
+                    <span class="tech-tag">Modules</span>
+                    <span class="tech-tag">S3 Backend</span>
+                    <span class="tech-tag">DynamoDB Lock</span>
+                    <span class="tech-tag">CI/CD</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#iac-concepts" class="toc-link">1. IaC Concepts</a></li>
+                    <li><a href="#architecture" class="toc-link">2. Terraform Architecture</a></li>
+                    <li><a href="#hcl-syntax" class="toc-link">3. HCL Syntax</a></li>
+                    <li><a href="#core-workflow" class="toc-link">4. Core Workflow</a></li>
+                    <li><a href="#state" class="toc-link">5. State &amp; Remote Backend</a></li>
+                    <li><a href="#aws-provisioning" class="toc-link">6. Provisioning AWS in HCL</a></li>
+                    <li><a href="#modules" class="toc-link">7. Modules</a></li>
+                    <li><a href="#environments" class="toc-link">8. Workspaces &amp; Environments</a></li>
+                    <li><a href="#eks-tf" class="toc-link">9. EKS via Terraform</a></li>
+                    <li><a href="#tf-ci" class="toc-link">10. Terraform in CI</a></li>
+                    <li><a href="#incidents" class="toc-link">11. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. IaC Concepts ============ -->
+                <section class="content-section" id="iac-concepts">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📋</div>
+                        <h2>1. IaC Concepts</h2>
+                    </div>
+                    <p class="content-text">
+                        After Module 12, you can build an EKS cluster — but only you know how. If the cluster
+                        needs rebuilding (disaster recovery, a new environment), it's a day of console clicks with
+                        no audit trail and certain configuration drift. Infrastructure as Code solves this:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Approach</th><th>Example</th><th>Problem</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Manual console</strong></td><td>Clicking "Create VPC"</td><td>Unrepeatable, undocumented, no audit trail</td></tr>
+                            <tr><td><strong>Imperative scripts</strong></td><td>AWS CLI shell scripts</td><td>Not idempotent — running twice breaks things</td></tr>
+                            <tr><td><strong>Declarative IaC</strong></td><td>Terraform HCL</td><td>✅ Idempotent, versioned, reviewable, reproducible</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        Terraform is declarative — you describe the desired end state, and Terraform figures out
+                        how to get there. This is the same reconciliation model as Kubernetes (M11) and ArgoCD
+                        (M17), applied to infrastructure provisioning.
+                    </p>
+                </section>
+
+                <!-- ============ 2. Architecture ============ -->
+                <section class="content-section" id="architecture">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. Terraform Architecture</h2>
+                    </div>
+                    <div class="visual-box">
+                        <div class="visual-box-title">The Terraform Triangle</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">HCL Code<br/>(desired state)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Terraform Core<br/>(plan + apply)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Provider<br/>(AWS/Azure/GCP API)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Real Infrastructure</span>
+                        </div>
+                        <div class="visual-flow" style="margin-top:8px;">
+                            <span class="flow-item">Real Infrastructure</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">State File<br/>(current state)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Terraform Core<br/>(diff = plan)</span>
+                        </div>
+                    </div>
+                    <p class="content-text">
+                        The <strong>state file</strong> (<code>terraform.tfstate</code>) is Terraform's memory —
+                        it maps your HCL resources to real infrastructure IDs. The plan is the diff between the
+                        desired state (HCL) and the current state (tfstate).
+                    </p>
+                </section>
+
+                <!-- ============ 3. HCL Syntax ============ -->
+                <section class="content-section" id="hcl-syntax">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📝</div>
+                        <h2>3. HCL Syntax</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">hcl — annotated main.tf</span></div>
+                        <pre><code><span class="comment"># Provider: the plugin that talks to AWS</span>
+<span class="keyword">terraform</span> {
+  required_providers {
+    aws = {
+      source  = <span class="string">"hashicorp/aws"</span>
+      version = <span class="string">"~> 5.0"</span>   <span class="comment"># ~> = pessimistic constraint (5.x but not 6.x)</span>
+    }
+  }
+  backend <span class="string">"s3"</span> {          <span class="comment"># remote state — covered in Section 5</span>
+    bucket = <span class="string">"techitfactory-tf-state"</span>
+    key    = <span class="string">"dev/terraform.tfstate"</span>
+    region = <span class="string">"us-east-1"</span>
+  }
+}
+
+<span class="keyword">provider</span> <span class="string">"aws"</span> {
+  region = <span class="keyword">var</span>.aws_region  <span class="comment"># reference a variable</span>
+}
+
+<span class="comment"># Variable with type, description, and validation</span>
+<span class="keyword">variable</span> <span class="string">"aws_region"</span> {
+  description = <span class="string">"AWS region to deploy into"</span>
+  type        = string
+  default     = <span class="string">"us-east-1"</span>
+  validation {
+    condition     = contains([<span class="string">"us-east-1"</span>, <span class="string">"us-west-2"</span>], <span class="keyword">var</span>.aws_region)
+    error_message = <span class="string">"Unsupported region."</span>
+  }
+}
+
+<span class="comment"># Resource: a real piece of infrastructure</span>
+<span class="keyword">resource</span> <span class="string">"aws_vpc"</span> <span class="string">"main"</span> {  <span class="comment"># type = aws_vpc, local name = main</span>
+  cidr_block           = <span class="string">"10.0.0.0/16"</span>
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = {
+    Name    = <span class="string">"techitfactory-vpc"</span>
+    Project = <span class="string">"techitfactory"</span>    <span class="comment"># cost allocation tag</span>
+  }
+}
+
+<span class="comment"># Output: expose values after apply</span>
+<span class="keyword">output</span> <span class="string">"vpc_id"</span> {
+  description = <span class="string">"ID of the created VPC"</span>
+  value       = <span class="keyword">aws_vpc</span>.main.id    <span class="comment"># reference: resource_type.local_name.attribute</span>
+}
+
+<span class="comment"># Data source: read existing infrastructure (not managed by this TF)</span>
+<span class="keyword">data</span> <span class="string">"aws_availability_zones"</span> <span class="string">"available"</span> {
+  state = <span class="string">"available"</span>
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Core Workflow ============ -->
+                <section class="content-section" id="core-workflow">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>4. Core Workflow — init → plan → apply → destroy</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ the four commands you'll run every day</span></div>
+                        <pre><code><span class="comment"># ⭐ init: download providers, initialize backend</span>
+<span class="command">terraform</span> init
+
+<span class="comment"># Format and validate before planning (run in CI)</span>
+<span class="command">terraform</span> fmt -check       <span class="comment"># exits non-zero if formatting differs</span>
+<span class="command">terraform</span> validate         <span class="comment"># syntax + type checking</span>
+
+<span class="comment"># ⭐ plan: show what will change — read this like a PR diff before applying</span>
+<span class="command">terraform</span> plan -out=tfplan  <span class="comment"># save the plan for deterministic apply</span>
+
+<span class="comment"># ⭐ apply: converge infrastructure to the desired state</span>
+<span class="command">terraform</span> apply tfplan       <span class="comment"># applies the saved plan (no prompt)</span>
+
+<span class="comment"># destroy: tear down everything (teardown checklists become one command)</span>
+<span class="command">terraform</span> destroy</code></pre>
+                    </div>
+                    <p class="content-text">
+                        The plan output uses symbols you must learn to read — they mean the same as a git diff,
+                        but for infrastructure:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Symbol</th><th>Meaning</th><th>Risk level</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>+</code></td><td>Create (new resource)</td><td>Low — additive</td></tr>
+                            <tr><td><code>-</code></td><td>Destroy (delete resource)</td><td>High — data loss possible</td></tr>
+                            <tr><td><code>~</code></td><td>Update in-place (modify attributes)</td><td>Low to medium</td></tr>
+                            <tr><td><code>-/+</code></td><td>Destroy and recreate (immutable attribute changed)</td><td>🚨 High — downtime</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 -/+ means downtime</div>
+                        <p><code>-/+</code> is the one to fear: Terraform must destroy the resource and create a fresh one because you changed an immutable attribute (e.g., an EC2's AZ, an RDS engine version). Always read the plan before typing <code>apply</code>. In CI, require manual approval for any <code>-/+</code> changes.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 5. State ============ -->
+                <section class="content-section" id="state">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗂️</div>
+                        <h2>5. State — Remote Backend with S3 + DynamoDB</h2>
+                    </div>
+                    <div class="tip-box tip-danger">
+                        <div class="tip-box-title">🚨 Never commit terraform.tfstate to Git</div>
+                        <p>The state file contains plaintext secrets — database passwords, TLS private keys, anything Terraform read or created. Add <code>*.tfstate</code> and <code>*.tfstate.*</code> to <code>.gitignore</code> immediately (Module 03 discipline applies here). Use remote state exclusively.</p>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — bootstrap the S3 + DynamoDB backend (run once)</span></div>
+                        <pre><code><span class="comment"># Create the state bucket with versioning (Module 06 backup thread: S3 edition)</span>
+<span class="command">aws</span> s3 mb s3://techitfactory-tf-state --region us-east-1
+<span class="command">aws</span> s3api put-bucket-versioning \
+    --bucket techitfactory-tf-state \
+    --versioning-configuration Status=Enabled
+<span class="command">aws</span> s3api put-bucket-encryption \     <span class="comment"># encrypt at rest</span>
+    --bucket techitfactory-tf-state \
+    --server-side-encryption-configuration \
+    '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+
+<span class="comment"># Create DynamoDB table for state locking (prevents concurrent applies)</span>
+<span class="command">aws</span> dynamodb create-table \
+    --table-name techitfactory-tf-lock \
+    --attribute-definitions AttributeName=LockID,AttributeType=S \
+    --key-schema AttributeName=LockID,KeyType=HASH \
+    --billing-mode PAY_PER_REQUEST</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Why locking?</div>
+                        <p>Two engineers run <code>terraform apply</code> simultaneously. Without locking, they both read the same state, both generate plans, and then apply conflicting changes — corrupting state. DynamoDB locking ensures only one apply runs at a time: the second engineer gets "Error acquiring the state lock" and waits. This is why DynamoDB is paired with S3 for state.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 6. AWS Provisioning ============ -->
+                <section class="content-section" id="aws-provisioning">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>6. Provisioning AWS — The Module 10 VPC in HCL</h2>
+                    </div>
+                    <p class="content-text">
+                        The VPC you built manually in Module 10 (nine CLI commands) becomes ~80 lines of
+                        idempotent, version-controlled HCL:
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">hcl — VPC, subnets, IGW, NAT, route tables</span></div>
+                        <pre><code><span class="comment"># VPC</span>
+<span class="keyword">resource</span> <span class="string">"aws_vpc"</span> <span class="string">"main"</span> {
+  cidr_block = <span class="string">"10.0.0.0/16"</span>
+  tags       = { Name = <span class="string">"techitfactory-vpc"</span> }
+}
+
+<span class="comment"># Public subnets (one per AZ)</span>
+<span class="keyword">resource</span> <span class="string">"aws_subnet"</span> <span class="string">"public"</span> {
+  count             = 2
+  vpc_id            = <span class="keyword">aws_vpc</span>.main.id
+  cidr_block        = cidrsubnet(<span class="string">"10.0.0.0/16"</span>, 8, count.index)  <span class="comment"># 10.0.0.0/24, 10.0.1.0/24</span>
+  availability_zone = <span class="keyword">data</span>.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = true
+  tags = { Name = <span class="string">"public-${count.index}"</span>, <span class="string">"kubernetes.io/role/elb"</span> = <span class="string">"1"</span> }
+}
+
+<span class="comment"># Private subnets</span>
+<span class="keyword">resource</span> <span class="string">"aws_subnet"</span> <span class="string">"private"</span> {
+  count             = 2
+  vpc_id            = <span class="keyword">aws_vpc</span>.main.id
+  cidr_block        = cidrsubnet(<span class="string">"10.0.0.0/16"</span>, 8, count.index + 10) <span class="comment"># 10.0.10.0/24, 10.0.11.0/24</span>
+  availability_zone = <span class="keyword">data</span>.aws_availability_zones.available.names[count.index]
+  tags = { Name = <span class="string">"private-${count.index}"</span>, <span class="string">"kubernetes.io/role/internal-elb"</span> = <span class="string">"1"</span> }
+}
+
+<span class="comment"># Internet Gateway + attachment</span>
+<span class="keyword">resource</span> <span class="string">"aws_internet_gateway"</span> <span class="string">"main"</span> {
+  vpc_id = <span class="keyword">aws_vpc</span>.main.id
+}
+
+<span class="comment"># NAT Gateway (one per region for dev, one per AZ for prod HA)</span>
+<span class="keyword">resource</span> <span class="string">"aws_eip"</span> <span class="string">"nat"</span> { domain = <span class="string">"vpc"</span> }
+<span class="keyword">resource</span> <span class="string">"aws_nat_gateway"</span> <span class="string">"main"</span> {
+  allocation_id = <span class="keyword">aws_eip</span>.nat.id
+  subnet_id     = <span class="keyword">aws_subnet</span>.public[0].id
+  depends_on    = [<span class="keyword">aws_internet_gateway</span>.main]  <span class="comment"># explicit dependency</span>
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Modules ============ -->
+                <section class="content-section" id="modules">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>7. Terraform Modules</h2>
+                    </div>
+                    <p class="content-text">
+                        A module is a reusable directory of <code>.tf</code> files with defined inputs (variables)
+                        and outputs. Think of it as a function for infrastructure — the same VPC setup used in
+                        three environments without copy-paste.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">hcl — calling a module</span></div>
+                        <pre><code><span class="comment"># environments/dev/main.tf — calls the vpc module</span>
+<span class="keyword">module</span> <span class="string">"vpc"</span> {
+  source = <span class="string">"../../modules/vpc"</span>  <span class="comment"># local path</span>
+
+  vpc_cidr    = <span class="string">"10.0.0.0/16"</span>
+  environment = <span class="string">"dev"</span>
+  aws_region  = <span class="string">"us-east-1"</span>
+}
+
+<span class="comment"># Or use the community module from Terraform Registry</span>
+<span class="keyword">module</span> <span class="string">"vpc"</span> {
+  source  = <span class="string">"terraform-aws-modules/vpc/aws"</span>
+  version = <span class="string">"5.1.2"</span>   <span class="comment"># always pin registry modules</span>
+
+  name            = <span class="string">"techitfactory-${var.environment}"</span>
+  cidr            = <span class="string">"10.0.0.0/16"</span>
+  azs             = [<span class="string">"us-east-1a"</span>, <span class="string">"us-east-1b"</span>]
+  private_subnets = [<span class="string">"10.0.1.0/24"</span>, <span class="string">"10.0.2.0/24"</span>]
+  public_subnets  = [<span class="string">"10.0.101.0/24"</span>, <span class="string">"10.0.102.0/24"</span>]
+  enable_nat_gateway = true
+}</code></pre>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 Write vs Reuse modules</div>
+                        <p>For standard AWS patterns (VPC, EKS, RDS), the community modules from <code>terraform-aws-modules</code> are excellent and battle-tested. Write your own when you have unique requirements not covered by the community module, or when you need fine-grained control over all attributes. Don't write a VPC module from scratch unless you have a specific reason to.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Workspaces & Environments ============ -->
+                <section class="content-section" id="environments">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🌍</div>
+                        <h2>8. Workspaces &amp; Environments</h2>
+                    </div>
+                    <p class="content-text">
+                        Two approaches to multi-environment Terraform:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Approach</th><th>Structure</th><th>Capstone choice</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Workspaces</strong></td><td>One directory; <code>terraform workspace select dev</code></td><td>State isolation, but same code = hidden divergence between envs</td></tr>
+                            <tr><td><strong>Directory per environment</strong></td><td><code>environments/dev/</code>, <code>environments/prod/</code></td><td>✅ Capstone uses this — explicit, no magic, safe blast radius</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">text — capstone repo structure (techitfactory-infra)</span></div>
+                        <pre><code>techitfactory-infra/
+├── bootstrap/           <span class="comment"># S3 bucket + DynamoDB for state (run once)</span>
+│   └── main.tf
+├── modules/
+│   ├── vpc/             <span class="comment"># reusable VPC module</span>
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── eks/             <span class="comment"># reusable EKS module</span>
+├── environments/
+│   ├── dev/
+│   │   ├── main.tf      <span class="comment"># calls modules; dev-specific vars</span>
+│   │   ├── terraform.tfvars
+│   │   └── backend.tf   <span class="comment"># dev/terraform.tfstate in S3</span>
+│   └── prod/
+│       ├── main.tf
+│       └── terraform.tfvars</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. EKS via Terraform ============ -->
+                <section class="content-section" id="eks-tf">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">☸️</div>
+                        <h2>9. EKS via Terraform</h2>
+                    </div>
+                    <p class="content-text">
+                        The eksctl cluster from Module 12 as code — one <code>terraform apply</code> creates the
+                        entire capstone infrastructure.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">hcl — EKS module call</span></div>
+                        <pre><code><span class="keyword">module</span> <span class="string">"eks"</span> {
+  source  = <span class="string">"terraform-aws-modules/eks/aws"</span>
+  version = <span class="string">"20.8.5"</span>
+
+  cluster_name    = <span class="string">"techitfactory-${var.environment}"</span>
+  cluster_version = <span class="string">"1.29"</span>
+  vpc_id          = <span class="keyword">module</span>.vpc.vpc_id
+  subnet_ids      = <span class="keyword">module</span>.vpc.private_subnet_ids
+  enable_irsa     = true   <span class="comment"># Module 12 IRSA payoff</span>
+
+  eks_managed_node_groups = {
+    workers = {
+      instance_types = [<span class="string">"t3.medium"</span>]
+      min_size       = 2
+      max_size       = 5
+      desired_size   = 2
+    }
+  }
+}
+
+<span class="keyword">output</span> <span class="string">"cluster_endpoint"</span>   { value = <span class="keyword">module</span>.eks.cluster_endpoint }
+<span class="keyword">output</span> <span class="string">"cluster_name"</span>       { value = <span class="keyword">module</span>.eks.cluster_name }</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 10. TF in CI ============ -->
+                <section class="content-section" id="tf-ci">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚙️</div>
+                        <h2>10. Terraform in CI</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">groovy — Jenkinsfile for infrastructure PR pipeline</span></div>
+                        <pre><code><span class="keyword">pipeline</span> {
+  <span class="keyword">agent</span> any
+  <span class="keyword">environment</span> {
+    <span class="variable">TF_IN_AUTOMATION</span> = <span class="string">'true'</span>   <span class="comment"># suppresses interactive prompts</span>
+  }
+  <span class="keyword">stages</span> {
+    <span class="keyword">stage</span>(<span class="string">'TF Validate'</span>) {
+      <span class="keyword">steps</span> {
+        <span class="function">sh</span> <span class="string">'terraform init -backend=false'</span>
+        <span class="function">sh</span> <span class="string">'terraform fmt -check -recursive'</span>
+        <span class="function">sh</span> <span class="string">'terraform validate'</span>
+      }
+    }
+    <span class="keyword">stage</span>(<span class="string">'TF Plan'</span>) {
+      <span class="keyword">steps</span> {
+        withCredentials([[$class: <span class="string">'AmazonWebServicesCredentialsBinding'</span>,
+                          credentialsId: <span class="string">'aws-tf-role'</span>]]) {
+          <span class="function">sh</span> <span class="string">"""
+            terraform init
+            terraform plan -out=tfplan -input=false
+          """</span>
+        }
+      }
+    }
+    <span class="keyword">stage</span>(<span class="string">'Approval'</span>) {   <span class="comment">// Module 07 input() payoff</span>
+      <span class="keyword">when</span> { branch <span class="string">'main'</span> }
+      <span class="keyword">steps</span> {
+        <span class="function">input</span> message: <span class="string">'Review the Terraform plan. Apply?'</span>, ok: <span class="string">'Apply'</span>
+      }
+    }
+    <span class="keyword">stage</span>(<span class="string">'TF Apply'</span>) {
+      <span class="keyword">when</span> { branch <span class="string">'main'</span> }
+      <span class="keyword">steps</span> {
+        <span class="function">sh</span> <span class="string">'terraform apply -input=false tfplan'</span>
+      }
+    }
+  }
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 11. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>11. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — State Lock Stuck After Killed Run</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — diagnose and force-unlock</span></div>
+                        <pre><code><span class="comment"># Error: Error acquiring the state lock</span>
+<span class="comment"># Lock Info: ID: 12345-... Operation: OperationTypeApply</span>
+<span class="comment"># The previous apply was Ctrl+C'd — DynamoDB lock item wasn't released</span>
+
+<span class="comment"># Verify: check if anyone else is running TF</span>
+<span class="comment"># If you're certain the previous apply is dead:</span>
+<span class="command">terraform</span> force-unlock 12345-abcd-...  <span class="comment"># the lock ID from the error message</span>
+
+<span class="comment"># Then re-run plan to see current state before applying again</span>
+<span class="command">terraform</span> plan</code></pre>
+                    </div>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Drift (Someone Clicked in the Console)</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td><code>terraform plan</code> shows changes you didn't make — e.g., a Security Group rule was added manually.</td></tr>
+                            <tr><td><strong>Decision tree</strong></td><td>(1) The manual change is wrong → <code>terraform apply</code> to revert drift. (2) The manual change is intentional → <code>terraform import</code> the resource and update the HCL to match, then apply (idempotent). (3) Temporarily exclude from TF → <code>lifecycle { ignore_changes = [tags] }</code>.</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>IAM deny policy for console changes to tagged resources (all infra tagged <code>ManagedBy=Terraform</code>); enforce via SCP. At minimum, CloudTrail alerts on console changes to production resources.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 3 — The Accidental Destroy</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">hcl — prevent_destroy lifecycle guard</span></div>
+                        <pre><code><span class="comment"># Never accidentally delete the production database:</span>
+<span class="keyword">resource</span> <span class="string">"aws_db_instance"</span> <span class="string">"prod"</span> {
+  identifier = <span class="string">"techitfactory-prod"</span>
+  <span class="comment"># ... config ...</span>
+  lifecycle {
+    prevent_destroy = true   <span class="comment"># terraform destroy will error out rather than delete this</span>
+  }
+}
+
+<span class="comment"># Also: save the plan file and review before applying in CI (Section 10)</span>
+<span class="comment"># terraform plan -out=tfplan → human reviews → terraform apply tfplan</span>
+<span class="comment"># The plan file is deterministic — apply does exactly what plan showed</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — techitfactory-infra Repo</h2>
+                    </div>
+                    <p class="content-text">
+                        Build the full IaC repo that provisions the capstone infrastructure —
+                        VPC + EKS via modules, with a Jenkins CI pipeline. See <a href="project1.html">Capstone Project</a> §12.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Bootstrap: S3 State Bucket + DynamoDB Lock</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Run the bootstrap commands from Section 5</span>
+<span class="comment"># Then initialize the main config with the S3 backend</span>
+<span class="command">cd</span> environments/dev
+<span class="command">terraform</span> init   <span class="comment"># downloads providers, connects to S3 backend</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Write VPC + EKS Modules</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Use community modules (terraform-aws-modules) for VPC and EKS</span>
+<span class="comment"># Parameterize environment, CIDR ranges, instance types via variables</span>
+<span class="command">terraform</span> validate   <span class="comment"># catch syntax errors early</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Apply Dev Environment</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">terraform</span> plan -out=tfplan -var-file=terraform.tfvars
+<span class="comment"># Review the plan — count: +VPC, +2 subnets×2, +IGW, +NAT, +EKS cluster, +node group</span>
+<span class="command">terraform</span> apply tfplan
+<span class="comment"># ~20 min — EKS cluster creation dominates</span>
+<span class="command">aws</span> eks update-kubeconfig --name techitfactory-dev
+<span class="command">kubectl</span> get nodes   <span class="comment"># verify cluster is healthy</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>Drift Drill</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># In the AWS console: add an inbound rule to the node security group</span>
+<span class="comment"># Then run plan — TF should show the drift</span>
+<span class="command">terraform</span> plan
+<span class="comment"># Output: ~ resource "aws_security_group_rule" "manual" { ... }</span>
+<span class="comment"># Decision: apply to revert, or import to codify</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">5</span>Jenkins Pipeline with Approval Gate</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="comment"># Push a PR changing instance type t3.medium → t3.large</span>
+<span class="comment"># Pipeline runs: validate → plan (shows -/+ node group replacement)</span>
+<span class="comment"># Human reviews — "this will drain and recreate nodes, schedule maintenance"</span>
+<span class="comment"># Approves → apply runs</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">6</span>Teardown</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">terraform</span> destroy   <span class="comment"># one command replaces the M10 teardown checklist</span>
+<span class="comment"># Verify no billing resources remain</span>
+<span class="command">aws</span> ec2 describe-addresses --query 'Addresses[?AssociationId==null]'
+<span class="command">aws</span> elbv2 describe-load-balancers</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is Terraform state and why must it be remote and locked?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>State is Terraform's record of what infrastructure it manages and the mapping from HCL resource names to real resource IDs (EC2 instance IDs, ARNs, etc.). Without it, Terraform can't know what already exists. Remote state (S3) means the team shares one source of truth instead of each engineer having a local state that diverges. Locking (DynamoDB) prevents concurrent applies from corrupting the state when two engineers or CI jobs run simultaneously. The state file also contains secrets in plaintext — S3 encryption + access control are mandatory.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between terraform plan and terraform apply?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Plan computes the diff between desired state (your HCL) and current state (tfstate + a real API refresh) and shows what would change — no side effects. Apply executes the changes. The best practice is to save the plan (<code>-out=tfplan</code>) so that when you apply, you're applying exactly what was reviewed, not a potentially different plan computed at apply time. In CI, plan runs on every PR (humans review it), apply only runs on merge to main after an approval gate.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you design Terraform modules?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>A module should have a single, clear responsibility — a VPC module creates the VPC and networking; an EKS module creates the cluster. It takes inputs (variables with types and descriptions) and produces outputs that other modules can reference. I avoid modules that do too many things — they become hard to test and reuse. For standard patterns, I use community modules from the Terraform registry (terraform-aws-modules) as a base and wrap them if I need additional standardization. I pin module versions the same way I pin Docker image tags.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you manage multiple environments with Terraform?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>I use a directory-per-environment pattern over workspaces. Each environment has its own directory with its own backend config (separate state bucket key), its own tfvars, and its own state. This makes blast radius explicit — a <code>terraform destroy</code> in <code>environments/dev/</code> can't touch production. Workspaces share a backend config which makes it easy to accidentally target the wrong environment. The tradeoff is more code duplication, which I mitigate by extracting shared infrastructure into modules.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you handle drift — when someone manually changes infrastructure?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Terraform plan shows drift as proposed changes — it refreshes state against the real API before comparing. My response depends on intent: if the manual change was wrong, I apply to revert. If it was intentional, I either codify it in HCL and apply (idempotent — no change needed), or use <code>terraform import</code> if the resource was created outside TF. Prevention: enforce IaC via IAM deny policies on direct resource modification (SCP in Organizations), and alert on CloudTrail events for console changes to tagged infra.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What does -/+ in a Terraform plan mean, and why is it dangerous?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p><code>-/+</code> means destroy and recreate — Terraform must delete the resource and create a new one because you changed an immutable attribute (one that can't be updated in-place). For an RDS instance, this means a new database with no data (unless you restore from snapshot). For an EKS node group, it means draining nodes and creating new ones — brief capacity reduction. Always flag <code>-/+</code> for human review in CI and schedule it as a maintenance window. <code>prevent_destroy = true</code> in the resource lifecycle blocks accidental destruction of critical resources.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-12.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 12 — EKS</span>
+                </div>
+            </a>
+            <a href="module-14.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 14 — Python</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 20 — AI in DevOps &amp; Career Mastery | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 20: AI in DevOps and Career Mastery — AI-assisted operations, GitHub Copilot in pipelines, LLM-powered runbooks, portfolio strategy, resume, and interview prep for senior DevOps/SRE roles.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 20 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level pro">Pro</span>
+                    <span class="module-hero-duration">Phase 5 · Final Module</span>
+                </div>
+                <h1>Module 20 — AI in DevOps &amp; <span class="gradient-text">Career Mastery</span></h1>
+                <p class="module-hero-desc">
+                    20 modules. One full-stack DevOps system. Now: where AI changes the game, how to
+                    present your new skills to land the role, and what the career path from here looks
+                    like. This is the capstone briefing — everything points to Project 1.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">GitHub Copilot</span>
+                    <span class="tech-tag">LLM Ops</span>
+                    <span class="tech-tag">AI-Assisted Monitoring</span>
+                    <span class="tech-tag">Resume Strategy</span>
+                    <span class="tech-tag">System Design</span>
+                    <span class="tech-tag">Salary Negotiation</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#ai-landscape" class="toc-link">1. AI in the DevOps Landscape</a></li>
+                    <li><a href="#ai-coding" class="toc-link">2. AI-Assisted Coding &amp; IaC</a></li>
+                    <li><a href="#ai-ops" class="toc-link">3. AIOps &amp; Intelligent Monitoring</a></li>
+                    <li><a href="#ai-security" class="toc-link">4. AI in Security</a></li>
+                    <li><a href="#llmops" class="toc-link">5. LLMOps — Running AI in Prod</a></li>
+                    <li><a href="#portfolio" class="toc-link">6. Portfolio Strategy</a></li>
+                    <li><a href="#resume" class="toc-link">7. Resume &amp; LinkedIn</a></li>
+                    <li><a href="#interview-prep" class="toc-link">8. Interview Framework</a></li>
+                    <li><a href="#system-design" class="toc-link">9. System Design Interviews</a></li>
+                    <li><a href="#salary" class="toc-link">10. Salary &amp; Career Path</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Capstone Preview</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Final Interview Q&amp;A</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. AI Landscape ============ -->
+                <section class="content-section" id="ai-landscape">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤖</div>
+                        <h2>1. AI in the DevOps Landscape — Signal vs Hype</h2>
+                    </div>
+                    <p class="content-text">
+                        AI won't replace DevOps engineers — it will replace DevOps engineers who don't
+                        use AI. The realistic impact in 2026: AI accelerates the work you've done across
+                        all 20 modules, but the engineering judgment, architecture decisions, and incident
+                        command still require a human.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>DevOps area</th><th>AI impact (real, 2026)</th><th>Still human</th></tr></thead>
+                        <tbody>
+                            <tr><td>IaC writing</td><td>Copilot generates Terraform/Ansible boilerplate 10× faster</td><td>Architecture, state design, blast-radius analysis</td></tr>
+                            <tr><td>Code review</td><td>Copilot flags security patterns, suggests improvements</td><td>Business context, team conventions, trade-off judgment</td></tr>
+                            <tr><td>Incident triage</td><td>LLM correlates logs + metrics → suggests probable root cause</td><td>Decision to roll back, escalate, or hold</td></tr>
+                            <tr><td>Runbook generation</td><td>AI drafts runbooks from past incidents and existing docs</td><td>Validation, edge cases, org-specific context</td></tr>
+                            <tr><td>Security scanning</td><td>AI-augmented CVE triage, code pattern detection</td><td>Risk acceptance, false positive judgment</td></tr>
+                            <tr><td>Capacity planning</td><td>ML models predict traffic patterns + scaling needs</td><td>Cost trade-offs, org priorities, SLO targets</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 2. AI-Assisted Coding ============ -->
+                <section class="content-section" id="ai-coding">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💻</div>
+                        <h2>2. AI-Assisted Coding &amp; Infrastructure as Code</h2>
+                    </div>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 How to use Copilot effectively for DevOps work</div>
+                        <p>Don't just accept suggestions — treat Copilot like a fast junior engineer. It's excellent at: generating Terraform resource blocks from comments, writing Python boto3 scripts from a natural-language description (Module 14 payoff), converting shell one-liners to reusable functions. Where it fails: Terraform remote state configuration (the relationships between providers are subtle), Kubernetes RBAC (gets permissions wrong frequently), and anything requiring org-specific context it doesn't have.</p>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">python — LLM-augmented log triage (boto3 + OpenAI)</span></div>
+                        <pre><code><span class="comment"># ai_triage.py — feed recent CloudWatch errors to an LLM for probable root cause</span>
+<span class="keyword">import</span> boto3, json, openai
+
+<span class="variable">cw</span> = boto3.client(<span class="string">'logs'</span>, region_name=<span class="string">'us-east-1'</span>)
+<span class="variable">client</span> = openai.OpenAI()  <span class="comment"># assumes OPENAI_API_KEY env var</span>
+
+<span class="keyword">def</span> <span class="function">get_recent_errors</span>(log_group: str, minutes: int = 30) -> str:
+    <span class="keyword">import</span> time
+    <span class="variable">end</span> = <span class="function">int</span>(time.time() * 1000)
+    <span class="variable">start</span> = end - (minutes * 60 * 1000)
+    <span class="variable">resp</span> = cw.filter_log_events(
+        logGroupName=log_group,
+        startTime=start, endTime=end,
+        filterPattern=<span class="string">'ERROR'</span>
+    )
+    <span class="keyword">return</span> <span class="string">'\n'</span>.join(e[<span class="string">'message'</span>] <span class="keyword">for</span> e <span class="keyword">in</span> resp[<span class="string">'events'</span>][:<span class="variable">20</span>])
+
+<span class="keyword">def</span> <span class="function">ai_triage</span>(log_group: str):
+    <span class="variable">errors</span> = <span class="function">get_recent_errors</span>(log_group)
+    <span class="keyword">if not</span> errors:
+        <span class="keyword">print</span>(<span class="string">"No recent errors found."</span>)
+        <span class="keyword">return</span>
+
+    <span class="variable">response</span> = client.chat.completions.create(
+        model=<span class="string">"gpt-4o"</span>,
+        messages=[{
+            <span class="string">"role"</span>: <span class="string">"system"</span>,
+            <span class="string">"content"</span>: <span class="string">"You are an SRE assistant. Analyze these logs, identify the probable root cause, and suggest specific kubectl or AWS CLI commands to investigate further."</span>
+        }, {
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="function">f</span><span class="string">"Recent errors from {log_group}:\n\n{errors}"</span>
+        }]
+    )
+    <span class="keyword">print</span>(response.choices[0].message.content)
+
+<span class="comment"># Usage: python ai_triage.py</span>
+<span class="function">ai_triage</span>(<span class="string">'/aws/eks/techitfactory/api'</span>)</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 3. AIOps ============ -->
+                <section class="content-section" id="ai-ops">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📊</div>
+                        <h2>3. AIOps &amp; Intelligent Monitoring</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>AIOps capability</th><th>How it works</th><th>Tool examples</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Anomaly detection</strong></td><td>ML models learn traffic/error baselines, alert on deviations — no static threshold needed</td><td>AWS DevOps Guru, Datadog Watchdog</td></tr>
+                            <tr><td><strong>Alert correlation</strong></td><td>Groups related alerts from different systems into one incident (not 47 separate pages)</td><td>PagerDuty AIOps, Datadog</td></tr>
+                            <tr><td><strong>Root cause suggestions</strong></td><td>Correlates recent deploys, config changes, and log patterns to surface probable causes</td><td>Dynatrace Davis, Moogsoft</td></tr>
+                            <tr><td><strong>Predictive scaling</strong></td><td>Scales infrastructure before traffic peaks hit, not after</td><td>AWS Predictive Scaling, KEDA</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ AIOps ≠ no-ops</div>
+                        <p>AIOps tools reduce alert noise and accelerate triage. They don't make decisions. "DevOps Guru flagged an anomaly in RDS CPU" still requires an engineer to determine whether it's a query that needs optimization, a traffic spike that needs scaling, or a backup job that's expected. The engineer who understands the system (Modules 10-19) uses AIOps as a faster compass — not a substitute for judgment.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 4. AI Security ============ -->
+                <section class="content-section" id="ai-security">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛡️</div>
+                        <h2>4. AI in Security (DevSecOps Extension)</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Area</th><th>AI application</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>SAST enhancement</strong></td><td>LLM-augmented Semgrep rules that understand business logic, not just syntax patterns — catches injection bugs that regex-based SAST misses</td></tr>
+                            <tr><td><strong>CVE triage</strong></td><td>AI classifies CVE severity in context: "This CVE in libssl is CRITICAL by CVSS but LOW risk for our app because we don't expose TLS directly" — reduces false positives from Trivy</td></tr>
+                            <tr><td><strong>Threat modeling</strong></td><td>LLMs can generate STRIDE threat models from architecture diagrams faster than manual sessions</td></tr>
+                            <tr><td><strong>Incident investigation</strong></td><td>AI correlates Falco runtime alerts with SBOM component data to identify which supply-chain dependency may be responsible</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 5. LLMOps ============ -->
+                <section class="content-section" id="llmops">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🧠</div>
+                        <h2>5. LLMOps — Running AI Models in Production</h2>
+                    </div>
+                    <p class="content-text">
+                        Companies are building products on LLMs and need DevOps engineers who understand
+                        the unique operational challenges. "LLMOps" is just DevOps applied to ML/AI workloads —
+                        everything you've built applies, with new concerns.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>LLMOps concern</th><th>DevOps parallel</th><th>Tools</th></tr></thead>
+                        <tbody>
+                            <tr><td>Model versioning</td><td>Container image tags (Module 09)</td><td>MLflow, DVC, S3</td></tr>
+                            <tr><td>Model serving (inference)</td><td>Kubernetes Deployments (Module 11)</td><td>vLLM, Triton, Ollama</td></tr>
+                            <tr><td>GPU node provisioning</td><td>Terraform node groups (Module 12/13)</td><td>EKS with p3/g4 instance types</td></tr>
+                            <tr><td>Prompt regression testing</td><td>CI unit tests (Module 09)</td><td>LangSmith, PromptLayer</td></tr>
+                            <tr><td>Latency/cost monitoring</td><td>Prometheus + Grafana (Module 16)</td><td>Custom prom-client metrics per model call</td></tr>
+                            <tr><td>Rollback</td><td>Git revert + ArgoCD (Module 17)</td><td>Model registry version pin</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 6. Portfolio ============ -->
+                <section class="content-section" id="portfolio">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🗂️</div>
+                        <h2>6. Portfolio Strategy — Show, Don't Tell</h2>
+                    </div>
+                    <p class="content-text">
+                        After completing this roadmap + Project 1, you have a portfolio that beats 90% of
+                        candidates. Structure it for maximum impact:
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Portfolio artifact</th><th>What it demonstrates</th><th>Where to host</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>techitfactory-infra (Terraform)</strong></td><td>IaC, state management, modules, EKS provisioning</td><td>GitHub — public with README</td></tr>
+                            <tr><td><strong>techitfactory-gitops (config repo)</strong></td><td>GitOps, App of Apps, Helm, multi-env promotion</td><td>GitHub — public with architecture diagram</td></tr>
+                            <tr><td><strong>Jenkinsfile with DevSecOps stages</strong></td><td>Full CI/CD including Trivy, Gitleaks, SAST</td><td>GitHub — in app repo</td></tr>
+                            <tr><td><strong>SLO Dashboard (screenshot/video)</strong></td><td>Observability, SRE practices, PromQL</td><td>README GIF or Loom video</td></tr>
+                            <tr><td><strong>Capstone architecture diagram</strong></td><td>End-to-end system design, all 20 modules integrated</td><td>README + LinkedIn post</td></tr>
+                            <tr><td><strong>Post-mortem document</strong></td><td>SRE mindset, incident culture, root cause analysis</td><td>GitHub Wiki or blog post</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The "cost evidence" hack</div>
+                        <p>For every AWS service you provisioned, screenshot the cost in Cost Explorer and add it to the README. "This EKS cluster costs ~$180/month running the full stack (2 t3.medium nodes + ALB + RDS free tier)" shows cost awareness — a top SRE/DevOps interview signal. Most portfolio projects have no cost data.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 7. Resume ============ -->
+                <section class="content-section" id="resume">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📄</div>
+                        <h2>7. Resume &amp; LinkedIn Strategy</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">text — high-signal resume bullet formula</span></div>
+                        <pre><code>BAD:  "Managed Kubernetes clusters and deployed applications"
+GOOD: "Reduced deployment lead time from 2 days to 45 minutes by implementing
+       GitOps with ArgoCD on EKS, eliminating 12 manual approval steps and cutting
+       deployment-related incidents by 60% (error budget burn rate fell from 3× to 0.8×)"
+
+BAD:  "Used Terraform for infrastructure"
+GOOD: "Authored 8 Terraform modules covering VPC, EKS, RDS, and ALB, enabling
+       dev teams to spin up isolated environments in 8 minutes vs. 3-week manual
+       process — reduced infra toil by ~180 hrs/quarter"
+
+BAD:  "Set up monitoring with Prometheus and Grafana"
+GOOD: "Implemented RED-method SLO monitoring with Prometheus/Grafana, defined
+       99.9% availability SLO with error-budget alerts, and reduced MTTR from
+       47 minutes to 8 minutes by providing on-call engineers instant context"
+
+Formula: [Action] + [What specifically] + [Measurable result] + [SRE context where possible]</code></pre>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Section</th><th>What interviewers look for</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Skills section</strong></td><td>Be specific: "Kubernetes (EKS, Helm, HPA, IRSA)" not just "Kubernetes". ATS parses exact terms.</td></tr>
+                            <tr><td><strong>LinkedIn</strong></td><td>Write a post about each project as you complete it. 3 technical posts = 10× recruiter inbound.</td></tr>
+                            <tr><td><strong>GitHub</strong></td><td>Green squares matter. Keep pushing. Every module project = commits + README.</td></tr>
+                            <tr><td><strong>Certifications</strong></td><td>AWS Solutions Architect + CKA (Certified Kubernetes Administrator) are the most recognized combo for Senior DevOps/SRE roles in 2026.</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 8. Interview Framework ============ -->
+                <section class="content-section" id="interview-prep">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🎯</div>
+                        <h2>8. Interview Framework — The STAR-SRE Method</h2>
+                    </div>
+                    <p class="content-text">
+                        DevOps/SRE behavioral interviews reward quantified, incident-anchored stories.
+                        Use STAR but add the SRE layer: what did the data say, what was the error budget
+                        impact, what systemic change did you make?
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">text — STAR-SRE template</span></div>
+                        <pre><code>Situation: "Our payment service was paging 8× per week — every on-call engineer
+            was spending 3+ hours per shift on manual restart procedures."
+
+Task: "As the on-call lead, I owned reducing page frequency and eliminating the
+      manual toil."
+
+Action: "I ran 5-Whys on 3 months of incident data. Root cause: a memory leak
+        in the payment processor on high-traffic evenings. Short-term: added HPA
+        with memory-based scaling + resource limits. Long-term: added prom-client
+        instrumentation, identified the leak in a third-party library, pinned to
+        the patched version in the Helm chart."
+
+Result: "Pages dropped from 8/week to 0.5/week over 6 weeks. MTTR fell from
+        42 minutes to 4 minutes for the remaining pages. On-call engineer
+        satisfaction score improved from 2.1 to 4.3/5 in the next survey.
+        Error budget consumption dropped from 120% to 18% per month."
+
+SRE layer: "This also let us unfreeze the error budget policy — we'd been in
+           feature freeze for 6 weeks. Product team shipped 3 features in the
+           month after the reliability work."</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 9. System Design ============ -->
+                <section class="content-section" id="system-design">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>9. System Design Interviews for DevOps/SRE</h2>
+                    </div>
+                    <p class="content-text">
+                        Senior DevOps/SRE system design questions ask you to design the infrastructure and
+                        operations system, not just the application. The capstone you built <em>is</em> your
+                        answer template.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Common question</th><th>Your answer map</th></tr></thead>
+                        <tbody>
+                            <tr><td>"Design a CI/CD pipeline for a microservices platform"</td><td>Modules 09 (Jenkins) + 12 (ECR/EKS) + 17 (GitOps/ArgoCD) + 18 (DevSecOps stages)</td></tr>
+                            <tr><td>"How would you achieve 99.99% uptime for a payment API?"</td><td>M10 (Multi-AZ), M11 (K8s rolling deploys + HPA), M16 (SLO + alerting), M17 (instant rollback via git revert), M19 (error budgets)</td></tr>
+                            <tr><td>"How would you onboard 10 new services per month?"</td><td>M13 (Terraform modules), M17 (App of Apps), M19 (IDP/Backstage templates), M18 (Gatekeeper policies auto-applied)</td></tr>
+                            <tr><td>"Design a disaster recovery plan for EKS"</td><td>M13 (Terraform reproduces infra), M17 (ArgoCD App of Apps restores all apps), M16 (restore Prometheus with Helm), M10 (multi-region S3 for state)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box tip-pro">
+                        <div class="tip-box-title">💡 The system design interview format</div>
+                        <p>Always start with: (1) Clarify requirements — RTO/RPO, traffic scale, team size, compliance needs. (2) High-level architecture — draw the boxes. (3) Drill into each layer — don't just name tools, explain the tradeoffs. (4) Failure modes — "what happens if the Jenkins controller goes down?" (5) Cost and trade-offs. The capstone project gives you a real system you've operated — draw from it. "I've built exactly this; here's what I'd do differently at 10× scale."</p>
+                    </div>
+                </section>
+
+                <!-- ============ 10. Salary ============ -->
+                <section class="content-section" id="salary">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">💰</div>
+                        <h2>10. Salary Ranges &amp; Career Path (2026)</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Role</th><th>Experience</th><th>US Range</th><th>India Range</th></tr></thead>
+                        <tbody>
+                            <tr><td>DevOps Engineer L2</td><td>1-3 years</td><td>$100K–$130K</td><td>₹12–22 LPA</td></tr>
+                            <tr><td>DevOps Engineer L3 / SRE</td><td>3-6 years</td><td>$130K–$175K</td><td>₹22–40 LPA</td></tr>
+                            <tr><td>Senior DevOps / Staff SRE</td><td>6+ years</td><td>$175K–$250K</td><td>₹40–80 LPA</td></tr>
+                            <tr><td>Platform Engineering Lead</td><td>8+ years</td><td>$220K–$300K</td><td>₹60–120 LPA</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        After this roadmap + capstone, you qualify for <strong>L3/Senior</strong> roles even
+                        with limited prior experience — because you have demonstrable, full-stack production
+                        experience (not toy tutorials).
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Career path branch</th><th>What it looks like</th><th>Modules that matter most</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>SRE path</strong></td><td>More incident management, SLO engineering, toil elimination, capacity planning</td><td>M16, M19</td></tr>
+                            <tr><td><strong>Platform Engineering</strong></td><td>Build the IDP, own the golden path, enable other dev teams</td><td>M13, M17, M19</td></tr>
+                            <tr><td><strong>DevSecOps/AppSec</strong></td><td>Security-focused pipelines, threat modeling, compliance</td><td>M10 (IAM), M18, M12 (IRSA)</td></tr>
+                            <tr><td><strong>ML/AI Infrastructure</strong></td><td>GPU clusters, model serving, LLMOps</td><td>M11, M12, M13, M20 (this module)</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ Capstone Preview ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏆</div>
+                        <h2>Capstone Preview — What Project 1 Builds</h2>
+                    </div>
+                    <p class="content-text">
+                        Project 1 wires every module together into one production-grade deployment of the
+                        TechitFactory application. This is the portfolio centerpiece you'll demo in every
+                        senior DevOps interview.
+                    </p>
+
+                    <div class="visual-box">
+                        <div class="visual-box-title">Full Capstone Architecture — Every Module in One System</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">GitHub<br/>(M03)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Jenkins CI<br/>Secret Scan<br/>SAST<br/>Docker Build<br/>Trivy Scan<br/>ECR Push<br/>(M09, M18)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">Config Repo<br/>tag commit<br/>(M17)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">ArgoCD<br/>GitOps<br/>Dev auto<br/>Prod manual<br/>(M17)</span>
+                            <span class="flow-arrow">→</span>
+                            <span class="flow-item">EKS Cluster<br/>Gatekeeper<br/>Falco<br/>HPA<br/>(M11,M12,M18)</span>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">Phase 1</span>Foundation (Modules 10-13 Integration)</div>
+                        <p class="content-text" style="margin:12px 0 0 0;">
+                            Terraform provisions VPC (M10), EKS cluster + node groups (M12/M13),
+                            RDS (M10), ECR repo (M10), ALB (M12). All state in S3 + DynamoDB lock (M13).
+                        </p>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">Phase 2</span>CI/CD Pipeline (Modules 09 + 18 + 17)</div>
+                        <p class="content-text" style="margin:12px 0 0 0;">
+                            Jenkins pipeline: Gitleaks → Semgrep → Docker build → Trivy → ECR push →
+                            SBOM archive → yq commit to gitops repo → ArgoCD auto-syncs dev.
+                        </p>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">Phase 3</span>GitOps + Security (Modules 17 + 18)</div>
+                        <p class="content-text" style="margin:12px 0 0 0;">
+                            App of Apps root, dev auto-sync, prod manual-sync with PR promotion.
+                            Gatekeeper constraints, Sealed Secrets, Falco with Slack alerts.
+                        </p>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">Phase 4</span>Observability + SRE (Modules 16 + 19)</div>
+                        <p class="content-text" style="margin:12px 0 0 0;">
+                            kube-prometheus-stack Helm, Grafana RED dashboards, SLO panels,
+                            error-budget-burn AlertManager rules, Loki log aggregation,
+                            Backstage service catalog entry.
+                        </p>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">Phase 5</span>Validation Drills</div>
+                        <p class="content-text" style="margin:12px 0 0 0;">
+                            Drift drill (selfHeal reverts manual kubectl). Rollback drill (git revert).
+                            Scale drill (HPA fires on load). Security drill (Falco alerts on shell exec).
+                            Chaos: kubectl delete pod — verify K8s reschedules within 30s.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Final Interview Questions</h2>
+                            <p>The hardest questions at Senior/Staff level. Click to reveal mastery-level answers.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: Walk me through your full DevOps stack.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Here's the production stack I built for TechitFactory: Code in GitHub (branch protection, PR reviews). Jenkins CI runs: Gitleaks secret scan, Semgrep SAST, Docker multi-stage build, Trivy container scan (fails on CRITICAL CVEs), generates SBOM, pushes to ECR. CI commits the image tag to a GitOps config repo. ArgoCD on EKS detects the commit, auto-syncs dev (selfHeal on), requires a manual sync for prod after a PR approval. The EKS cluster has OPA Gatekeeper enforcing resource limits and registry policies, Falco for runtime anomaly detection, HPA for autoscaling. Observability: kube-prometheus-stack with RED-method dashboards, 99.9% availability SLO, error-budget-burn AlertManager rules routing to PagerDuty. Rollback is git revert — ArgoCD syncs the revert in under 5 minutes. Infrastructure is Terraform with S3+DynamoDB remote state, organized as modules for reuse. The whole stack bootstraps from an ArgoCD App of Apps — disaster recovery is one kubectl apply.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does AI change your role as a DevOps engineer?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>AI makes me faster at the parts that don't require judgment — boilerplate IaC, script scaffolding, first-pass CVE triage. I use Copilot for Terraform resource blocks and Python boto3 scripts; what used to take 30 minutes takes 5. For incidents, I've built an LLM-assisted log triage tool that feeds recent CloudWatch errors to GPT-4 and gets a probable root cause with suggested commands — it's not always right, but it narrows the search space. AIOps tools like AWS DevOps Guru handle anomaly detection that we'd have needed ML expertise to build ourselves. What AI can't replace: the decision to roll back a deploy at 2 AM when the error budget is burning, the architecture judgment call about whether to use DynamoDB or RDS for a given access pattern, or the organizational navigation to get a blameless post-mortem culture adopted. I see AI as eliminating the low-judgment toil — which frees more time for the engineering work that actually matters.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the hardest technical problem you've solved?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>[Frame around your capstone work] The hardest part of building the capstone was wiring Terraform, ArgoCD, and the EKS IRSA chain correctly. The problem: ArgoCD needs permissions to read ECR (to pull images), but the pod identity chain goes: ArgoCD pod → K8s service account → IRSA IAM role → ECR. Getting the aws-auth ConfigMap, the OIDC provider, the IRSA annotation, and the trust relationship all consistent took me several iterations. The lesson: IRSA failures are silent in logs — the pod starts normally but image pulls fail with a generic auth error. I learned to validate the IRSA chain independently using aws sts assume-role-with-web-identity before attaching it to ArgoCD. Now I document this in a runbook so future team members have the debugging path immediately. This kind of layered identity problem — where the failure mode is misleading — is exactly where deep system understanding beats surface-level tool knowledge.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: You're on call. API error rate just spiked to 40%. Walk me through your response.</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>First: assess severity and open the incident channel. 40% error rate = P1. Declare IC and get a scribe. Step 1: check for a recent deploy in ArgoCD — most incidents correlate with the last change. If there was one in the last 30 minutes, roll back first (git revert, verify ArgoCD syncs, watch error rate). If no recent deploy: Step 2: kubectl get pods — any CrashLoopBackOff or OOMKilled? Step 3: kubectl logs on failing pods — what's the error? Step 4: check Grafana — is this latency (possibly HPA underprovision), errors (upstream dependency), or both? Step 5: check downstream dependencies (RDS connection pool, external APIs). Throughout: keep the scribe logging the timeline. Communicate status to stakeholders every 10 minutes even if just "still investigating." Once mitigated, set a time-bounded monitoring period before clearing. Then: schedule post-mortem within 48 hours, not next sprint.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you manage technical debt in infrastructure?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Infrastructure debt comes in a few forms: drift (live state ≠ Terraform state — GitOps and terraform plan in CI catch this), version lag (outdated Kubernetes, Terraform providers, Helm charts — I maintain a quarterly upgrade calendar), toil accumulation (manual processes that grew — I track toil ratio and treat anything over 30% as a P2 backlog item), and architectural debt (wrong tool for the job — this needs a proper ADR and migration plan). My practice: every 6 weeks, I run a "debt audit" — terraform plan on all workspaces, kubectl get nodes -o yaml for k8s version, trivy on base images. The output is a prioritized ticket list. The key cultural piece: debt reduction work gets sprint capacity, not just "get to it when you have time." Debt compounds; a minor version lag today becomes an emergency upgrade in 6 months when a CVE hits.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's your 30-60-90 day plan if you joined this team?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Days 1-30: Learn and listen. Read existing runbooks, post-mortems, architecture docs. Shadow 3 on-call shifts before taking primary. Map the system: what's the CI/CD path, where's the state, how is production traffic routed? Identify the top 3 pain points by asking the team, not assuming I know. Days 30-60: Deliver one thing. Pick the highest-pain toil item from my listening phase and eliminate it — a script, a pipeline stage, a monitoring gap. Prove I can ship in this environment. Days 60-90: Propose and start a medium-term initiative — likely an SLO implementation if the team lacks them, or a security stage if the pipeline is missing it. By day 90, be fully independent on-call primary and have at least one post-mortem authored. The goal: be a net positive to the team by day 45, not day 90.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <div class="tip-box tip-success" style="margin-top:48px;">
+                    <div class="tip-box-title">🎉 You've completed all 20 modules</div>
+                    <p>From "what is SSH" (Module 01) to "how does ArgoCD reconcile a Helm chart through IRSA on EKS while Falco watches for runtime anomalies and Prometheus tracks your SLO burn rate" — you built it all. The capstone is the final proof. Go build it.</p>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-19.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 19 — SRE &amp; Platform Engineering</span>
+                </div>
+            </a>
+            <a href="project1.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Capstone Project</span>
+                    <span class="nav-btn-title">Project 1 — Full Stack DevOps</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>

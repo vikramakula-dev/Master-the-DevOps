@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 15 — Configuration Management with Ansible | DevOps Roadmap 2026</title>
+    <meta name="description" content="Module 15: Ansible — agentless, idempotent configuration management. Playbooks, roles, Vault, dynamic inventory, and the Terraform + Ansible + K8s trio.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="module-page.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="module-topbar">
+        <div class="topbar-inner">
+            <a href="index.html#roadmap" class="topbar-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Roadmap
+            </a>
+            <span class="topbar-progress">MODULE 15 / 20</span>
+        </div>
+    </div>
+
+    <div class="module-page">
+        <header class="module-hero">
+            <div class="module-hero-inner">
+                <div class="module-hero-badge">
+                    <span class="module-level advanced">Advanced</span>
+                    <span class="module-hero-duration">Phase 4 · Automation &amp; IaC</span>
+                </div>
+                <h1>Module 15 — Configuration Management with <span class="gradient-text">Ansible</span></h1>
+                <p class="module-hero-desc">
+                    Terraform builds the house (Module 13); Ansible furnishes it — and unlike your Module 02
+                    Bash scripts, it's idempotent: run it twice, converge once. The Module 02→09 server-setup
+                    scripts get their final, professional form here.
+                </p>
+                <div class="module-hero-techs">
+                    <span class="tech-tag">Ansible</span>
+                    <span class="tech-tag">Playbooks</span>
+                    <span class="tech-tag">Roles</span>
+                    <span class="tech-tag">Vault</span>
+                    <span class="tech-tag">Jinja2</span>
+                    <span class="tech-tag">Dynamic Inventory</span>
+                    <span class="tech-tag">aws_ec2</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-content-wrapper">
+            <aside class="module-sidebar">
+                <div class="toc-title">On This Page</div>
+                <ul class="toc-list">
+                    <li><a href="#why-config" class="toc-link">1. Why Config Management</a></li>
+                    <li><a href="#architecture" class="toc-link">2. Architecture</a></li>
+                    <li><a href="#inventory" class="toc-link">3. Inventory</a></li>
+                    <li><a href="#adhoc-playbooks" class="toc-link">4. Ad-hoc vs Playbooks</a></li>
+                    <li><a href="#playbooks-deep" class="toc-link">5. Playbooks Deep-Dive</a></li>
+                    <li><a href="#modules" class="toc-link">6. Key Modules</a></li>
+                    <li><a href="#roles" class="toc-link">7. Roles</a></li>
+                    <li><a href="#vault" class="toc-link">8. Ansible Vault</a></li>
+                    <li><a href="#trio" class="toc-link">9. TF + Ansible + K8s Trio</a></li>
+                    <li><a href="#dynamic-inventory" class="toc-link">10. AWS Dynamic Inventory</a></li>
+                    <li><a href="#incidents" class="toc-link">11. 🔥 Real-Time Incidents</a></li>
+                    <li><a href="#project" class="toc-link toc-project">🛠️ Real-Time Project</a></li>
+                    <li><a href="#interview" class="toc-link toc-interview">💬 Interview Questions</a></li>
+                </ul>
+            </aside>
+
+            <main class="module-main">
+
+                <!-- ============ 1. Why Config Management ============ -->
+                <section class="content-section" id="why-config">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🤔</div>
+                        <h2>1. Why Configuration Management?</h2>
+                    </div>
+                    <p class="content-text">
+                        Scenario: you have 10 servers. In month 1 you SSH'd into each and ran your setup script.
+                        By month 6, someone hotfixed a config on server 3, someone else updated nginx on servers
+                        1-5 but forgot 6-10. Now each server is slightly different — this is <em>configuration
+                        drift</em> and it causes "works on my server" bugs at 3am.
+                    </p>
+                    <table class="content-table">
+                        <thead><tr><th>Approach</th><th>Idempotent?</th><th>Scalable?</th><th>Drift-proof?</th></tr></thead>
+                        <tbody>
+                            <tr><td>Manual SSH + commands</td><td>❌</td><td>❌ (n servers = n SSH sessions)</td><td>❌</td></tr>
+                            <tr><td>Bash scripts (M02)</td><td>❌ (run twice → breaks)</td><td>Partial (for-loop over IPs)</td><td>❌</td></tr>
+                            <tr><td><strong>Ansible</strong></td><td>✅</td><td>✅ (parallel execution)</td><td>✅ (re-run to converge)</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        <strong>Idempotency</strong> means "ensure nginx is installed" — Ansible checks if nginx
+                        is already installed; if so, it does nothing. Run the playbook 10 times, same result.
+                        Your Module 02 script would try to install nginx 10 times.
+                    </p>
+                </section>
+
+                <!-- ============ 2. Architecture ============ -->
+                <section class="content-section" id="architecture">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🏗️</div>
+                        <h2>2. Architecture — Agentless over SSH</h2>
+                    </div>
+                    <p class="content-text">
+                        Ansible is agentless — no daemon to install on managed nodes. It connects via SSH
+                        (Module 02 keys payoff — Ansible literally is "SSH in a for-loop with a brain"),
+                        pushes Python code to <code>/tmp</code>, executes it, and cleans up.
+                    </p>
+                    <div class="visual-box">
+                        <div class="visual-box-title">Ansible Execution Model</div>
+                        <div class="visual-flow">
+                            <span class="flow-item">Control Node<br/>(your machine / CI)</span>
+                            <span class="flow-arrow">→ SSH →</span>
+                            <span class="flow-item">Managed Node 1<br/>(web-1)</span>
+                        </div>
+                        <div class="visual-flow" style="margin-top:8px;">
+                            <span class="flow-item">Control Node</span>
+                            <span class="flow-arrow">→ SSH →</span>
+                            <span class="flow-item">Managed Node 2<br/>(web-2)</span>
+                        </div>
+                        <div class="visual-flow" style="margin-top:8px;">
+                            <span class="flow-item">Control Node</span>
+                            <span class="flow-arrow">→ SSH →</span>
+                            <span class="flow-item">Managed Node 3<br/>(db-1)</span>
+                        </div>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>Model</th><th>Agent?</th><th>Language</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Ansible</strong></td><td>Push (control node initiates)</td><td>None</td><td>YAML playbooks</td></tr>
+                            <tr><td>Chef</td><td>Pull (node fetches from server)</td><td>Yes (chef-client)</td><td>Ruby DSL</td></tr>
+                            <tr><td>Puppet</td><td>Pull</td><td>Yes (puppet agent)</td><td>Puppet DSL</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 3. Inventory ============ -->
+                <section class="content-section" id="inventory">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📋</div>
+                        <h2>3. Inventory — Static and Dynamic</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">ini — static inventory</span></div>
+                        <pre><code><span class="comment"># hosts.ini</span>
+[web]
+web-1 ansible_host=10.0.1.10 ansible_user=ec2-user
+web-2 ansible_host=10.0.1.11 ansible_user=ec2-user
+
+[db]
+db-1 ansible_host=10.0.3.10 ansible_user=ec2-user
+
+[all:vars]
+ansible_ssh_private_key_file=~/.ssh/my-keypair.pem  <span class="comment"># Module 02 key</span>
+ansible_python_interpreter=/usr/bin/python3</code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — first contact: ping all hosts</span></div>
+                        <pre><code><span class="comment"># ⭐ The first Ansible command you run — verifies SSH + Python on all nodes</span>
+<span class="command">ansible</span> all -i hosts.ini -m ping
+<span class="output">web-1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web-2 | SUCCESS => {...</span>
+
+<span class="comment"># Ad-hoc: gather facts (OS version, IP, memory) from all hosts</span>
+<span class="command">ansible</span> all -i hosts.ini -m setup -a "filter=ansible_distribution*"</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 4. Ad-hoc vs Playbooks ============ -->
+                <section class="content-section" id="adhoc-playbooks">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">⚡</div>
+                        <h2>4. Ad-hoc Commands vs Playbooks</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — ⭐ ad-hoc commands (one-offs)</span></div>
+                        <pre><code><span class="comment"># ⭐ Restart nginx on all web servers</span>
+<span class="command">ansible</span> web -i hosts.ini -m service -a "name=nginx state=restarted" --become
+
+<span class="comment"># ⭐ Check disk usage across all hosts</span>
+<span class="command">ansible</span> all -i hosts.ini -m shell -a "df -h" --become
+
+<span class="comment"># Copy a file to all web servers</span>
+<span class="command">ansible</span> web -i hosts.ini -m copy \
+    -a "src=./nginx.conf dest=/etc/nginx/nginx.conf mode=0644" --become
+
+<span class="comment"># Run a command and show output</span>
+<span class="command">ansible</span> all -i hosts.ini -m command -a "uptime"</code></pre>
+                    </div>
+                    <p class="content-text">
+                        Ad-hoc commands are for one-offs. If you'll run the same set of tasks more than once,
+                        write a playbook — it's documented, version-controlled, and idempotent.
+                    </p>
+                </section>
+
+                <!-- ============ 5. Playbooks Deep-Dive ============ -->
+                <section class="content-section" id="playbooks-deep">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📖</div>
+                        <h2>5. Playbooks — The Module 02 server-setup.sh Reborn</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — annotated playbook: setup.yml</span></div>
+                        <pre><code><span class="comment">---</span>
+- <span class="keyword">name</span>: Configure web servers          <span class="comment"># play name (shown in output)</span>
+  <span class="keyword">hosts</span>: web                            <span class="comment"># inventory group to target</span>
+  <span class="keyword">become</span>: true                          <span class="comment"># sudo — equivalent to M02's sudo</span>
+  <span class="keyword">vars</span>:
+    <span class="keyword">app_port</span>: 3000
+    <span class="keyword">nginx_worker_processes</span>: auto
+
+  <span class="keyword">handlers</span>:                             <span class="comment"># run only when notified, and only once</span>
+  - <span class="keyword">name</span>: Restart nginx
+    <span class="keyword">service</span>: { name: nginx, state: restarted }
+
+  <span class="keyword">tasks</span>:
+  - <span class="keyword">name</span>: Install nginx                 <span class="comment"># declarative: "ensure installed"</span>
+    <span class="keyword">apt</span>:
+      <span class="keyword">name</span>: nginx
+      <span class="keyword">state</span>: present                    <span class="comment"># idempotent — skips if already present</span>
+      <span class="keyword">update_cache</span>: yes
+
+  - <span class="keyword">name</span>: Deploy nginx config from template
+    <span class="keyword">template</span>:
+      <span class="keyword">src</span>: nginx.conf.j2                <span class="comment"># Jinja2 template — vars injected at render</span>
+      <span class="keyword">dest</span>: /etc/nginx/nginx.conf
+      <span class="keyword">validate</span>: nginx -t -c %s         <span class="comment"># test config before deploying</span>
+    <span class="keyword">notify</span>: Restart nginx               <span class="comment"># trigger handler only if file changed</span>
+
+  - <span class="keyword">name</span>: Start and enable nginx
+    <span class="keyword">service</span>:
+      <span class="keyword">name</span>: nginx
+      <span class="keyword">state</span>: started
+      <span class="keyword">enabled</span>: yes
+
+  - <span class="keyword">name</span>: Allow app port through firewall
+    <span class="keyword">ufw</span>:
+      <span class="keyword">rule</span>: allow
+      <span class="keyword">port</span>: <span class="string">"{{ app_port }}"</span>            <span class="comment"># Jinja2 variable reference</span>
+      <span class="keyword">proto</span>: tcp
+    <span class="keyword">when</span>: ansible_os_family == <span class="string">"Debian"</span> <span class="comment"># conditional: skip on non-Debian (gather_facts)</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">jinja2 — nginx.conf.j2 template (Module 04 nginx config, templated)</span></div>
+                        <pre><code>worker_processes {{ nginx_worker_processes }};
+events { worker_connections 1024; }
+http {
+    upstream app {
+        server 127.0.0.1:{{ app_port }};
+    }
+    server {
+        listen 80;
+        server_name _;
+        location / {
+            proxy_pass http://app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 6. Key Modules ============ -->
+                <section class="content-section" id="modules">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔧</div>
+                        <h2>6. Key Ansible Modules</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Module</th><th>Module 02 equivalent</th><th>What it does</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>apt</code> / <code>yum</code></td><td><code>sudo apt install</code></td><td>Install/remove packages (idempotent)</td></tr>
+                            <tr><td><code>copy</code></td><td><code>cp + scp</code></td><td>Copy file to managed node</td></tr>
+                            <tr><td><code>template</code></td><td><code>envsubst</code></td><td>Render Jinja2 template and copy</td></tr>
+                            <tr><td><code>file</code></td><td><code>mkdir, chmod, chown</code></td><td>Manage file/directory state</td></tr>
+                            <tr><td><code>service</code></td><td><code>systemctl</code></td><td>Start/stop/enable/restart services</td></tr>
+                            <tr><td><code>user</code></td><td><code>useradd, usermod</code></td><td>Manage user accounts</td></tr>
+                            <tr><td><code>docker_container</code></td><td><code>docker run</code></td><td>Manage Docker containers declaratively</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- ============ 7. Roles ============ -->
+                <section class="content-section" id="roles">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">📦</div>
+                        <h2>7. Roles — Reusable Playbook Components</h2>
+                    </div>
+                    <p class="content-text">
+                        A role is a structured directory that packages tasks, handlers, templates, and variables
+                        for one concern. Just as Terraform modules are reusable infrastructure, Ansible roles
+                        are reusable configuration. Roles compose into a site playbook.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — create a role scaffold</span></div>
+                        <pre><code><span class="command">ansible-galaxy</span> init roles/docker   <span class="comment"># creates standard directory structure</span>
+<span class="comment"># roles/docker/
+# ├── tasks/main.yml      ← what to do
+# ├── handlers/main.yml   ← what to do when notified
+# ├── templates/          ← Jinja2 files
+# ├── vars/main.yml       ← non-overridable vars
+# ├── defaults/main.yml   ← overridable defaults
+# └── meta/main.yml       ← role dependencies</span>
+
+<span class="comment"># site.yml: compose roles into a site playbook</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — site.yml (the capstone's one-command convergence)</span></div>
+                        <pre><code><span class="comment">---</span>
+- <span class="keyword">name</span>: Configure all servers
+  <span class="keyword">hosts</span>: all
+  <span class="keyword">become</span>: true
+  <span class="keyword">roles</span>:
+  - role: common          <span class="comment"># OS hardening, NTP, syslog</span>
+  - role: docker          <span class="comment"># Docker install + compose deploy (M08 app)</span>
+  - role: nginx           <span class="comment"># nginx + templated reverse proxy (M04 config)</span>
+  - role: node_exporter   <span class="comment"># installs Prometheus exporter (Module 16 setup!)</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 8. Vault ============ -->
+                <section class="content-section" id="vault">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔒</div>
+                        <h2>8. Ansible Vault — Encrypting Secrets in Git</h2>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — vault lifecycle</span></div>
+                        <pre><code><span class="comment"># Create an encrypted file</span>
+<span class="command">ansible-vault</span> create group_vars/all/vault.yml
+<span class="comment"># Opens editor — add secrets:</span>
+<span class="comment"># vault_db_password: "supersecret123"</span>
+<span class="comment"># vault_jwt_secret: "mykey456"</span>
+<span class="comment"># File is now AES-256 encrypted — safe to commit to Git</span>
+
+<span class="comment"># Edit an existing vault</span>
+<span class="command">ansible-vault</span> edit group_vars/all/vault.yml
+
+<span class="comment"># View without editing</span>
+<span class="command">ansible-vault</span> view group_vars/all/vault.yml
+
+<span class="comment"># Run playbook with vault (prompt for password)</span>
+<span class="command">ansible-playbook</span> -i inventory site.yml --ask-vault-pass
+
+<span class="comment"># In CI: store vault password in Jenkins credentials, pass via file</span>
+<span class="command">ansible-playbook</span> -i inventory site.yml \
+    --vault-password-file /run/secrets/ansible-vault-pass</code></pre>
+                    </div>
+                    <div class="tip-box tip-warning">
+                        <div class="tip-box-title">⚠️ Vault password leaked in CI log</div>
+                        <p>If the vault password appears in Jenkins console output, immediately rotate it: (1) decrypt all vault files (<code>ansible-vault decrypt</code>), (2) create a new password, (3) re-encrypt (<code>ansible-vault encrypt</code>), (4) update the Jenkins credential. Use Jenkins' built-in secret masking — never pass the vault password as a plain environment variable.</p>
+                    </div>
+                </section>
+
+                <!-- ============ 9. The Trio ============ -->
+                <section class="content-section" id="trio">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔺</div>
+                        <h2>9. The Trio: Terraform + Ansible + Kubernetes</h2>
+                    </div>
+                    <table class="content-table">
+                        <thead><tr><th>Tool</th><th>What it does</th><th>Analogy</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Terraform</strong></td><td>Provision infrastructure (VPC, EC2, EKS, RDS)</td><td>Builds the house</td></tr>
+                            <tr><td><strong>Ansible</strong></td><td>Configure OS and deploy software on existing servers</td><td>Furnishes the house</td></tr>
+                            <tr><td><strong>Kubernetes</strong></td><td>Orchestrate containers — scheduling, self-healing, scaling</td><td>Manages the tenants</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="content-text">
+                        The handoff: Terraform outputs (VPC IDs, EC2 IPs) feed Ansible dynamic inventory.
+                        Ansible configures the nodes and installs the container runtime. Kubernetes (on EKS)
+                        then schedules the application workloads. They don't overlap — each owns its layer.
+                    </p>
+                </section>
+
+                <!-- ============ 10. Dynamic Inventory ============ -->
+                <section class="content-section" id="dynamic-inventory">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔄</div>
+                        <h2>10. AWS Dynamic Inventory</h2>
+                    </div>
+                    <p class="content-text">
+                        Hardcoded IPs in a static inventory break the moment Terraform replaces an instance.
+                        The <code>aws_ec2</code> inventory plugin queries AWS for current instances, grouped
+                        by tag — no more hardcoded IPs.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — aws_ec2.yml dynamic inventory plugin</span></div>
+                        <pre><code><span class="comment"># aws_ec2.yml — Ansible reads this as a dynamic inventory source</span>
+<span class="keyword">plugin</span>: aws_ec2
+<span class="keyword">regions</span>:
+- us-east-1
+<span class="keyword">filters</span>:
+  <span class="keyword">instance-state-name</span>: running
+  <span class="keyword">tag:Project</span>: techitfactory     <span class="comment"># only instances tagged with our project</span>
+<span class="keyword">keyed_groups</span>:
+- <span class="keyword">key</span>: tags.Role                  <span class="comment"># groups by the Role tag: tag_Role_web, tag_Role_db</span>
+  <span class="keyword">prefix</span>: tag_role
+<span class="keyword">compose</span>:
+  <span class="keyword">ansible_host</span>: private_ip_address  <span class="comment"># use private IP (instances are in private subnets)</span></code></pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">bash — use dynamic inventory</span></div>
+                        <pre><code><span class="comment"># Verify what Ansible sees (debug — lists hosts and groups)</span>
+<span class="command">ansible-inventory</span> -i aws_ec2.yml --graph
+<span class="output">@all:
+  |--@tag_role_web:
+  |  |--10.0.3.10
+  |  |--10.0.3.11
+  |--@tag_role_db:
+  |  |--10.0.4.10</span>
+
+<span class="comment"># Run playbook against EC2 instances from dynamic inventory</span>
+<span class="command">ansible-playbook</span> -i aws_ec2.yml site.yml \
+    --vault-password-file /run/secrets/vault-pass</code></pre>
+                    </div>
+                </section>
+
+                <!-- ============ 11. Incidents ============ -->
+                <section class="content-section" id="incidents">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🔥</div>
+                        <h2>11. Real-Time Incidents &amp; Troubleshooting</h2>
+                    </div>
+
+                    <h3 class="subsection-title">Incident 1 — Playbook Works on One Host, Fails on Another</h3>
+                    <table class="content-table">
+                        <thead><tr><th>Stage</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Symptom</strong></td><td>The nginx role succeeds on <code>web-1</code> (Ubuntu 22.04), fails on <code>web-2</code> (Amazon Linux 2) with "no apt package nginx".</td></tr>
+                            <tr><td><strong>Root Cause</strong></td><td>The role used <code>apt</code> module unconditionally. Amazon Linux 2 uses <code>yum</code>. Drift in the server fleet caused an inconsistency the playbook exposed.</td></tr>
+                            <tr><td><strong>Fix</strong></td><td>Use <code>when: ansible_os_family == "Debian"</code> for apt tasks and <code>when: ansible_os_family == "RedHat"</code> for yum, or use the <code>package</code> module (OS-agnostic).</td></tr>
+                            <tr><td><strong>Prevention</strong></td><td>Standardize the OS across the fleet. Use the same AMI for all instances (Terraform AMI data source). The playbook then documents the drift it just fixed.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="subsection-title" style="margin-top:24px;">Incident 2 — Hung Task (SSH Prompt / sudo Password)</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span class="code-block-lang">yaml — prevent SSH/sudo hangs</span></div>
+                        <pre><code><span class="comment"># ansible.cfg — required for automation (non-interactive SSH)</span>
+[defaults]
+host_key_checking = False   <span class="comment"># don't prompt for unknown host key (M02 StrictHostKey analogy)</span>
+timeout = 30
+
+[ssh_connection]
+pipelining = True           <span class="comment"># avoids sudo password prompt — requires requiretty off in sudoers</span>
+ssh_args = -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null</code></pre>
+                    </div>
+                    <p class="content-text">
+                        If pipelining is enabled but sudo still prompts, check the remote
+                        <code>/etc/sudoers</code> for <code>requiretty</code> — comment it out or add
+                        <code>Defaults:ansible !requiretty</code>. This is the same non-interactive discipline
+                        from Modules 02 and 09.
+                    </p>
+                </section>
+
+                <!-- ============ Project ============ -->
+                <section class="project-walkthrough" id="project">
+                    <div class="content-section-header">
+                        <div class="content-section-icon">🛠️</div>
+                        <h2>Real-Time Project — TF Provisions → Ansible Configures</h2>
+                    </div>
+                    <p class="content-text">
+                        Terraform provisions three EC2 instances (Module 13). Dynamic inventory picks them up
+                        by tag. Ansible roles configure them: Docker + app, nginx reverse proxy, Prometheus
+                        node-exporter. One command: everything converges.
+                    </p>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">1</span>Terraform Provisions EC2s with Tags</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">hcl</span></div>
+                            <pre><code><span class="comment"># ec2.tf (inside the Module 13 TF repo)</span>
+<span class="keyword">resource</span> <span class="string">"aws_instance"</span> <span class="string">"web"</span> {
+  count         = 3
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = <span class="string">"t3.small"</span>
+  subnet_id     = <span class="keyword">module</span>.vpc.private_subnet_ids[count.index % 2]
+  key_name      = <span class="string">"my-keypair"</span>
+  tags = {
+    Name    = <span class="string">"web-${count.index}"</span>
+    Project = <span class="string">"techitfactory"</span>
+    Role    = <span class="string">"web"</span>              <span class="comment"># dynamic inventory groups by this tag</span>
+  }
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">2</span>Create Four Roles</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">ansible-galaxy</span> init roles/common
+<span class="command">ansible-galaxy</span> init roles/docker
+<span class="command">ansible-galaxy</span> init roles/nginx
+<span class="command">ansible-galaxy</span> init roles/node_exporter
+<span class="comment"># Add tasks to each role based on the Module 02 server-setup.sh equivalents</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">3</span>Vault-Encrypted Secrets</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">ansible-vault</span> create group_vars/all/vault.yml
+<span class="comment"># Add: vault_db_password, vault_app_secret_key</span>
+<span class="comment"># Reference in playbook: "{{ vault_db_password }}"</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="project-step">
+                        <div class="project-step-header"><span class="project-step-num">4</span>One Command Converges Everything</div>
+                        <div class="code-block">
+                            <div class="code-block-header"><span class="code-block-lang">bash</span></div>
+                            <pre><code><span class="command">ansible-playbook</span> -i aws_ec2.yml site.yml \
+    --vault-password-file ~/.ansible_vault_pass
+
+<span class="output">PLAY [Configure all servers] *******************
+TASK [common : Install essential packages] ***** ok: [10.0.3.10] ok: [10.0.3.11]
+TASK [docker : Install Docker CE] ************** ok: [10.0.3.10] ok: [10.0.3.11]
+TASK [nginx : Deploy nginx config] ************* changed: [10.0.3.10] changed: [10.0.3.11]
+RUNNING HANDLER [nginx : Restart nginx] ******** changed: [10.0.3.10] changed: [10.0.3.11]
+PLAY RECAP ************************************* ok=18 changed=2 unreachable=0 failed=0</span>
+
+<span class="comment"># Second run — idempotency proof:</span>
+<span class="command">ansible-playbook</span> -i aws_ec2.yml site.yml --vault-password-file ~/.ansible_vault_pass
+<span class="output">PLAY RECAP: ok=18 changed=0 unreachable=0 failed=0</span>
+<span class="comment"># changed=0 means the system is already in the desired state</span></code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Interview ============ -->
+                <section class="interview-section" id="interview">
+                    <div class="interview-header">
+                        <div class="interview-header-icon">💬</div>
+                        <div>
+                            <h2>Interview Questions</h2>
+                            <p>Click a card to reveal a strong candidate answer.</p>
+                        </div>
+                    </div>
+                    <div class="interview-grid">
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What's the difference between Ansible and Terraform?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>They solve different problems in the same stack. Terraform provisions infrastructure — it creates EC2 instances, VPCs, load balancers. Ansible configures existing infrastructure — it installs software, manages files, ensures services are running. Terraform is declarative with a state file; Ansible is also declarative (idempotent modules) but stateless — it re-runs the desired state on each execution. In practice: Terraform → EC2 instances exist; Ansible → those instances are configured correctly.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What is idempotency and give a concrete example?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Idempotency means running an operation multiple times produces the same result as running it once. Concrete Ansible example: <code>apt: name=nginx state=present</code> — if nginx is already installed, Ansible reports "ok" and does nothing. If it's not installed, it installs it and reports "changed." Compare to <code>apt-get install nginx</code> in a Bash script — running it twice tries to install again, outputs noise, might fail. The Ansible task is safe to run in a cron job or at every boot as a convergence check.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What are handlers in Ansible and when do you use them?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Handlers are tasks that only run when notified and only once per play, regardless of how many tasks notify them. The classic use case: you have three tasks that might change an nginx config file, and you want nginx restarted after any of them change — but only once. Without handlers, you'd restart nginx three times if all three tasks changed. Handlers run at the end of the play, in notification order, once. This is cleaner and avoids multiple unnecessary restarts during long playbook runs.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How does AWS dynamic inventory work?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>The <code>aws_ec2</code> inventory plugin calls the AWS EC2 API at playbook runtime to discover running instances. You configure it with filters (only instances in your project, in your region, in the running state) and keyed groups (group by tag values — so instances tagged <code>Role=web</code> appear in the <code>tag_role_web</code> group). Ansible then runs tasks against those dynamically-discovered groups. This means your playbook always targets the current fleet, even after Terraform replaces instances with new IPs.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: How do you handle Ansible Vault in CI?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Store the vault password in the CI system's secret store (Jenkins Credentials, GitHub Actions secret, AWS Secrets Manager). In the pipeline, write it to a temp file or pass it via the <code>ANSIBLE_VAULT_PASSWORD_FILE</code> environment variable. Never pass it as a command-line argument (<code>--vault-pass</code> gets logged by process lists). Enable secret masking in the CI system. Rotate the vault password if you suspect exposure — the encrypted vault files in Git remain safe as long as the password is secret.</p>
+                            </div>
+                        </div>
+
+                        <div class="interview-card" onclick="toggleInterview(this)">
+                            <div class="interview-question">
+                                <span>Q: What are the pros and cons of Ansible being agentless?</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="interview-answer">
+                                <p>Pros: nothing to install on managed nodes — you can run Ansible against a freshly-provisioned EC2 immediately. No agent to maintain, upgrade, or troubleshoot. Works on any host with SSH + Python. Cons: SSH overhead means Ansible is slower than agent-based tools (Chef/Puppet) at scale — each task opens SSH connections. For thousands of nodes, you need strategies like connection pipelining and fact caching. Also, Ansible can't continuously converge like an agent that runs on a schedule — you must re-run the playbook explicitly (or schedule it). For most deployments under 1000 nodes, agentless is the right tradeoff.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="module-footer">
+        <div class="module-footer-inner">
+            <a href="module-14.html" class="footer-nav-btn prev-btn">
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Previous Module</span>
+                    <span class="nav-btn-title">Module 14 — Python</span>
+                </div>
+            </a>
+            <a href="module-16.html" class="footer-nav-btn next-btn">
+                <div class="nav-btn-text">
+                    <span class="nav-btn-label">Next Module</span>
+                    <span class="nav-btn-title">Module 16 — Monitoring</span>
+                </div>
+                <div class="nav-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        function toggleInterview(el) {
+            el.closest('.interview-card').classList.toggle('open');
+        }
+
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = [...document.querySelectorAll('.content-section, .project-walkthrough, .interview-section')];
+        const linkById = {};
+        tocLinks.forEach(l => { linkById[l.getAttribute('href').slice(1)] = l; });
+
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(l => l.classList.remove('active'));
+                    const link = linkById[entry.target.id];
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(s => spy.observe(s));
+    </script>
+</body>
+</html>
